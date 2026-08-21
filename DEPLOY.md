@@ -19,11 +19,22 @@ Output is ~46 MB: a 39 MB `index.wasm` (the engine) and a 7.8 MB `index.pck`
 ## Deploy to Vercel
 
 ```bash
-npx vercel deploy build/web --prod
+cp vercel.json build/web/
+npx vercel deploy build/web --prod --yes
 ```
 
-The first run asks you to log in and name the project. `vercel.json` at the repo
-root supplies the headers and MIME types described below.
+**The copy is not optional.** `build/web` is deployed as the site root, so a
+`vercel.json` sitting at the repo root is outside the upload and is silently
+ignored -- the headers and cache rules below simply never apply, with no error
+to tell you. Exporting wipes `build/web`, so the copy has to be repeated after
+every export.
+
+**Deployment Protection must be off for the game to be public.** Vercel enables
+it by default on new projects: every request 302s to `vercel.com/sso-api` and
+only someone logged into the owning account can load the page. Turn it off in
+the Vercel dashboard under Settings -> Deployment Protection -> Vercel
+Authentication -> Disabled. Verify with `curl -o /dev/null -w "%{http_code}"`
+against the deployment URL -- a public site answers 200, a protected one 302.
 
 ## Deploy anywhere else
 
