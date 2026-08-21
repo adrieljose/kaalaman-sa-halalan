@@ -1,7 +1,7 @@
 [gd_scene load_steps=16 format=3]
 
 [ext_resource type="Script" path="res://scripts/main_menu.gd" id="1"]
-[ext_resource type="Texture2D" path="res://assets/images/backgrounds/menu_plaza.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/images/backgrounds/menu_updated.png" id="2"]
 [ext_resource type="Texture2D" path="res://assets/images/backgrounds/chapter_map.png" id="7"]
 [ext_resource type="Texture2D" path="res://assets/images/ui/button_banner.png" id="4"]
 [ext_resource type="FontFile" path="res://assets/fonts/TitanOne-Regular.ttf" id="5"]
@@ -118,6 +118,7 @@ anchor_bottom = 1.0
 texture = ExtResource("2")
 expand_mode = 1
 stretch_mode = 6
+texture_filter = 2
 
 [node name="TitleLogo" type="TextureRect" parent="."]
 layout_mode = 0
