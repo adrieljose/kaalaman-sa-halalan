@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/images/portraits/enemy_kapitan_komisyon.png" id="2"]
+[ext_resource type="Resource" path="res://data/moves/kapitan_komisyon_under_the_table.tres" id="3"]
+[ext_resource type="Resource" path="res://data/moves/kapitan_komisyon_ghost_payroll.tres" id="4"]
+[ext_resource type="Resource" path="res://data/moves/kapitan_komisyon_tong_collection.tres" id="5"]
+[ext_resource type="Texture2D" path="res://assets/images/backgrounds/battle_court.png" id="6"]
+
+[resource]
+script = ExtResource("1")
+enemy_name = "Kapitan Komisyon"
+title = "The Ten Percent"
+max_hp = 180
+portrait = ExtResource("2")
+background = ExtResource("6")
+lore = "Every permit, every contract, every sack of relief goods passes through his hands — and every one of them comes out a little lighter."
+is_boss = false
+moves = [ExtResource("3"), ExtResource("4"), ExtResource("5")]
+idle_dir = "res://assets/images/characters/kapitan_komisyon_idle"
+idle_count = 5
+attack_dir = "res://assets/images/characters/kapitan_komisyon_attack"
+attack_count = 7
+hit_dir = "res://assets/images/characters/kapitan_komisyon_hit"
+hit_count = 5

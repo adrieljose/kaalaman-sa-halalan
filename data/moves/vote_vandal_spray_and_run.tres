@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="EnemyMove" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_move.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/images/moves/spray_and_run.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+move_id = "spray_and_run"
+move_name = "Spray and Run"
+description = "One quick tag, then he is gone before anyone turns around."
+icon = ExtResource("2")
+direct_damage = 11
+animation_style = "lunge"
+effect_color = Color(0.35, 0.90, 0.45, 0.95)

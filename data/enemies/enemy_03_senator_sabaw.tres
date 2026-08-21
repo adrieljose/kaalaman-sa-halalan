@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/images/portraits/enemy_senator_sabaw.png" id="2"]
+[ext_resource type="Resource" path="res://data/moves/senator_sabaw_word_salad.tres" id="3"]
+[ext_resource type="Resource" path="res://data/moves/senator_sabaw_sabaw_splash.tres" id="4"]
+[ext_resource type="Resource" path="res://data/moves/senator_sabaw_filibuster.tres" id="5"]
+[ext_resource type="Texture2D" path="res://assets/images/backgrounds/battle_session_hall.png" id="6"]
+
+[resource]
+script = ExtResource("1")
+enemy_name = "Senator Sabaw"
+title = "The Empty Chair"
+max_hp = 160
+portrait = ExtResource("2")
+background = ExtResource("6")
+lore = "Twenty-two years in the Senate and not one bill with his name on it. He attends every hearing and remembers none of them."
+is_boss = false
+moves = [ExtResource("3"), ExtResource("4"), ExtResource("5")]
+idle_dir = "res://assets/images/characters/senator_sabaw_idle"
+idle_count = 5
+attack_dir = "res://assets/images/characters/senator_sabaw_attack"
+attack_count = 7
+hit_dir = "res://assets/images/characters/senator_sabaw_hit"
+hit_count = 5

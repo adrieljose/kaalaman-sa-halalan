@@ -1,0 +1,656 @@
+[gd_scene format=3 uid="uid://cevseu8f16qf5"]
+
+[ext_resource type="Script" uid="uid://cl5xesk1jcmis" path="res://scripts/word_battle_controller.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/ui/heart_row.tscn" id="2"]
+[ext_resource type="Texture2D" uid="uid://bcr08r8l5v1k" path="res://assets/images/backgrounds/battle_library.png" id="5"]
+[ext_resource type="Texture2D" uid="uid://bfv37gnmr8kkl" path="res://assets/images/ui/chapter_banner.png" id="9"]
+[ext_resource type="Texture2D" uid="uid://dk333642dyvut" path="res://assets/images/ui/console_bar.png" id="10"]
+[ext_resource type="Script" uid="uid://dk8inlfqueea4" path="res://scripts/ui/animated_character.gd" id="11"]
+[ext_resource type="Texture2D" uid="uid://dhpv55cw46crv" path="res://assets/images/potions/potion_health.png" id="12"]
+[ext_resource type="Texture2D" uid="uid://cixjuua4b0gdn" path="res://assets/images/potions/potion_power.png" id="13"]
+[ext_resource type="Texture2D" uid="uid://dyg7evox3vvb8" path="res://assets/images/potions/potion_purify.png" id="14"]
+[ext_resource type="Script" uid="uid://0ibljdcnmtx7" path="res://scripts/board_controller.gd" id="15"]
+[ext_resource type="PackedScene" path="res://scenes/ui/letter_tile.tscn" id="16"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_badge"]
+bg_color = Color(0.09, 0.06, 0.04, 0.85)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.72, 0.56, 0.22, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.09, 0.06, 0.04, 0.9)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0.72, 0.56, 0.22, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+shadow_color = Color(0, 0, 0, 0.5)
+shadow_size = 6
+shadow_offset = Vector2(3, 3)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_health_potion"]
+bg_color = Color(0.55, 0.16, 0.16, 0.75)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.85, 0.75, 0.5, 0.8)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_power_potion"]
+bg_color = Color(0.18, 0.45, 0.22, 0.75)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.85, 0.75, 0.5, 0.8)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_purify_potion"]
+bg_color = Color(0.2, 0.34, 0.6, 0.75)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.85, 0.75, 0.5, 0.8)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_timer_bg"]
+bg_color = Color(0.16, 0.11, 0.06, 0.95)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_timer_fill"]
+bg_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_board"]
+bg_color = Color(0.15, 0.1, 0.06, 0.95)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0.72, 0.56, 0.22, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+shadow_color = Color(0, 0, 0, 0.5)
+shadow_size = 6
+shadow_offset = Vector2(3, 3)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_shuffle_well"]
+bg_color = Color(0.25, 0.35, 0.55, 0.55)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.85, 0.75, 0.5, 0.8)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_attack_well"]
+bg_color = Color(0.55, 0.2, 0.18, 0.55)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.85, 0.75, 0.5, 0.8)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_menu_well"]
+bg_color = Color(0.55, 0.45, 0.15, 0.55)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.85, 0.75, 0.5, 0.8)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[node name="WordBattle" type="Control" unique_id=169442608]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+
+[node name="Background" type="TextureRect" parent="." unique_id=1167607811]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("5")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="ChapterBanner" type="TextureRect" parent="." unique_id=2141761873]
+layout_mode = 0
+offset_right = 640.0
+offset_bottom = 50.0
+texture = ExtResource("9")
+expand_mode = 1
+stretch_mode = 1
+
+[node name="HeaderBar" type="ColorRect" parent="." unique_id=706654966]
+layout_mode = 0
+offset_right = 640.0
+offset_bottom = 50.0
+color = Color(0.05, 0.03, 0.02, 0.4)
+
+[node name="ChapterLabel" type="Label" parent="." unique_id=126626588]
+layout_mode = 0
+offset_right = 640.0
+offset_bottom = 14.0
+theme_override_colors/font_color = Color(1, 0.92, 0.75, 0.95)
+theme_override_font_sizes/font_size = 10
+text = "CHAPTER 1 — LORD TRAPO, THE DYNASTY HEIR"
+horizontal_alignment = 1
+
+[node name="ChapterBadge" type="PanelContainer" parent="." unique_id=166276627]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 2.0
+offset_right = 46.0
+offset_bottom = 15.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_badge")
+
+[node name="ChapterBadgeLabel" type="Label" parent="ChapterBadge" unique_id=2001903779]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.5, 1)
+theme_override_font_sizes/font_size = 8
+text = "CH. 1"
+horizontal_alignment = 1
+
+[node name="TopBar" type="Control" parent="." unique_id=491181595]
+anchors_preset = 0
+anchor_right = 1.0
+
+[node name="PlayerPanel" type="VBoxContainer" parent="TopBar" unique_id=1419578995]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 6.0
+offset_right = 333.0
+offset_bottom = 50.0
+theme_override_constants/separation = 3
+
+[node name="PlayerNameLabel" type="Label" parent="TopBar/PlayerPanel" unique_id=1992449097]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "You"
+
+[node name="PlayerHeartRow" parent="TopBar/PlayerPanel" unique_id=49942021 instance=ExtResource("2")]
+layout_mode = 2
+
+[node name="EnemyPanel" type="VBoxContainer" parent="TopBar" unique_id=1047283935]
+layout_mode = 0
+offset_left = 380.0
+offset_top = 4.0
+offset_right = 630.0
+offset_bottom = 50.0
+theme_override_constants/separation = 2
+
+[node name="EnemyNameLabel" type="Label" parent="TopBar/EnemyPanel" unique_id=1260502308]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Enemy"
+horizontal_alignment = 2
+
+[node name="EncounterLabel" type="Label" parent="TopBar/EnemyPanel" unique_id=1352039755]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.72, 0.63, 0.48, 1)
+theme_override_font_sizes/font_size = 9
+text = "Encounter 1/5"
+horizontal_alignment = 2
+
+[node name="EnemyHeartRow" parent="TopBar/EnemyPanel" unique_id=1632213904 instance=ExtResource("2")]
+layout_mode = 2
+alignment = 2
+
+[node name="PotionPanel" type="PanelContainer" parent="." unique_id=1525128300]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 55.0
+offset_right = 218.0
+offset_bottom = 138.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="VBox" type="VBoxContainer" parent="PotionPanel" unique_id=1693533965]
+layout_mode = 2
+theme_override_constants/separation = 3
+
+[node name="PotionTitle" type="Label" parent="PotionPanel/VBox" unique_id=525770220]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.55, 1)
+theme_override_font_sizes/font_size = 9
+text = "POTIONS — free action"
+horizontal_alignment = 1
+
+[node name="Row" type="HBoxContainer" parent="PotionPanel/VBox" unique_id=1233091803]
+layout_mode = 2
+theme_override_constants/separation = 4
+alignment = 1
+
+[node name="HealthPotionButton" type="Button" parent="PotionPanel/VBox/Row" unique_id=2095085053]
+custom_minimum_size = Vector2(60, 32)
+layout_mode = 2
+tooltip_text = "Health Potion — restore HP"
+theme_override_colors/font_color = Color(1, 0.96, 0.85, 1)
+theme_override_font_sizes/font_size = 10
+theme_override_styles/normal = SubResource("StyleBoxFlat_health_potion")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_health_potion")
+theme_override_styles/hover = SubResource("StyleBoxFlat_health_potion")
+theme_override_styles/focus = SubResource("StyleBoxFlat_health_potion")
+text = "x2"
+icon = ExtResource("12")
+
+[node name="PowerPotionButton" type="Button" parent="PotionPanel/VBox/Row" unique_id=2097570496]
+custom_minimum_size = Vector2(60, 32)
+layout_mode = 2
+tooltip_text = "Power Up Potion — next word hits harder"
+theme_override_colors/font_color = Color(1, 0.96, 0.85, 1)
+theme_override_font_sizes/font_size = 10
+theme_override_styles/normal = SubResource("StyleBoxFlat_power_potion")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_power_potion")
+theme_override_styles/hover = SubResource("StyleBoxFlat_power_potion")
+theme_override_styles/focus = SubResource("StyleBoxFlat_power_potion")
+text = "x2"
+icon = ExtResource("13")
+
+[node name="PurifyPotionButton" type="Button" parent="PotionPanel/VBox/Row" unique_id=1495516845]
+custom_minimum_size = Vector2(60, 32)
+layout_mode = 2
+tooltip_text = "Purify Potion — clean contamination off the board"
+theme_override_colors/font_color = Color(1, 0.96, 0.85, 1)
+theme_override_font_sizes/font_size = 10
+theme_override_styles/normal = SubResource("StyleBoxFlat_purify_potion")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_purify_potion")
+theme_override_styles/hover = SubResource("StyleBoxFlat_purify_potion")
+theme_override_styles/focus = SubResource("StyleBoxFlat_purify_potion")
+text = "x2"
+icon = ExtResource("14")
+
+[node name="PlayerCharacter" type="TextureRect" parent="." unique_id=1244289755]
+layout_mode = 0
+offset_left = 37.0
+offset_top = 258.0
+offset_right = 167.0
+offset_bottom = 438.0
+expand_mode = 1
+stretch_mode = 5
+script = ExtResource("11")
+idle_dir = "res://assets/images/characters/player_idle"
+idle_count = 5
+attack_dir = "res://assets/images/characters/player_attack"
+attack_count = 7
+hit_dir = "res://assets/images/characters/player_hit"
+hit_count = 5
+walk_dir = "res://assets/images/characters/player_walk"
+walk_count = 9
+
+[node name="EnemyCharacter" type="TextureRect" parent="." unique_id=1797491958]
+layout_mode = 0
+offset_left = 478.0
+offset_top = 265.0
+offset_right = 608.0
+offset_bottom = 445.0
+expand_mode = 1
+stretch_mode = 5
+script = ExtResource("11")
+idle_dir = "res://assets/images/characters/enemy_idle"
+idle_count = 5
+attack_dir = "res://assets/images/characters/enemy_attack"
+attack_count = 7
+hit_dir = "res://assets/images/characters/enemy_hit"
+hit_count = 5
+
+[node name="QuestionPanel" type="PanelContainer" parent="." unique_id=661628994]
+layout_mode = 0
+offset_left = 220.0
+offset_top = 54.0
+offset_right = 479.0
+offset_bottom = 138.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="VBox" type="VBoxContainer" parent="QuestionPanel" unique_id=2031424881]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="QuestionLabel" type="Label" parent="QuestionPanel/VBox" unique_id=893866641]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(1, 0.94, 0.82, 1)
+theme_override_font_sizes/font_size = 12
+text = "Loading question..."
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="TimerBar" type="ProgressBar" parent="QuestionPanel/VBox" unique_id=451065252]
+custom_minimum_size = Vector2(0, 12)
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_timer_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_timer_fill")
+max_value = 10.0
+value = 10.0
+show_percentage = false
+
+[node name="WordTray" type="HBoxContainer" parent="." unique_id=1240371605]
+layout_mode = 0
+offset_top = 143.0
+offset_right = 640.0
+offset_bottom = 175.0
+theme_override_constants/separation = 2
+alignment = 1
+
+[node name="WordPreviewLabel" type="Label" parent="." unique_id=1165481481]
+layout_mode = 0
+offset_left = -5.0
+offset_top = 416.0
+offset_right = 635.0
+offset_bottom = 452.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 13
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BoardFrame" type="PanelContainer" parent="." unique_id=939509226]
+layout_mode = 0
+offset_left = 199.0
+offset_top = 181.0
+offset_right = 442.0
+offset_bottom = 424.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_board")
+
+[node name="Board" type="Control" parent="." unique_id=939509227]
+anchors_preset = 0
+offset_left = 205.0
+offset_top = 187.0
+offset_right = 436.0
+offset_bottom = 418.0
+script = ExtResource("15")
+tile_scene = ExtResource("16")
+
+[node name="SidePanel" type="PanelContainer" parent="." unique_id=304698681]
+layout_mode = 0
+offset_left = 480.0
+offset_top = 55.0
+offset_right = 630.0
+offset_bottom = 136.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="VBox" type="VBoxContainer" parent="SidePanel" unique_id=1700858915]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="MoveIcon" type="TextureRect" parent="SidePanel/VBox" unique_id=1910966403]
+custom_minimum_size = Vector2(28, 28)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="MoveNameLabel" type="Label" parent="SidePanel/VBox" unique_id=1836533137]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.55, 1)
+theme_override_font_sizes/font_size = 12
+text = "Lord Trapo"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="MoveDescLabel" type="Label" parent="SidePanel/VBox" unique_id=99755487]
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+autowrap_mode = 2
+
+[node name="ConsoleBar" type="TextureRect" parent="." unique_id=1352367380]
+layout_mode = 0
+offset_left = 120.0
+offset_top = 454.0
+offset_right = 520.0
+offset_bottom = 480.0
+texture = ExtResource("10")
+expand_mode = 1
+stretch_mode = 1
+
+[node name="ShuffleButton" type="Button" parent="." unique_id=1329667390]
+layout_mode = 0
+offset_left = 135.0
+offset_top = 457.0
+offset_right = 245.0
+offset_bottom = 477.0
+theme_override_colors/font_color = Color(1, 0.96, 0.85, 1)
+theme_override_font_sizes/font_size = 11
+theme_override_styles/normal = SubResource("StyleBoxFlat_shuffle_well")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_shuffle_well")
+theme_override_styles/hover = SubResource("StyleBoxFlat_shuffle_well")
+theme_override_styles/focus = SubResource("StyleBoxFlat_shuffle_well")
+text = "Shuffle"
+
+[node name="AttackButton" type="Button" parent="." unique_id=701208434]
+layout_mode = 0
+offset_left = 260.0
+offset_top = 457.0
+offset_right = 370.0
+offset_bottom = 477.0
+theme_override_colors/font_color = Color(1, 0.96, 0.85, 1)
+theme_override_font_sizes/font_size = 11
+theme_override_styles/normal = SubResource("StyleBoxFlat_attack_well")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_attack_well")
+theme_override_styles/hover = SubResource("StyleBoxFlat_attack_well")
+theme_override_styles/focus = SubResource("StyleBoxFlat_attack_well")
+text = "Attack"
+
+[node name="MenuButton" type="Button" parent="." unique_id=2100164212]
+layout_mode = 0
+offset_left = 385.0
+offset_top = 457.0
+offset_right = 495.0
+offset_bottom = 477.0
+theme_override_colors/font_color = Color(1, 0.96, 0.85, 1)
+theme_override_font_sizes/font_size = 11
+theme_override_styles/normal = SubResource("StyleBoxFlat_menu_well")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_menu_well")
+theme_override_styles/hover = SubResource("StyleBoxFlat_menu_well")
+theme_override_styles/focus = SubResource("StyleBoxFlat_menu_well")
+text = "Menu"
+
+[node name="TransitionVeil" type="ColorRect" parent="." unique_id=1584023184]
+visible = false
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+color = Color(0.02, 0.01, 0.01, 0)
+
+[node name="EncounterBanner" type="PanelContainer" parent="." unique_id=513718131]
+visible = false
+layout_mode = 0
+offset_left = 150.0
+offset_top = 175.0
+offset_right = 490.0
+offset_bottom = 245.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="VBox" type="VBoxContainer" parent="EncounterBanner" unique_id=1358730921]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="BannerTitleLabel" type="Label" parent="EncounterBanner/VBox" unique_id=1386056345]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.78, 0.68, 0.5, 1)
+theme_override_font_sizes/font_size = 11
+text = "Encounter 2 of 5"
+horizontal_alignment = 1
+
+[node name="BannerNameLabel" type="Label" parent="EncounterBanner/VBox" unique_id=949837370]
+layout_mode = 2
+theme_override_font_sizes/font_size = 17
+text = "Vote Vandal"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="PauseOverlay" type="Control" parent="." unique_id=1864554470]
+process_mode = 2
+visible = false
+anchors_preset = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Dim" type="ColorRect" parent="PauseOverlay" unique_id=970602599]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.02, 0.01, 0.01, 0.6)
+
+[node name="PauseMainPanel" type="PanelContainer" parent="PauseOverlay" unique_id=482209236]
+layout_mode = 0
+offset_left = 195.0
+offset_top = 135.0
+offset_right = 445.0
+offset_bottom = 325.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="VBox" type="VBoxContainer" parent="PauseOverlay/PauseMainPanel" unique_id=959860085]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="PauseTitle" type="Label" parent="PauseOverlay/PauseMainPanel/VBox" unique_id=497730496]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.5, 1)
+theme_override_font_sizes/font_size = 18
+text = "PAUSED"
+horizontal_alignment = 1
+
+[node name="ResumeButton" type="Button" parent="PauseOverlay/PauseMainPanel/VBox" unique_id=1661011745]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "Resume"
+
+[node name="OptionsButton" type="Button" parent="PauseOverlay/PauseMainPanel/VBox" unique_id=1166332038]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "Options"
+
+[node name="TitleButton" type="Button" parent="PauseOverlay/PauseMainPanel/VBox" unique_id=10393957]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "Title Page"
+
+[node name="PauseOptionsPanel" type="PanelContainer" parent="PauseOverlay" unique_id=791472063]
+visible = false
+layout_mode = 0
+offset_left = 195.0
+offset_top = 135.0
+offset_right = 445.0
+offset_bottom = 325.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="VBox" type="VBoxContainer" parent="PauseOverlay/PauseOptionsPanel" unique_id=384341580]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="OptionsTitle" type="Label" parent="PauseOverlay/PauseOptionsPanel/VBox" unique_id=503911319]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.5, 1)
+theme_override_font_sizes/font_size = 16
+text = "OPTIONS"
+horizontal_alignment = 1
+
+[node name="MusicLabel" type="Label" parent="PauseOverlay/PauseOptionsPanel/VBox" unique_id=685036846]
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "Music volume"
+
+[node name="MusicSlider" type="HSlider" parent="PauseOverlay/PauseOptionsPanel/VBox" unique_id=2049878248]
+custom_minimum_size = Vector2(0, 16)
+layout_mode = 2
+theme_override_styles/slider = SubResource("StyleBoxFlat_timer_bg")
+theme_override_styles/grabber_area = SubResource("StyleBoxFlat_timer_fill")
+theme_override_styles/grabber_area_highlight = SubResource("StyleBoxFlat_timer_fill")
+value = 100.0
+
+[node name="SfxLabel" type="Label" parent="PauseOverlay/PauseOptionsPanel/VBox" unique_id=202549293]
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "Sound effects volume"
+
+[node name="SfxSlider" type="HSlider" parent="PauseOverlay/PauseOptionsPanel/VBox" unique_id=803446455]
+custom_minimum_size = Vector2(0, 16)
+layout_mode = 2
+theme_override_styles/slider = SubResource("StyleBoxFlat_timer_bg")
+theme_override_styles/grabber_area = SubResource("StyleBoxFlat_timer_fill")
+theme_override_styles/grabber_area_highlight = SubResource("StyleBoxFlat_timer_fill")
+value = 100.0
+
+[node name="BackButton" type="Button" parent="PauseOverlay/PauseOptionsPanel/VBox" unique_id=92382695]
+custom_minimum_size = Vector2(0, 26)
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "Back"
+
+[node name="ResultOverlay" type="PanelContainer" parent="." unique_id=2000654719]
+visible = false
+layout_mode = 0
+offset_left = 170.0
+offset_top = 180.0
+offset_right = 470.0
+offset_bottom = 300.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="VBox" type="VBoxContainer" parent="ResultOverlay" unique_id=139224791]
+layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="ResultLabel" type="Label" parent="ResultOverlay/VBox" unique_id=95319859]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Victory!"
+horizontal_alignment = 1
+
+[node name="TryAgainButton" type="Button" parent="ResultOverlay/VBox" unique_id=664771667]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Try Again"

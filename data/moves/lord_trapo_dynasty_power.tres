@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="EnemyMove" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_move.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/images/moves/dynasty_crest.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+move_id = "dynasty_power"
+move_name = "Dynasty Power"
+description = "Three generations of influence, weaponized against you."
+icon = ExtResource("2")
+direct_damage = 10
+animation_style = "slam"
+effect_color = Color(0.85, 0.66, 0.22, 0.95)
+attack_dir = "res://assets/images/characters/lord_trapo_dynasty"
+attack_count = 6

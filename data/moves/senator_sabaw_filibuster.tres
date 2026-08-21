@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="EnemyMove" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_move.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/images/moves/filibuster.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+move_id = "filibuster"
+move_name = "Filibuster"
+description = "Talks until the session closes and nothing at all passes."
+icon = ExtResource("2")
+direct_damage = 8
+animation_style = "curse"
+effect_color = Color(0.70, 0.64, 0.48, 0.95)

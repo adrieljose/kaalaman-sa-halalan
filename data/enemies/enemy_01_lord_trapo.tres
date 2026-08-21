@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/images/portraits/enemy_lord_trapo.png" id="2"]
+[ext_resource type="Resource" path="res://data/moves/lord_trapo_padrino_favor.tres" id="4"]
+[ext_resource type="Resource" path="res://data/moves/lord_trapo_dynasty_power.tres" id="5"]
+[ext_resource type="Resource" path="res://data/moves/lord_trapo_smear_campaign.tres" id="6"]
+[ext_resource type="Texture2D" path="res://assets/images/backgrounds/battle_library.png" id="7"]
+
+[resource]
+script = ExtResource("1")
+enemy_name = "Lord Trapo"
+title = "The Dynasty Heir"
+max_hp = 120
+portrait = ExtResource("2")
+background = ExtResource("7")
+lore = "Third-generation mayor, congressman, and now this. His family's name is on every plaza, gym, and relief-goods sack in the province — never mind who actually paid for them."
+is_boss = false
+moves = [ExtResource("4"), ExtResource("5"), ExtResource("6")]
+idle_dir = "res://assets/images/characters/lord_trapo_idle"
+idle_count = 4
+attack_dir = "res://assets/images/characters/lord_trapo_smear"
+attack_count = 7
+hit_dir = "res://assets/images/characters/lord_trapo_hit"
+hit_count = 6
+walk_dir = "res://assets/images/characters/lord_trapo_walk"
+walk_count = 6

@@ -1,0 +1,19 @@
+# Godot
+.godot/
+export_presets.cfg.bak
+
+# Web build output — regenerate with the command in DEPLOY.md
+build/
+
+# Editor / OS noise
+*.tmp
+Thumbs.db
+
+# Local tool config — NOT for version control.
+# .codex/config.toml holds a plaintext PixelLab API key, and settings.local.json
+# is this machine's own permission list. Neither belongs in a shared history.
+.codex/
+.claude/settings.local.json
+
+# Graphics-driver logs that appear in the project root on Windows.
+NVIDIA Corporation/

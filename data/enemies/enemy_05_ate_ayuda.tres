@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/images/portraits/enemy_ate_ayuda.png" id="2"]
+[ext_resource type="Resource" path="res://data/moves/ate_ayuda_relief_goods_blitz.tres" id="3"]
+[ext_resource type="Resource" path="res://data/moves/ate_ayuda_tarpaulin_wall.tres" id="4"]
+[ext_resource type="Resource" path="res://data/moves/ate_ayuda_medical_mission.tres" id="5"]
+[ext_resource type="Texture2D" path="res://assets/images/backgrounds/battle_plaza.png" id="6"]
+
+[resource]
+script = ExtResource("1")
+enemy_name = "Ate Ayuda"
+title = "The Patroness"
+max_hp = 300
+portrait = ExtResource("2")
+background = ExtResource("6")
+lore = "She has never held office and has never needed to. Her face is on every rice sack, every ambulance, every basketball court — and when the ballots come, everyone remembers who fed them."
+is_boss = true
+moves = [ExtResource("3"), ExtResource("4"), ExtResource("5")]
+idle_dir = "res://assets/images/characters/ate_ayuda_gen_idle"
+idle_count = 4
+attack_dir = "res://assets/images/characters/ate_ayuda_attack"
+attack_count = 7
+hit_dir = "res://assets/images/characters/ate_ayuda_gen_hit"
+hit_count = 6
+walk_dir = "res://assets/images/characters/ate_ayuda_gen_walk"
+walk_count = 4

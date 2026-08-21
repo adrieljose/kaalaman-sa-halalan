@@ -1,0 +1,3149 @@
+[
+  {
+    "chapter": 1,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "The choice a citizen casts in an election is a ___.",
+    "answer": "VOTE",
+    "fact": "Article V of the 1987 Constitution gives every Filipino citizen aged 18 or older the right to vote."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "A Filipino registered to cast a ballot is a ___.",
+    "answer": "VOTER",
+    "fact": "To register you must be a Filipino citizen, at least 18 on election day, and a resident of your area for six months."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "The sheet a voter marks their choices on is the ___.",
+    "answer": "BALLOT",
+    "fact": "The paper ballot is fed into a counting machine, but the paper itself is kept as the official record."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "The agency that administers Philippine elections is the ___.",
+    "answer": "COMELEC",
+    "fact": "COMELEC also registers political parties and decides election disputes."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "The smallest local government unit in the Philippines is the ___.",
+    "answer": "BARANGAY",
+    "fact": "The barangay is the level of government closest to daily life, and every Filipino lives in one."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "A member of the barangay council is a barangay ___.",
+    "answer": "KAGAWAD",
+    "fact": "A Sangguniang Barangay has seven elected Kagawad, who pass the barangay's local ordinances."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "The stain put on a voter's finger to stop double voting is indelible ___.",
+    "answer": "INK",
+    "fact": "Indelible ink marks the finger for days, so one person cannot vote a second time."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "A Filipino must be 18 years of ___ to vote.",
+    "answer": "AGE",
+    "fact": "The 1987 Constitution lowered the voting age from 21 to 18."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "The voting area a citizen is assigned to is their ___.",
+    "answer": "PRECINCT",
+    "fact": "COMELEC assigns your precinct from your registered address, so moving house means transferring your registration."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "A Filipino's vote is meant to stay ___.",
+    "answer": "SECRET",
+    "fact": "The Constitution requires a secret ballot, which is exactly what makes a bought vote impossible to enforce."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "After the polls close, officials ___ the votes.",
+    "answer": "COUNT",
+    "fact": "Counting happens at the precinct in public view, where accredited watchers may observe."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "The place where citizens go to vote is often called the ___.",
+    "answer": "POLLS",
+    "fact": "Polling places are usually public schools, staffed by teachers serving on the electoral board."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "A vote-counting ___ reads the marked ballots.",
+    "answer": "MACHINE",
+    "fact": "The machine prints a receipt so a voter can confirm it read their ballot correctly."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "Registered voters appear on the official voters' ___.",
+    "answer": "LIST",
+    "fact": "You can check that your name is on the list before election day through COMELEC's precinct finder."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "Only a Filipino ___ may register to vote.",
+    "answer": "CITIZEN",
+    "fact": "Citizenship, age and residence are the only requirements; the Constitution forbids any literacy or property test."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "The polling place staff on election day are usually a ___ from the school.",
+    "answer": "TEACHER",
+    "fact": "Public school teachers make up the electoral board, and serving on it is a legal duty."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "The Filipino word for a vote is ___.",
+    "answer": "BOTO",
+    "fact": "The reminder 'ang boto mo ay mahalaga' captures why turnout matters: uncast votes still change the result."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "Citizens vote to choose a ___.",
+    "answer": "LEADER",
+    "fact": "In a barangay election you choose a Punong Barangay and seven Kagawad on the same ballot."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "In a democracy, power comes from the ___.",
+    "answer": "PEOPLE",
+    "fact": "The Constitution states that sovereignty resides in the people and all government authority comes from them."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "Voting is both a duty and a ___.",
+    "answer": "RIGHT",
+    "fact": "Suffrage is a right the Constitution protects, though voting is not compulsory in the Philippines."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "An honest election must be ___ and fair.",
+    "answer": "FREE",
+    "fact": "COMELEC's mandate is to hold free, orderly, honest, peaceful and credible elections."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "Voting gives a citizen a ___ in government.",
+    "answer": "VOICE",
+    "fact": "Between elections citizens can still be heard at the barangay assembly, which meets at least twice a year."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "Every citizen's vote counts as ___.",
+    "answer": "EQUAL",
+    "fact": "One person, one vote: a wealthy voter's ballot counts exactly the same as a poor voter's."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "An elected official is chosen to ___ the public.",
+    "answer": "SERVE",
+    "fact": "Article XI of the Constitution declares that public office is a public trust."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "Public office is a public ___.",
+    "answer": "TRUST",
+    "fact": "Officials must act with integrity and remain accountable to the people at all times."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "The SK gives the ___ a voice in the barangay.",
+    "answer": "YOUTH",
+    "fact": "Sangguniang Kabataan officials are elected by and from Filipinos aged 15 to 30."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "The youth council in every barangay is the Sangguniang ___.",
+    "answer": "KABATAAN",
+    "fact": "The SK chairperson also sits on the Sangguniang Barangay as its eighth member."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "Young voters help decide the country's ___.",
+    "answer": "FUTURE",
+    "fact": "Young Filipinos form one of the largest voting blocs, so turnout among them can decide close races."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "Government should act for the ___ good.",
+    "answer": "COMMON",
+    "fact": "A barangay project is meant to serve the whole community, not only the officials' supporters."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "easy",
+    "category": "candidate",
+    "prompt": "A person running for public office is a ___.",
+    "answer": "CANDIDATE",
+    "fact": "Someone becomes an official candidate only after filing a Certificate of Candidacy with COMELEC."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "easy",
+    "category": "candidate",
+    "prompt": "The form filed to run for office is the ___.",
+    "answer": "COC",
+    "fact": "The Certificate of Candidacy names the office sought and declares that the filer is eligible for it."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "easy",
+    "category": "candidate",
+    "prompt": "A candidate should explain their ___ for the community.",
+    "answer": "PLAN",
+    "fact": "Always ask how a plan will be paid for: a barangay's funds come largely from its share of national taxes."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "easy",
+    "category": "candidate",
+    "prompt": "A public campaign gathering is a ___.",
+    "answer": "RALLY",
+    "fact": "Campaigning outside the official campaign period set by COMELEC is prohibited."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "easy",
+    "category": "candidate",
+    "prompt": "Candidates answer questions side by side in a ___.",
+    "answer": "DEBATE",
+    "fact": "A barangay debate lets voters compare plans directly instead of judging by posters alone."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "easy",
+    "category": "candidate",
+    "prompt": "Printed campaign material displayed in public is a ___.",
+    "answer": "POSTER",
+    "fact": "COMELEC limits poster size and allows them only in designated common poster areas."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "easy",
+    "category": "candidate",
+    "prompt": "A candidate's past performance is their track ___.",
+    "answer": "RECORD",
+    "fact": "Attendance at council sessions and finished projects are checkable evidence, unlike promises."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "easy",
+    "category": "candidate",
+    "prompt": "A realistic plan must fit the barangay's ___.",
+    "answer": "BUDGET",
+    "fact": "A barangay must set aside part of its budget for the SK and for disaster risk reduction."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "easy",
+    "category": "candidate",
+    "prompt": "The length of time an official serves is their ___.",
+    "answer": "TERM",
+    "fact": "Republic Act 12232 set a four-year term for barangay and SK officials and moved the elections to the first Monday of November 2026."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "easy",
+    "category": "candidate",
+    "prompt": "A winner takes an ___ of office before serving.",
+    "answer": "OATH",
+    "fact": "The oath binds the official to defend the Constitution and discharge their duties faithfully."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "easy",
+    "category": "candidate",
+    "prompt": "A group of candidates with shared aims is a political ___.",
+    "answer": "PARTY",
+    "fact": "Barangay and SK elections are non-partisan, so candidates there run without party backing."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "easy",
+    "category": "candidate",
+    "prompt": "Voters should look for an ___ candidate.",
+    "answer": "HONEST",
+    "fact": "Officials file a yearly statement of assets, liabilities and net worth that the public may inspect."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "easy",
+    "category": "fraud",
+    "prompt": "Paying someone for their vote is vote ___.",
+    "answer": "BUYING",
+    "fact": "Vote buying is an election offense, and the law can hold both the giver and the receiver liable."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "easy",
+    "category": "fraud",
+    "prompt": "Using a ___ to force someone's vote is illegal.",
+    "answer": "THREAT",
+    "fact": "Intimidating a voter is an election offense; report it to COMELEC or to a poll watcher."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "easy",
+    "category": "fraud",
+    "prompt": "A ___ news post can mislead voters.",
+    "answer": "FAKE",
+    "fact": "Check a surprising election claim against COMELEC's official channels before sharing it."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "easy",
+    "category": "fraud",
+    "prompt": "An unverified claim passed between people is a ___.",
+    "answer": "RUMOR",
+    "fact": "A claim repeated many times does not become true; trace it back to its original source."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "easy",
+    "category": "fraud",
+    "prompt": "A serious accusation needs ___.",
+    "answer": "PROOF",
+    "fact": "Ask who published a claim, when they published it, and what evidence they actually showed."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "easy",
+    "category": "fraud",
+    "prompt": "Carrying firearms is barred during the election period under the ___.",
+    "answer": "GUNBAN",
+    "display": "GUN BAN",
+    "fact": "COMELEC imposes a nationwide gun ban for the whole election period to keep the polls peaceful."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "easy",
+    "category": "fraud",
+    "prompt": "A person who monitors the polls for a group is a poll ___.",
+    "answer": "WATCHER",
+    "fact": "Accredited watchers may observe the counting and receive their own copy of the results."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "easy",
+    "category": "fraud",
+    "prompt": "A voter who witnesses cheating should ___ it.",
+    "answer": "REPORT",
+    "fact": "COMELEC runs reporting hotlines and an anti-vote-buying campaign for exactly this purpose."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "easy",
+    "category": "fraud",
+    "prompt": "Before believing a claim, check its ___.",
+    "answer": "SOURCE",
+    "fact": "An official result comes from COMELEC, not from a social media post or a group chat forward."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "The elected head of a barangay is the ___.",
+    "answer": "PUNONGBARANGAY",
+    "display": "PUNONG BARANGAY",
+    "fact": "The Punong Barangay presides over the Sangguniang Barangay but may only vote to break a tie."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "The local legislative council of an LGU is called the ___.",
+    "answer": "SANGGUNIAN",
+    "fact": "The barangay's version, the Sangguniang Barangay, passes ordinances binding within the barangay."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "The right of citizens to vote is called ___.",
+    "answer": "SUFFRAGE",
+    "fact": "Article V of the Constitution bars any literacy, property or other substantive test on suffrage."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "Living in an area long enough to vote there is the ___ requirement.",
+    "answer": "RESIDENCY",
+    "fact": "A voter must have lived in the Philippines for one year and in their locality for six months."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "A voter who moves to a new city files a ___ of registration.",
+    "answer": "TRANSFER",
+    "fact": "Without transferring, your name stays in your old precinct and you must return there to vote."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "The fingerprint and photo taken at registration are a voter's ___.",
+    "answer": "BIOMETRICS",
+    "fact": "Biometrics let COMELEC detect one person registering twice under different names."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "Adding up precinct results to get a total is called ___.",
+    "answer": "CANVASSING",
+    "fact": "Canvassing happens in public before a board of canvassers, with watchers entitled to observe."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "The board of canvassers will ___ the winners.",
+    "answer": "PROCLAIM",
+    "fact": "Only proclamation makes a win official; leading an unofficial tally is not the same as winning."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "A voter who deliberately leaves a race blank chooses to ___.",
+    "answer": "ABSTAIN",
+    "fact": "An abstention is not an invalid ballot: the rest of your choices are still counted."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "Marking more names than allowed in a race is an ___.",
+    "answer": "OVERVOTE",
+    "fact": "Only the over-voted race is voided; your other choices on the same ballot still count."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "The share of registered voters who actually vote is the ___.",
+    "answer": "TURNOUT",
+    "fact": "Philippine turnout is high by world standards, often well above two thirds of registered voters."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "All the people entitled to vote form the ___.",
+    "answer": "ELECTORATE",
+    "fact": "The electorate grows every election as newly registered 18-year-olds join the rolls."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "A direct vote to approve a proposed change to law is a ___.",
+    "answer": "PLEBISCITE",
+    "fact": "Creating, merging or abolishing a barangay requires a plebiscite among the affected voters."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "The seat of barangay government is the ___.",
+    "answer": "BARANGAYHALL",
+    "display": "BARANGAY HALL",
+    "fact": "The barangay hall is where the council meets and where residents file blotter reports and clearances."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "A local law passed by a Sanggunian is an ___.",
+    "answer": "ORDINANCE",
+    "fact": "A barangay ordinance binds only within that barangay and cannot override national law."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "Government where citizens choose their leaders is a ___.",
+    "answer": "DEMOCRACY",
+    "fact": "The Constitution calls the Philippines a democratic and republican state where sovereignty resides in the people."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "The protection that keeps a vote unknown is ballot ___.",
+    "answer": "SECRECY",
+    "fact": "Secrecy is a safeguard, not a courtesy: it is what makes buying or coercing a vote unenforceable."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "Officials must be ___ to the people who elected them.",
+    "answer": "ACCOUNTABLE",
+    "fact": "Article XI makes public officials accountable and provides for their removal from office."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "Open and inspectable government processes are ___.",
+    "answer": "TRANSPARENT",
+    "fact": "Barangay budgets must be posted publicly so residents can see how funds are spent."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "Freedom from corruption or improper influence is ___.",
+    "answer": "INTEGRITY",
+    "fact": "Officials swear to serve with integrity and file yearly declarations of their wealth."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "The meeting where barangay residents are consulted is the barangay ___.",
+    "answer": "ASSEMBLY",
+    "fact": "The barangay assembly must be held at least twice a year and any resident may attend."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "A state where power is exercised through elected representatives is a ___.",
+    "answer": "REPUBLIC",
+    "fact": "The Philippines is a democratic and republican state under Article II of the Constitution."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "In the Philippines the people are ___.",
+    "answer": "SOVEREIGN",
+    "fact": "Sovereignty resides in the people, and all government authority comes from them."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "A voter who decides using reliable information is an ___ voter.",
+    "answer": "INFORMED",
+    "fact": "Comparing a candidate's record against their promises is the core habit of informed voting."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "Teaching citizens their electoral rights is voter ___.",
+    "answer": "EDUCATION",
+    "fact": "COMELEC and schools run voter education drives before every election."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "Making sure every group can take part is ___.",
+    "answer": "INCLUSION",
+    "fact": "Persons with disabilities, seniors and detainees have special voting arrangements so they are not excluded."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "Polling places must be ___ to voters with disabilities.",
+    "answer": "ACCESSIBLE",
+    "fact": "COMELEC provides ground-floor accessible polling places and allows an assistor for those who need one."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "Citizens who take part in public life ___.",
+    "answer": "PARTICIPATE",
+    "fact": "Voting is one form of participation; attending the barangay assembly is another."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "The authority voters give a winner is their ___.",
+    "answer": "MANDATE",
+    "fact": "A mandate is limited by law: an official may only exercise the powers the office actually has."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "Article XI says public office is a ___.",
+    "answer": "PUBLICTRUST",
+    "display": "PUBLIC TRUST",
+    "fact": "Officials must serve with responsibility, integrity, loyalty and efficiency, and act with patriotism and justice."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "Election officials must remain ___.",
+    "answer": "IMPARTIAL",
+    "fact": "The electoral board must treat every candidate the same, whatever their own preference."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "Duties a citizen owes the community are ___ duties.",
+    "answer": "CIVIC",
+    "fact": "Registering, voting and reporting offenses are all civic duties in an election."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "A voter's freedom to choose without control is voter ___.",
+    "answer": "AUTONOMY",
+    "fact": "Voting inside a private booth is the practical guarantee of that freedom."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "medium",
+    "category": "candidate",
+    "prompt": "A candidate's stated programme of action is their ___.",
+    "answer": "PLATFORM",
+    "fact": "Ask whether a platform names a funding source; a barangay cannot spend money it does not have."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "medium",
+    "category": "candidate",
+    "prompt": "The period of public persuasion before voting is the ___.",
+    "answer": "CAMPAIGN",
+    "fact": "COMELEC sets fixed campaign period dates, and campaigning outside them is an offense."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "medium",
+    "category": "candidate",
+    "prompt": "Filing a certificate of ___ makes someone an official candidate.",
+    "answer": "CANDIDACY",
+    "fact": "A filer who is not actually eligible for the office can have their certificate cancelled."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "medium",
+    "category": "candidate",
+    "prompt": "COMELEC may reject a ___ candidate.",
+    "answer": "NUISANCE",
+    "fact": "A nuisance candidate is one filing to mock the process or to confuse voters with a similar name."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "medium",
+    "category": "candidate",
+    "prompt": "A candidate must be legally ___ for the office.",
+    "answer": "ELIGIBLE",
+    "fact": "A barangay candidate must be a registered voter of that barangay and a resident for at least one year."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "medium",
+    "category": "candidate",
+    "prompt": "The official currently holding the post is the ___.",
+    "answer": "INCUMBENT",
+    "fact": "An incumbent's record is checkable: look at finished projects and session attendance."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "medium",
+    "category": "candidate",
+    "prompt": "A candidate meeting every legal requirement is ___.",
+    "answer": "QUALIFIED",
+    "fact": "Age, citizenship, residence and voter registration are the basic qualifications for barangay office."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "medium",
+    "category": "candidate",
+    "prompt": "A pledge made while campaigning is a campaign ___.",
+    "answer": "PROMISE",
+    "fact": "Compare a promise against the office's real powers: a Punong Barangay cannot build a national highway."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "medium",
+    "category": "candidate",
+    "prompt": "A plan that can realistically be done is ___.",
+    "answer": "FEASIBLE",
+    "fact": "Feasibility means asking about money, manpower and time, not just whether the idea sounds good."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "medium",
+    "category": "candidate",
+    "prompt": "A specific public works plan is a barangay ___.",
+    "answer": "PROJECT",
+    "fact": "Barangay projects must appear in the barangay development plan before funds can be released."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "medium",
+    "category": "candidate",
+    "prompt": "Work done for the community is public ___.",
+    "answer": "SERVICE",
+    "fact": "Public service is measured by what reaches residents, not by how visible the official is."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "medium",
+    "category": "candidate",
+    "prompt": "A candidate's previous relevant work is their ___.",
+    "answer": "EXPERIENCE",
+    "fact": "Experience is only useful evidence if you can verify it independently."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "medium",
+    "category": "fraud",
+    "prompt": "Padding one candidate's votes while shaving another's is ___.",
+    "answer": "DAGDAGBAWAS",
+    "display": "DAGDAG-BAWAS",
+    "fact": "Dagdag-bawas alters the tally during canvassing, which is why public canvassing and watchers matter."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "medium",
+    "category": "fraud",
+    "prompt": "Someone who votes in a precinct where they do not belong is a ___.",
+    "answer": "FLYINGVOTER",
+    "display": "FLYING VOTER",
+    "fact": "Biometric registration and indelible ink exist specifically to stop flying voters."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "medium",
+    "category": "fraud",
+    "prompt": "Forcing a person to vote a certain way is ___.",
+    "answer": "COERCION",
+    "fact": "Coercion is an election offense whether the pressure comes from an employer, a neighbour or a relative."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "medium",
+    "category": "fraud",
+    "prompt": "An act punished under election law is an election ___.",
+    "answer": "OFFENSE",
+    "fact": "Election offenses can carry imprisonment and disqualification from holding public office."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "medium",
+    "category": "fraud",
+    "prompt": "To spread false claims deliberately is to ___.",
+    "answer": "DISINFORM",
+    "fact": "Disinformation is deliberate; misinformation is the same falsehood shared by someone who believed it."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "A citizen wrongly prevented from voting has been ___.",
+    "answer": "DISENFRANCHISED",
+    "fact": "Failing to vote in two consecutive regular elections can deactivate a registration, which is why reactivation drives exist."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "Restoring a deactivated registration requires ___.",
+    "answer": "REACTIVATION",
+    "fact": "A voter whose record was deactivated must file for reactivation with the local COMELEC office before the deadline."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "The teachers who run a precinct on election day form the ___.",
+    "answer": "ELECTORALBOARD",
+    "display": "ELECTORAL BOARD",
+    "fact": "The board verifies each voter's identity, issues the ballot and oversees the counting machine."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "The document carrying totals up to the next canvassing level is the ___.",
+    "answer": "CERTIFICATEOFCANVASS",
+    "display": "CERTIFICATE OF CANVASS",
+    "fact": "Each certificate of canvass is signed and copies go to watchers, so alterations can be traced."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "Hand-counting sample precincts to check the machines is a random ___.",
+    "answer": "MANUALAUDIT",
+    "display": "MANUAL AUDIT",
+    "fact": "The random manual audit compares hand counts against machine counts in randomly chosen precincts."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "COMELEC's online tool for locating where you vote is the ___.",
+    "answer": "PRECINCTFINDER",
+    "display": "PRECINCT FINDER",
+    "fact": "Checking the precinct finder before election day avoids being turned away at the wrong polling place."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "The official master record of registered voters is the ___.",
+    "answer": "VOTERSREGISTRY",
+    "display": "VOTERS' REGISTRY",
+    "fact": "The registry is maintained continuously, but registration closes months before an election."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "Voter registration in the Philippines is a ___ process.",
+    "answer": "CONTINUING",
+    "fact": "Continuing registration runs year-round at local COMELEC offices, pausing only near an election."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "Detainees and some other voters cast their choices using a ___.",
+    "answer": "SPECIALBALLOT",
+    "display": "SPECIAL BALLOT",
+    "fact": "Detainee voting lets qualified persons in custody vote without having been convicted by final judgment."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "Officials on duty away from their precinct may use ___ voting.",
+    "answer": "LOCALABSENTEE",
+    "display": "LOCAL ABSENTEE",
+    "fact": "Local absentee voting covers government workers and media personnel assigned elsewhere on election day."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "Filipinos abroad take part through ___.",
+    "answer": "OVERSEASVOTING",
+    "display": "OVERSEAS VOTING",
+    "fact": "Overseas Filipinos register at an embassy or consulate and may vote over a period of about a month."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "The link between voters and those they elect is political ___.",
+    "answer": "REPRESENTATION",
+    "fact": "A Kagawad represents the whole barangay, not only the residents who voted for them."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "The formal declaration of a winner is the ___.",
+    "answer": "PROCLAMATION",
+    "fact": "Until proclamation there is no winner in law, however clear an unofficial count appears."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "Filling a mid-term vacancy follows the rules of ___.",
+    "answer": "SUCCESSION",
+    "fact": "If a Punong Barangay's post falls vacant, the highest-ranked Kagawad succeeds to the office."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "The duty of officials to answer for their decisions is ___.",
+    "answer": "ACCOUNTABILITY",
+    "fact": "Article XI provides for impeachment, removal and criminal liability as the machinery of accountability."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "Making government processes open to inspection is ___.",
+    "answer": "TRANSPARENCY",
+    "fact": "Barangays must post their budget and projects publicly, so residents can compare spending against plans."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "Taking an active part in public decisions is civic ___.",
+    "answer": "PARTICIPATION",
+    "fact": "Voting is periodic; attending the barangay assembly gives residents a say between elections."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "The supreme law of the Philippines is the ___.",
+    "answer": "CONSTITUTION",
+    "fact": "The 1987 Constitution created COMELEC as an independent commission so it could not be run by the government of the day."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "Splitting power among branches of government is the ___ of powers.",
+    "answer": "SEPARATION",
+    "fact": "No single official holds all power, which is why a barangay captain cannot simply overrule a court."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "COMELEC's freedom from political control is its ___.",
+    "answer": "INDEPENDENCE",
+    "fact": "Its independence is constitutional: COMELEC has its own budget and commissioners with fixed terms."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "Barring someone from office for a legal reason is ___.",
+    "answer": "DISQUALIFICATION",
+    "fact": "Conviction of certain crimes, or committing an election offense, can disqualify a person from holding office."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "Officials must yearly file a statement of assets, liabilities and net worth, known as the ___.",
+    "answer": "SALN",
+    "fact": "The SALN is a public document, so citizens may inspect whether an official's wealth matches their income."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "A cap on consecutive terms in the same post is a ___.",
+    "answer": "TERMLIMIT",
+    "display": "TERM LIMIT",
+    "fact": "Under Republic Act 12232 a barangay official may serve at most three consecutive terms in the same post, and an SK official only one."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "One family holding many offices at once is a ___.",
+    "answer": "POLITICALDYNASTY",
+    "display": "POLITICAL DYNASTY",
+    "fact": "The Constitution says the State shall prohibit political dynasties, but Congress has never passed the enabling law."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "Deciding a matter you personally profit from is a ___.",
+    "answer": "CONFLICTOFINTEREST",
+    "display": "CONFLICT OF INTEREST",
+    "fact": "An official should abstain when a barangay contract would benefit their own family or business."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "Decisions serving society rather than private gain serve the ___.",
+    "answer": "PUBLICINTEREST",
+    "display": "PUBLIC INTEREST",
+    "fact": "A project chosen because it helps the most residents serves the public interest; one chosen to reward supporters does not."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "Putting a law directly to the voters is a ___.",
+    "answer": "REFERENDUM",
+    "fact": "Referendum, initiative and recall let citizens act directly instead of waiting for the next election."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "Citizens proposing a law themselves use people's ___.",
+    "answer": "INITIATIVE",
+    "fact": "Local initiative lets registered voters propose or repeal a local ordinance by petition."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "Removing a local official by popular vote before the term ends is a ___.",
+    "answer": "RECALL",
+    "fact": "A recall election lets voters replace a local official mid-term, though barangay posts are treated separately."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "Careful public discussion before deciding is ___.",
+    "answer": "DELIBERATION",
+    "fact": "The Sangguniang Barangay must deliberate in session, and its sessions are open to residents."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "Careful management of public resources is ___.",
+    "answer": "STEWARDSHIP",
+    "fact": "Barangay funds are public money, and their use is audited by the Commission on Audit."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "The principle that officials are bound by law just as citizens are is the ___.",
+    "answer": "RULEOFLAW",
+    "display": "RULE OF LAW",
+    "fact": "Holding office is not immunity: an official who commits an election offense faces the same law as anyone else."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "Checking whether public actions follow the rules is ___.",
+    "answer": "OVERSIGHT",
+    "fact": "The Commission on Audit examines government spending, including at barangay level."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "hard",
+    "category": "candidate",
+    "prompt": "Campaigning before the official period is ___ campaigning.",
+    "answer": "PREMATURE",
+    "fact": "Campaign materials may only go up once the COMELEC campaign period has formally begun."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "hard",
+    "category": "candidate",
+    "prompt": "Replacing a candidate who withdraws or dies is ___.",
+    "answer": "SUBSTITUTION",
+    "fact": "Substitution is tightly limited by law, and generally requires the substitute to be from the same party."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "hard",
+    "category": "candidate",
+    "prompt": "Documented past performance in office is a ___.",
+    "answer": "TRACKRECORD",
+    "display": "TRACK RECORD",
+    "fact": "A record is checkable evidence: completed projects, attendance, and audited spending."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "hard",
+    "category": "candidate",
+    "prompt": "Weighing what a project gives against what it costs is a ___ analysis.",
+    "answer": "COSTBENEFIT",
+    "display": "COST-BENEFIT",
+    "fact": "A covered court and a drainage system may cost the same, so ask which one solves the bigger local problem."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "hard",
+    "category": "candidate",
+    "prompt": "A completed and verifiable achievement is an ___.",
+    "answer": "ACCOMPLISHMENT",
+    "fact": "Ask for the completion date and cost; an unfinished project is not an accomplishment."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "hard",
+    "category": "candidate",
+    "prompt": "Ranking which needs to address first is ___.",
+    "answer": "PRIORITIZATION",
+    "fact": "Barangay funds are limited, so a credible candidate can explain what they would fund first and why."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "hard",
+    "category": "candidate",
+    "prompt": "The setting aside of public funds for a purpose is an ___.",
+    "answer": "APPROPRIATION",
+    "fact": "The Sangguniang Barangay passes an annual budget ordinance appropriating the barangay's funds."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "hard",
+    "category": "candidate",
+    "prompt": "The public posting of barangay projects and costs appears on the ___.",
+    "answer": "TRANSPARENCYBOARD",
+    "display": "TRANSPARENCY BOARD",
+    "fact": "Posting projects and their budgets lets any resident check spending without filing a request."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "hard",
+    "category": "candidate",
+    "prompt": "Asking affected residents before deciding is ___.",
+    "answer": "CONSULTATION",
+    "fact": "Barangay development plans are meant to be drawn up with resident consultation, not written behind closed doors."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "hard",
+    "category": "candidate",
+    "prompt": "The barangay's programme of projects is its ___.",
+    "answer": "DEVELOPMENTPLAN",
+    "display": "DEVELOPMENT PLAN",
+    "fact": "A project must appear in the barangay development plan before money can properly be spent on it."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "hard",
+    "category": "candidate",
+    "prompt": "The qualifications a candidate claims are their ___.",
+    "answer": "CREDENTIALS",
+    "fact": "Credentials are worth checking: claimed schooling and past positions are matters of public record."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "hard",
+    "category": "fraud",
+    "prompt": "Giving money or goods in exchange for a vote is ___.",
+    "answer": "VOTEBUYING",
+    "display": "VOTE BUYING",
+    "fact": "COMELEC's anti-vote-buying drive treats both giver and receiver as liable, and the secret ballot means no buyer can verify the vote."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "hard",
+    "category": "fraud",
+    "prompt": "False content created deliberately to deceive is ___.",
+    "answer": "DISINFORMATION",
+    "fact": "Disinformation is manufactured to mislead; misinformation is the same falsehood passed on in good faith."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "hard",
+    "category": "fraud",
+    "prompt": "False content shared by someone who believes it is ___.",
+    "answer": "MISINFORMATION",
+    "fact": "The remedy is the same for both: trace a claim to its source before passing it on."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "hard",
+    "category": "fraud",
+    "prompt": "The skill of telling reliable sources from misleading ones is ___.",
+    "answer": "MEDIALITERACY",
+    "display": "MEDIA LITERACY",
+    "fact": "Check who published a claim, when, and what evidence they showed before believing an election story."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "hard",
+    "category": "fraud",
+    "prompt": "A formal legal challenge to a result is an ___.",
+    "answer": "ELECTIONPROTEST",
+    "display": "ELECTION PROTEST",
+    "fact": "Protests are decided by the courts or COMELEC, not by whoever shouts loudest online."
+  },
+  {
+    "chapter": 1,
+    "difficulty": "hard",
+    "category": "fraud",
+    "prompt": "A coordinated group paid to push political content online is a ___.",
+    "answer": "TROLLFARM",
+    "display": "TROLL FARM",
+    "fact": "Many accounts posting identical wording at the same time is a sign of coordination rather than public opinion."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "The elected leader of a city or town is the ___.",
+    "answer": "MAYOR",
+    "fact": "Mayors serve three-year terms under the Local Government Code."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "The elected chief executive of a city or town is its ___.",
+    "answer": "MAYOR",
+    "fact": "Mayors serve three-year terms under the Local Government Code."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "The second-highest city official is the ___ mayor.",
+    "answer": "VICE",
+    "fact": "The vice mayor presides over the city council."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "Second in command at city hall is the ___ mayor.",
+    "answer": "VICE",
+    "fact": "The vice mayor presides over the city council."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "A mayor may serve up to ___ terms in a row.",
+    "answer": "THREE",
+    "fact": "The three-consecutive-term limit applies to local elective officials generally."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "Local officials, mayors included, are capped at ___ consecutive terms.",
+    "answer": "THREE",
+    "fact": "The three-consecutive-term limit applies to local elective officials generally."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "The lawmaking body of a city or town is the ___.",
+    "answer": "COUNCIL",
+    "fact": "The council passes ordinances for the whole city."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "Local ordinances for a city come from its ___.",
+    "answer": "COUNCIL",
+    "fact": "The council passes ordinances for the whole city."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "fraud",
+    "prompt": "Padding some precinct counts while shaving others is ___-bawas.",
+    "answer": "DAGDAG",
+    "fact": "This can happen during city-level canvassing just as at other levels."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "fraud",
+    "prompt": "City-level canvassing can still be corrupted by ___-bawas.",
+    "answer": "DAGDAG",
+    "fact": "This can happen during city-level canvassing just as at other levels."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "fraud",
+    "prompt": "Registering to vote where you don't actually live enables ___ voting.",
+    "answer": "FLYING",
+    "fact": "It is an election offense with prison time attached."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "fraud",
+    "prompt": "Claiming a false city address just to vote there is ___ voting.",
+    "answer": "FLYING",
+    "fact": "It is an election offense with prison time attached."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "candidate",
+    "prompt": "A law passed by a city council is called an ___.",
+    "answer": "ORDINANCE",
+    "fact": "Ordinances apply only within that local government unit."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "candidate",
+    "prompt": "A city council's local law is formally called an ___.",
+    "answer": "ORDINANCE",
+    "fact": "Ordinances apply only within that local government unit."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "candidate",
+    "prompt": "A candidate's application to run is a Certificate of ___.",
+    "answer": "CANDIDACY",
+    "fact": "It must be filed within the period COMELEC sets."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "candidate",
+    "prompt": "Running for city council or mayor starts with a Certificate of ___.",
+    "answer": "CANDIDACY",
+    "fact": "It must be filed within the period COMELEC sets."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "Roads, parks, and plazas belong to everyone, so they are ___ property.",
+    "answer": "PUBLIC",
+    "fact": "Public funds may never be spent on a candidate's own campaign."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "A plaza built with city funds belongs to everyone, making it ___ property.",
+    "answer": "PUBLIC",
+    "fact": "Public funds may never be spent on a candidate's own campaign."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "A candidate's written set of proposals for the city is their ___.",
+    "answer": "PLATFORM",
+    "fact": "Comparing platforms is a better guide than comparing jingles."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "A mayoral candidate's written agenda for the city is their ___.",
+    "answer": "PLATFORM",
+    "fact": "Comparing platforms is a better guide than comparing jingles."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "The rules on what may be built where in a city are called ___.",
+    "answer": "ZONING",
+    "fact": "Zoning ordinances keep homes separated from factories."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "Rules about what can be built where in a city fall under ___.",
+    "answer": "ZONING",
+    "fact": "Zoning ordinances keep homes separated from factories."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "Relating to a town government rather than a city is ___.",
+    "answer": "MUNICIPAL",
+    "fact": "A municipality is headed by a mayor just like a city."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "A local government unit smaller and rural in character is ___ rather than a city.",
+    "answer": "MUNICIPAL",
+    "fact": "A municipality is headed by a mayor just like a city."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "A city or town councilor in Filipino is a ___.",
+    "answer": "KONSEHAL",
+    "fact": "Konsehal is the everyday term for a city council member."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "The Filipino word for a member of the city council is ___.",
+    "answer": "KONSEHAL",
+    "fact": "Konsehal is the everyday term for a city council member."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "fraud",
+    "prompt": "Money given to induce a vote is the crime of vote ___.",
+    "answer": "BUYING",
+    "fact": "The penalty includes 1 to 6 years imprisonment with no probation."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "fraud",
+    "prompt": "Handing a voter cash to influence a city race is the crime of vote ___.",
+    "answer": "BUYING",
+    "fact": "The penalty includes 1 to 6 years imprisonment with no probation."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "fraud",
+    "prompt": "Someone who solicits payment for their vote commits vote ___.",
+    "answer": "SELLING",
+    "fact": "Both the buyer and the seller can be prosecuted."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "fraud",
+    "prompt": "Accepting cash in exchange for a vote makes a person guilty of vote ___.",
+    "answer": "SELLING",
+    "fact": "Both the buyer and the seller can be prosecuted."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "candidate",
+    "prompt": "A candidate filed only to confuse voters is a ___ candidate.",
+    "answer": "NUISANCE",
+    "fact": "COMELEC can cancel such a COC under Section 69 of the OEC."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "candidate",
+    "prompt": "A COC filed to mock a city race can be struck down as a ___ candidacy.",
+    "answer": "NUISANCE",
+    "fact": "COMELEC can cancel such a COC under Section 69 of the OEC."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "candidate",
+    "prompt": "A replacement for a withdrawn or disqualified candidate is a ___.",
+    "answer": "SUBSTITUTE",
+    "fact": "The substitute must run for the exact same position."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "candidate",
+    "prompt": "Someone stepping in after a city candidate withdraws is a ___.",
+    "answer": "SUBSTITUTE",
+    "fact": "The substitute must run for the exact same position."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "candidate",
+    "prompt": "The city official who values property for tax purposes is the ___.",
+    "answer": "ASSESSOR",
+    "fact": "The assessor's valuations decide how much property tax is owed."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "candidate",
+    "prompt": "The city hall official who sets property values for taxation is the ___.",
+    "answer": "ASSESSOR",
+    "fact": "The assessor's valuations decide how much property tax is owed."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "Roads, bridges, and drainage projects together are city ___.",
+    "answer": "PROJECTS",
+    "fact": "Infrastructure projects are one of the biggest local budget items."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "Roads, bridges, and drainage a city builds are collectively its ___.",
+    "answer": "PROJECTS",
+    "fact": "Infrastructure projects are one of the biggest local budget items."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "Explaining how public money was spent is a duty of ___.",
+    "answer": "TRANSPARENCY",
+    "fact": "City budgets must be posted where residents can see them."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "Posting the city budget where residents can see it is an act of ___.",
+    "answer": "TRANSPARENCY",
+    "fact": "City budgets must be posted where residents can see them."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "The city council is formally the Sangguniang ___.",
+    "answer": "PANLUNGSOD",
+    "fact": "A municipality's version is the Sangguniang Bayan."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "A city's lawmaking body is formally titled the Sangguniang ___.",
+    "answer": "PANLUNGSOD",
+    "fact": "A municipality's version is the Sangguniang Bayan."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "Setting aside city funds for a specific purpose is an ___.",
+    "answer": "APPROPRIATION",
+    "fact": "The annual budget is itself an appropriations ordinance."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "A city's annual budget is legally an ___ ordinance.",
+    "answer": "APPROPRIATION",
+    "fact": "The annual budget is itself an appropriations ordinance."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "hard",
+    "category": "fraud",
+    "prompt": "COMELEC Resolution 11104 extended vote-buying rules to cover digital ___.",
+    "answer": "TRANSFERS",
+    "fact": "Online bank and e-wallet transfers now count as vote buying too."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "hard",
+    "category": "fraud",
+    "prompt": "Vote-buying rules were extended to cover online bank ___ by COMELEC Resolution 11104.",
+    "answer": "TRANSFERS",
+    "fact": "Online bank and e-wallet transfers now count as vote buying too."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "hard",
+    "category": "fraud",
+    "prompt": "Repeatedly voting using more than one registration is an election ___.",
+    "answer": "OFFENSE",
+    "fact": "It can lead to perpetual disqualification from public office."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "hard",
+    "category": "fraud",
+    "prompt": "Voting more than once using duplicate registration is, on its own, an election ___.",
+    "answer": "OFFENSE",
+    "fact": "It can lead to perpetual disqualification from public office."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "hard",
+    "category": "candidate",
+    "prompt": "COMELEC and the courts must resolve disqualification cases with legal ___.",
+    "answer": "PRIORITY",
+    "fact": "The Omnibus Election Code requires such cases to be resolved with priority."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "hard",
+    "category": "candidate",
+    "prompt": "City disqualification cases are required by law to be handled with legal ___.",
+    "answer": "PRIORITY",
+    "fact": "The Omnibus Election Code requires such cases to be resolved with priority."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "hard",
+    "category": "candidate",
+    "prompt": "The peso amount a candidate may spend is capped per registered ___.",
+    "answer": "VOTERS",
+    "fact": "RA 7166 sets these spending limits per voter in the constituency."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "hard",
+    "category": "candidate",
+    "prompt": "A city candidate's spending cap is measured in pesos per registered ___.",
+    "answer": "VOTERS",
+    "fact": "RA 7166 sets these spending limits per voter in the constituency."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "Dishonest use of entrusted public office for private gain is ___.",
+    "answer": "CORRUPTION",
+    "fact": "City procurement is a common area where it surfaces."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "Diverting entrusted city funds for private gain is ___.",
+    "answer": "CORRUPTION",
+    "fact": "City procurement is a common area where it surfaces."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "Treating every resident the same regardless of politics is ___.",
+    "answer": "IMPARTIALITY",
+    "fact": "Officials are expected to serve supporters and critics alike."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "Serving both allies and critics the same way in office is ___.",
+    "answer": "IMPARTIALITY",
+    "fact": "Officials are expected to serve supporters and critics alike."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "The Commission on Audit performs a financial ___ of every city.",
+    "answer": "AUDITING",
+    "fact": "The Commission on Audit reviews every local government unit."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "COA reviews city spending through a formal financial ___.",
+    "answer": "AUDITING",
+    "fact": "The Commission on Audit reviews every local government unit."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "Being honest and consistent in the use of office is ___.",
+    "answer": "INTEGRITY",
+    "fact": "Integrity is what keeps public trust in local government."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "Consistent honesty in the use of a city post is ___.",
+    "answer": "INTEGRITY",
+    "fact": "Integrity is what keeps public trust in local government."
+  },
+  {
+    "chapter": 3,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "The elected head of a province is the ___.",
+    "answer": "GOVERNOR",
+    "fact": "Governors serve three-year terms, same as mayors."
+  },
+  {
+    "chapter": 3,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "A province's top elected executive is its ___.",
+    "answer": "GOVERNOR",
+    "fact": "Governors serve three-year terms, same as mayors."
+  },
+  {
+    "chapter": 3,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "The second-highest provincial official is the ___ governor.",
+    "answer": "VICE",
+    "fact": "The vice governor presides over the provincial board."
+  },
+  {
+    "chapter": 3,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "The provincial board is presided over by the ___ governor.",
+    "answer": "VICE",
+    "fact": "The vice governor presides over the provincial board."
+  },
+  {
+    "chapter": 3,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "The main town of a province, where officials work, is its ___.",
+    "answer": "CAPITAL",
+    "fact": "The provincial capitol stands in the capital town."
+  },
+  {
+    "chapter": 3,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "Provincial officials work out of the capitol, located in the province's ___.",
+    "answer": "CAPITAL",
+    "fact": "The provincial capitol stands in the capital town."
+  },
+  {
+    "chapter": 3,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "A governor may serve up to ___ terms in a row.",
+    "answer": "THREE",
+    "fact": "The same three-consecutive-term rule applies to governors."
+  },
+  {
+    "chapter": 3,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "Like mayors, governors are limited to ___ consecutive terms.",
+    "answer": "THREE",
+    "fact": "The same three-consecutive-term rule applies to governors."
+  },
+  {
+    "chapter": 3,
+    "difficulty": "easy",
+    "category": "fraud",
+    "prompt": "A voter falsely registered outside their real home enables ___ voting.",
+    "answer": "FLYING",
+    "fact": "It is prosecuted the same way at the provincial level as anywhere else."
+  },
+  {
+    "chapter": 3,
+    "difficulty": "easy",
+    "category": "fraud",
+    "prompt": "A voter falsely claiming provincial residency to vote is guilty of ___ voting.",
+    "answer": "FLYING",
+    "fact": "It is prosecuted the same way at the provincial level as anywhere else."
+  },
+  {
+    "chapter": 3,
+    "difficulty": "easy",
+    "category": "fraud",
+    "prompt": "Offering payment for a vote in a governor's race is vote ___.",
+    "answer": "BUYING",
+    "fact": "The Omnibus Election Code treats it as a serious election offense."
+  },
+  {
+    "chapter": 3,
+    "difficulty": "easy",
+    "category": "fraud",
+    "prompt": "Cash offered for a vote in a governor's race is still vote ___.",
+    "answer": "BUYING",
+    "fact": "The Omnibus Election Code treats it as a serious election offense."
+  },
+  {
+    "chapter": 3,
+    "difficulty": "easy",
+    "category": "candidate",
+    "prompt": "A group of towns and cities that share one province forms its ___.",
+    "answer": "TERRITORY",
+    "fact": "A province's territory covers every town and city inside it."
+  },
+  {
+    "chapter": 3,
+    "difficulty": "easy",
+    "category": "candidate",
+    "prompt": "Every town and city that shares a province forms its ___.",
+    "answer": "TERRITORY",
+    "fact": "A province's territory covers every town and city inside it."
+  },
+  {
+    "chapter": 3,
+    "difficulty": "easy",
+    "category": "candidate",
+    "prompt": "A candidate's official filing to run is a Certificate of ___.",
+    "answer": "CANDIDACY",
+    "fact": "Provincial candidates file this with the COMELEC provincial office."
+  },
+  {
+    "chapter": 3,
+    "difficulty": "easy",
+    "category": "candidate",
+    "prompt": "Provincial candidates file their Certificate of ___ with the COMELEC provincial office.",
+    "answer": "CANDIDACY",
+    "fact": "Provincial candidates file this with the COMELEC provincial office."
+  },
+  {
+    "chapter": 3,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "The right guaranteed to every qualified citizen to vote is ___.",
+    "answer": "SUFFRAGE",
+    "fact": "It cannot be taken away by a literacy or property test."
+  },
+  {
+    "chapter": 3,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "No literacy or property test can take away a citizen's ___.",
+    "answer": "SUFFRAGE",
+    "fact": "It cannot be taken away by a literacy or property test."
+  },
+  {
+    "chapter": 3,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "Adding up results from every town in a province is called ___.",
+    "answer": "TALLYING",
+    "fact": "The provincial board of canvassers tallies every town's results."
+  },
+  {
+    "chapter": 3,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "Adding up every town's results into one provincial total is called ___.",
+    "answer": "TALLYING",
+    "fact": "The provincial board of canvassers tallies every town's results."
+  },
+  {
+    "chapter": 3,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "The provincial council is formally the Sangguniang ___.",
+    "answer": "PANLALAWIGAN",
+    "fact": "It passes ordinances covering the whole province."
+  },
+  {
+    "chapter": 3,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "A province's legislative body is formally the Sangguniang ___.",
+    "answer": "PANLALAWIGAN",
+    "fact": "It passes ordinances covering the whole province."
+  },
+  {
+    "chapter": 3,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "A member of the provincial council is a board ___.",
+    "answer": "MEMBER",
+    "fact": "Board members are elected per legislative district within the province."
+  },
+  {
+    "chapter": 3,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "An elected seat on the provincial council belongs to a board ___.",
+    "answer": "MEMBER",
+    "fact": "Board members are elected per legislative district within the province."
+  },
+  {
+    "chapter": 3,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "An official currently holding a post seeking re-election is the ___.",
+    "answer": "INCUMBENT",
+    "fact": "Incumbent governors usually have strong name recognition."
+  },
+  {
+    "chapter": 3,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "A governor already holding office and seeking re-election is the ___.",
+    "answer": "INCUMBENT",
+    "fact": "Incumbent governors usually have strong name recognition."
+  },
+  {
+    "chapter": 3,
+    "difficulty": "medium",
+    "category": "fraud",
+    "prompt": "Vote counts padded in one place and cut in another describe ___-bawas.",
+    "answer": "DAGDAG",
+    "fact": "It is the classic manual-era manipulation, still alleged today."
+  },
+  {
+    "chapter": 3,
+    "difficulty": "medium",
+    "category": "fraud",
+    "prompt": "Provincial canvassing isn't immune to the padding-and-shaving scheme called ___-bawas.",
+    "answer": "DAGDAG",
+    "fact": "It is the classic manual-era manipulation, still alleged today."
+  },
+  {
+    "chapter": 3,
+    "difficulty": "medium",
+    "category": "fraud",
+    "prompt": "A person who receives payment for their vote commits vote ___.",
+    "answer": "SELLING",
+    "fact": "Both parties to the transaction can face prosecution."
+  },
+  {
+    "chapter": 3,
+    "difficulty": "medium",
+    "category": "fraud",
+    "prompt": "Taking payment in exchange for a provincial vote is vote ___.",
+    "answer": "SELLING",
+    "fact": "Both parties to the transaction can face prosecution."
+  },
+  {
+    "chapter": 3,
+    "difficulty": "medium",
+    "category": "candidate",
+    "prompt": "A candidate with no genuine intent to run may be ruled a ___.",
+    "answer": "NUISANCE",
+    "fact": "COMELEC may cancel that candidacy under Section 69."
+  },
+  {
+    "chapter": 3,
+    "difficulty": "medium",
+    "category": "candidate",
+    "prompt": "A gubernatorial hopeful with no genuine intent to run may be ruled a ___.",
+    "answer": "NUISANCE",
+    "fact": "COMELEC may cancel that candidacy under Section 69."
+  },
+  {
+    "chapter": 3,
+    "difficulty": "medium",
+    "category": "candidate",
+    "prompt": "Replacing a disqualified candidate with one from the same party is a ___.",
+    "answer": "SUBSTITUTION",
+    "fact": "The replacement must run for the identical position."
+  },
+  {
+    "chapter": 3,
+    "difficulty": "medium",
+    "category": "candidate",
+    "prompt": "Filling a vacated candidacy with a same-party pick is called ___.",
+    "answer": "SUBSTITUTION",
+    "fact": "The replacement must run for the identical position."
+  },
+  {
+    "chapter": 3,
+    "difficulty": "medium",
+    "category": "candidate",
+    "prompt": "Parties running together to support each other's candidates form a ___.",
+    "answer": "COALITION",
+    "fact": "Provincial coalitions commonly form after, not before, the filing period."
+  },
+  {
+    "chapter": 3,
+    "difficulty": "medium",
+    "category": "candidate",
+    "prompt": "Two or more parties teaming up to back each other's local candidates form a ___.",
+    "answer": "COALITION",
+    "fact": "Provincial coalitions commonly form after, not before, the filing period."
+  },
+  {
+    "chapter": 3,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "The body of registered voters across a whole province is its ___.",
+    "answer": "ELECTORATE",
+    "fact": "A province's electorate can number well over a million people."
+  },
+  {
+    "chapter": 3,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "A province's full body of registered voters is its ___.",
+    "answer": "ELECTORATE",
+    "fact": "A province's electorate can number well over a million people."
+  },
+  {
+    "chapter": 3,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "One family holding elected posts across generations is a political ___.",
+    "answer": "DYNASTY",
+    "fact": "The Constitution discourages dynasties, though no enabling law yet defines them."
+  },
+  {
+    "chapter": 3,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "One family repeatedly winning provincial posts describes a political ___.",
+    "answer": "DYNASTY",
+    "fact": "The Constitution discourages dynasties, though no enabling law yet defines them."
+  },
+  {
+    "chapter": 3,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "Dividing legislative seats among areas by population is ___.",
+    "answer": "APPORTIONMENT",
+    "fact": "It is meant to keep representation proportional to population."
+  },
+  {
+    "chapter": 3,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "Seats are divided among areas by population through ___.",
+    "answer": "APPORTIONMENT",
+    "fact": "It is meant to keep representation proportional to population."
+  },
+  {
+    "chapter": 3,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "A formal re-examination of contested ballots is a ___.",
+    "answer": "RECOUNT",
+    "fact": "A recount only proceeds if a proper election protest was filed."
+  },
+  {
+    "chapter": 3,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "Disputed ballots can be formally re-examined through a ___.",
+    "answer": "RECOUNT",
+    "fact": "A recount only proceeds if a proper election protest was filed."
+  },
+  {
+    "chapter": 3,
+    "difficulty": "hard",
+    "category": "fraud",
+    "prompt": "Redrawing district lines to favor one side unfairly is ___.",
+    "answer": "GERRYMANDERING",
+    "fact": "It distorts who actually holds representative power."
+  },
+  {
+    "chapter": 3,
+    "difficulty": "hard",
+    "category": "fraud",
+    "prompt": "Redrawing boundaries to favor one side is the practice known as ___.",
+    "answer": "GERRYMANDERING",
+    "fact": "It distorts who actually holds representative power."
+  },
+  {
+    "chapter": 3,
+    "difficulty": "hard",
+    "category": "fraud",
+    "prompt": "Depriving eligible people of their right to vote is to ___ them.",
+    "answer": "DISENFRANCHISE",
+    "fact": "Missing records or long lines can disenfranchise voters in practice."
+  },
+  {
+    "chapter": 3,
+    "difficulty": "hard",
+    "category": "fraud",
+    "prompt": "Missing records or long lines can effectively ___ eligible voters.",
+    "answer": "DISENFRANCHISE",
+    "fact": "Missing records or long lines can disenfranchise voters in practice."
+  },
+  {
+    "chapter": 3,
+    "difficulty": "hard",
+    "category": "candidate",
+    "prompt": "COMELEC and the courts must decide disqualification cases with legal ___.",
+    "answer": "PRIORITY",
+    "fact": "The law requires speedy resolution before election day where possible."
+  },
+  {
+    "chapter": 3,
+    "difficulty": "hard",
+    "category": "candidate",
+    "prompt": "Provincial disqualification suits must be resolved with legal ___ before election day.",
+    "answer": "PRIORITY",
+    "fact": "The law requires speedy resolution before election day where possible."
+  },
+  {
+    "chapter": 3,
+    "difficulty": "hard",
+    "category": "candidate",
+    "prompt": "A candidate withdrawing after the filing deadline generally cannot be ___.",
+    "answer": "SUBSTITUTED",
+    "fact": "COMELEC bars most substitutions based on late withdrawal."
+  },
+  {
+    "chapter": 3,
+    "difficulty": "hard",
+    "category": "candidate",
+    "prompt": "A candidate who waits until after the filing deadline to withdraw generally cannot be ___.",
+    "answer": "SUBSTITUTED",
+    "fact": "COMELEC bars most substitutions based on late withdrawal."
+  },
+  {
+    "chapter": 3,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "A province's freedom to manage its own local affairs is local ___.",
+    "answer": "AUTONOMY",
+    "fact": "Local autonomy is guaranteed in the 1987 Constitution."
+  },
+  {
+    "chapter": 3,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "A province's freedom over its own local affairs is called local ___.",
+    "answer": "AUTONOMY",
+    "fact": "Local autonomy is guaranteed in the 1987 Constitution."
+  },
+  {
+    "chapter": 3,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "Organized effort to influence provincial officials is called ___.",
+    "answer": "LOBBYING",
+    "fact": "Lobbying is legal, but undisclosed lobbying undermines transparency."
+  },
+  {
+    "chapter": 3,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "Organized efforts to influence provincial officials are known as ___.",
+    "answer": "LOBBYING",
+    "fact": "Lobbying is legal, but undisclosed lobbying undermines transparency."
+  },
+  {
+    "chapter": 3,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "Government controlled by a small, entrenched group is called an ___.",
+    "answer": "OLIGARCHY",
+    "fact": "Concentrated local wealth can turn politics into an oligarchy in practice."
+  },
+  {
+    "chapter": 3,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "Local politics dominated by a small, entrenched group is called an ___.",
+    "answer": "OLIGARCHY",
+    "fact": "Concentrated local wealth can turn politics into an oligarchy in practice."
+  },
+  {
+    "chapter": 3,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "Supreme authority that the Constitution says rests in the people is ___.",
+    "answer": "SOVEREIGNTY",
+    "fact": "Clean elections are the clearest expression of that sovereignty."
+  },
+  {
+    "chapter": 3,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "The Constitution states that supreme authority, or ___, rests in the people.",
+    "answer": "SOVEREIGNTY",
+    "fact": "Clean elections are the clearest expression of that sovereignty."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "The highest elected official of the country is the ___.",
+    "answer": "PRESIDENT",
+    "fact": "The President heads the executive branch of government."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "The single highest elected office in the country is the ___.",
+    "answer": "PRESIDENT",
+    "fact": "The President heads the executive branch of government."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "A President serves a single term of ___ years.",
+    "answer": "SIX",
+    "fact": "Six years, with no re-election allowed under the 1987 Constitution."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "A single presidential term under the Constitution lasts ___ years.",
+    "answer": "SIX",
+    "fact": "Six years, with no re-election allowed under the 1987 Constitution."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "The President's elected successor-in-waiting is the ___ President.",
+    "answer": "VICE",
+    "fact": "The Vice President is voted for in a separate race."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "Chosen in a separate race, the President's running mate-in-waiting is the ___ President.",
+    "answer": "VICE",
+    "fact": "The Vice President is voted for in a separate race."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "The official residence of the President is Malacañang ___.",
+    "answer": "PALACE",
+    "fact": "It has served as the seat of the presidency since the Spanish era."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "The President's official home and workplace is Malacañang ___.",
+    "answer": "PALACE",
+    "fact": "It has served as the seat of the presidency since the Spanish era."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "fraud",
+    "prompt": "Offering money for a vote in a presidential race is vote ___.",
+    "answer": "BUYING",
+    "fact": "It remains an election offense no matter which office is contested."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "fraud",
+    "prompt": "Paying for votes in a presidential race is still vote ___, a crime.",
+    "answer": "BUYING",
+    "fact": "It remains an election offense no matter which office is contested."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "fraud",
+    "prompt": "A voter registered in two places to vote twice is a ___ voter.",
+    "answer": "FLYING",
+    "fact": "The offense carries the same penalties nationwide."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "fraud",
+    "prompt": "Fraudulently registering in two places to vote twice for President is being a ___ voter.",
+    "answer": "FLYING",
+    "fact": "The offense carries the same penalties nationwide."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "candidate",
+    "prompt": "A presidential hopeful's official filing to run is a Certificate of ___.",
+    "answer": "CANDIDACY",
+    "fact": "It must be filed within the period COMELEC fixes for that election."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "candidate",
+    "prompt": "A presidential run begins with filing a Certificate of ___.",
+    "answer": "CANDIDACY",
+    "fact": "It must be filed within the period COMELEC fixes for that election."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "candidate",
+    "prompt": "A candidate's written plan for governing the country is their ___.",
+    "answer": "PLATFORM",
+    "fact": "Comparing platforms matters more than comparing campaign jingles."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "candidate",
+    "prompt": "A presidential candidate's written governing agenda is their ___.",
+    "answer": "PLATFORM",
+    "fact": "Comparing platforms matters more than comparing campaign jingles."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "A citizen's constitutionally protected right to vote is called ___.",
+    "answer": "SUFFRAGE",
+    "fact": "It applies equally in choosing the President as in any other race."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "The constitutional right exercised by choosing a President is called ___.",
+    "answer": "SUFFRAGE",
+    "fact": "It applies equally in choosing the President as in any other race."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "The authority voters hand a winning candidate is called a ___.",
+    "answer": "MANDATE",
+    "fact": "A wide winning margin is often described as a strong mandate."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "A big winning margin gives a new President a strong ___.",
+    "answer": "MANDATE",
+    "fact": "A wide winning margin is often described as a strong mandate."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "A person appointed to head an executive department is a ___.",
+    "answer": "SECRETARY",
+    "fact": "Cabinet secretaries serve at the President's pleasure."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "A department head appointed by the President is called a ___.",
+    "answer": "SECRETARY",
+    "fact": "Cabinet secretaries serve at the President's pleasure."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "The President's power to reject a bill from Congress is the ___.",
+    "answer": "VETO",
+    "fact": "Congress can override a presidential veto by a two-thirds vote."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "The President's power to reject a bill outright is the ___.",
+    "answer": "VETO",
+    "fact": "Congress can override a presidential veto by a two-thirds vote."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "The President's yearly address to Congress is the State of the ___.",
+    "answer": "NATION",
+    "fact": "The State of the Nation Address opens the regular session."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "The President's yearly address opening Congress is the State of the ___.",
+    "answer": "NATION",
+    "fact": "The State of the Nation Address opens the regular session."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "medium",
+    "category": "fraud",
+    "prompt": "Manipulating a national canvass total is a form of ___-bawas.",
+    "answer": "DAGDAG",
+    "fact": "It refers to padding some totals while shaving others."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "medium",
+    "category": "fraud",
+    "prompt": "A padded-and-shaved national tally describes ___-bawas at the presidential level.",
+    "answer": "DAGDAG",
+    "fact": "It refers to padding some totals while shaving others."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "medium",
+    "category": "fraud",
+    "prompt": "COMELEC Resolution 11104 covers vote buying done through digital ___.",
+    "answer": "WALLETS",
+    "fact": "Mobile wallet and online transfers now count as vote buying too."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "medium",
+    "category": "fraud",
+    "prompt": "COMELEC Resolution 11104 treats digital ___ transfers as vote buying too.",
+    "answer": "WALLETS",
+    "fact": "Mobile wallet and online transfers now count as vote buying too."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "medium",
+    "category": "candidate",
+    "prompt": "A candidacy filed only to mock the process may be ruled a ___.",
+    "answer": "NUISANCE",
+    "fact": "This applies to presidential races the same as any other."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "medium",
+    "category": "candidate",
+    "prompt": "A presidential COC filed only to mock the race can be ruled a ___ candidacy.",
+    "answer": "NUISANCE",
+    "fact": "This applies to presidential races the same as any other."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "medium",
+    "category": "candidate",
+    "prompt": "A President may pardon a convicted person using the power of ___.",
+    "answer": "PARDON",
+    "fact": "The pardoning power belongs solely to the President."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "medium",
+    "category": "candidate",
+    "prompt": "The power to forgive a convicted person's sentence is the President's power of ___.",
+    "answer": "PARDON",
+    "fact": "The pardoning power belongs solely to the President."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "medium",
+    "category": "candidate",
+    "prompt": "A presidential candidate may spend up to ten pesos per registered ___.",
+    "answer": "VOTERS",
+    "fact": "That original 1991 cap under RA 7166 is still the standing legal limit."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "medium",
+    "category": "candidate",
+    "prompt": "A presidential campaign's legal spending ceiling is pegged to the number of registered ___.",
+    "answer": "VOTERS",
+    "fact": "That original 1991 cap under RA 7166 is still the standing legal limit."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "The branch of government that carries out the laws is the ___ branch.",
+    "answer": "EXECUTIVE",
+    "fact": "The President leads the executive branch."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "Carrying out the laws Congress passes is the job of the ___ branch.",
+    "answer": "EXECUTIVE",
+    "fact": "The President leads the executive branch."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "Dividing power among three branches so none dominates is ___ of powers.",
+    "answer": "SEPARATION",
+    "fact": "It is one of the core structures of the 1987 Constitution."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "No single branch dominates thanks to the principle of ___ of powers.",
+    "answer": "SEPARATION",
+    "fact": "It is one of the core structures of the 1987 Constitution."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "Charging a high official with wrongdoing in office is to ___ them.",
+    "answer": "IMPEACH",
+    "fact": "The House impeaches; the Senate then tries the case."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "Formally accusing a sitting official of serious wrongdoing is to ___ them.",
+    "answer": "IMPEACH",
+    "fact": "The House impeaches; the Senate then tries the case."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "The peaceful handover of power after an election is the ___.",
+    "answer": "TRANSITION",
+    "fact": "A peaceful transition is a clear sign a democracy is functioning."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "A peaceful handover of the presidency after an election is called a ___.",
+    "answer": "TRANSITION",
+    "fact": "A peaceful transition is a clear sign a democracy is functioning."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "hard",
+    "category": "fraud",
+    "prompt": "Buying votes through instant online transfers now falls under updated ___.",
+    "answer": "GUIDELINES",
+    "fact": "COMELEC issued new guidelines covering digital vote-buying methods."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "hard",
+    "category": "fraud",
+    "prompt": "Buying votes via instant transfer is now addressed by COMELEC's updated ___.",
+    "answer": "GUIDELINES",
+    "fact": "COMELEC issued new guidelines covering digital vote-buying methods."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "hard",
+    "category": "fraud",
+    "prompt": "A scheme to inflate one candidate's national tally is vote ___.",
+    "answer": "TAMPERING",
+    "fact": "It can be challenged through an election protest after proclamation."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "hard",
+    "category": "fraud",
+    "prompt": "Inflating a candidate's national tally through manipulation is vote ___.",
+    "answer": "TAMPERING",
+    "fact": "It can be challenged through an election protest after proclamation."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "hard",
+    "category": "candidate",
+    "prompt": "Formal approval of a treaty needs a two-thirds vote of the ___.",
+    "answer": "SENATE",
+    "fact": "Senate concurrence is required before a treaty takes effect."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "hard",
+    "category": "candidate",
+    "prompt": "A treaty only takes effect once it wins a two-thirds vote of the ___.",
+    "answer": "SENATE",
+    "fact": "Senate concurrence is required before a treaty takes effect."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "hard",
+    "category": "candidate",
+    "prompt": "A rule barring endless re-election to the presidency is a term ___.",
+    "answer": "RESTRICTION",
+    "fact": "The single six-year presidential term is meant to prevent entrenchment."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "hard",
+    "category": "candidate",
+    "prompt": "Barring endless presidential re-election is the point of the term ___.",
+    "answer": "RESTRICTION",
+    "fact": "The single six-year presidential term is meant to prevent entrenchment."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "The supreme law every official, including the President, must obey is the ___.",
+    "answer": "CONSTITUTION",
+    "fact": "The current Constitution was ratified in 1987."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "Even the President must obey the supreme law, the ___.",
+    "answer": "CONSTITUTION",
+    "fact": "The current Constitution was ratified in 1987."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "Rule by one person holding total, unchecked power is a ___.",
+    "answer": "DICTATORSHIP",
+    "fact": "The 1987 Constitution was written partly to guard against its return."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "Total, unchecked power held by one person describes a ___.",
+    "answer": "DICTATORSHIP",
+    "fact": "The 1987 Constitution was written partly to guard against its return."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "Being answerable to the public for official acts is ___.",
+    "answer": "ACCOUNTABILITY",
+    "fact": "Public office, even the presidency, is a public trust under the Constitution."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "Even the presidency is bound by the duty of public ___.",
+    "answer": "ACCOUNTABILITY",
+    "fact": "Public office, even the presidency, is a public trust under the Constitution."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "A system where governing power ultimately rests with the people is a ___.",
+    "answer": "DEMOCRACY",
+    "fact": "Democracy depends on regular, genuine, competitive elections."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "A government where power ultimately rests with the people is a ___.",
+    "answer": "DEMOCRACY",
+    "fact": "Democracy depends on regular, genuine, competitive elections."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "The lawmaking branch of the Philippine government is ___.",
+    "answer": "CONGRESS",
+    "fact": "Congress is made up of the Senate and the House of Representatives."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "The Philippines' national lawmaking body is called ___.",
+    "answer": "CONGRESS",
+    "fact": "Congress is made up of the Senate and the House of Representatives."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "The upper chamber of Congress is the ___.",
+    "answer": "SENATE",
+    "fact": "The Senate has 24 members elected by the whole country."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "Twenty-four members elected nationwide sit in the ___.",
+    "answer": "SENATE",
+    "fact": "The Senate has 24 members elected by the whole country."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "The lower chamber of Congress is the ___ of Representatives.",
+    "answer": "HOUSE",
+    "fact": "The House holds both district and party-list members."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "District and party-list members together fill the ___ of Representatives.",
+    "answer": "HOUSE",
+    "fact": "The House holds both district and party-list members."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "A proposed law being debated in Congress is a ___.",
+    "answer": "BILL",
+    "fact": "A bill becomes law once signed, or once a veto is overridden."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "A proposed law still being debated in Congress is a ___.",
+    "answer": "BILL",
+    "fact": "A bill becomes law once signed, or once a veto is overridden."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "easy",
+    "category": "fraud",
+    "prompt": "Paying someone for their vote in a congressional race is vote ___.",
+    "answer": "BUYING",
+    "fact": "It is prosecuted the same as vote buying in any other election."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "easy",
+    "category": "fraud",
+    "prompt": "Even a Senate race isn't exempt from the crime of vote ___.",
+    "answer": "BUYING",
+    "fact": "It is prosecuted the same as vote buying in any other election."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "easy",
+    "category": "fraud",
+    "prompt": "A voter registered in more than one district is a ___ voter.",
+    "answer": "FLYING",
+    "fact": "It carries prison time and loss of voting rights under the law."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "easy",
+    "category": "fraud",
+    "prompt": "Registering in more than one district to vote twice makes someone a ___ voter.",
+    "answer": "FLYING",
+    "fact": "It carries prison time and loss of voting rights under the law."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "easy",
+    "category": "candidate",
+    "prompt": "A senatorial hopeful's filing to run is a Certificate of ___.",
+    "answer": "CANDIDACY",
+    "fact": "Senators are elected nationwide, so it is filed with COMELEC en banc."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "easy",
+    "category": "candidate",
+    "prompt": "Because senators run nationwide, their Certificate of ___ is filed with COMELEC en banc.",
+    "answer": "CANDIDACY",
+    "fact": "Senators are elected nationwide, so it is filed with COMELEC en banc."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "easy",
+    "category": "candidate",
+    "prompt": "A candidate's outline of what they will push for in Congress is their ___.",
+    "answer": "PLATFORM",
+    "fact": "Voters can compare platforms across the 12 Senate seats up for election."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "easy",
+    "category": "candidate",
+    "prompt": "A congressional candidate's written agenda for Congress is their ___.",
+    "answer": "PLATFORM",
+    "fact": "Voters can compare platforms across the 12 Senate seats up for election."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "Each national election fills ___ of the Senate's 24 seats.",
+    "answer": "TWELVE",
+    "fact": "Senate terms are staggered so half the chamber turns over each time."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "___ of the Senate's 24 seats are contested in each national election.",
+    "answer": "TWELVE",
+    "fact": "Senate terms are staggered so half the chamber turns over each time."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "A senator serves a term of ___ years.",
+    "answer": "SIX",
+    "fact": "Senators may serve at most two consecutive six-year terms."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "A senator's single term of office runs ___ years.",
+    "answer": "SIX",
+    "fact": "Senators may serve at most two consecutive six-year terms."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "Seats reserved for under-represented sectors come from the ___ system.",
+    "answer": "PARTYLIST",
+    "fact": "Party-list groups represent sectors rather than geographic areas."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "Seats set aside for under-represented sectors come through the ___ system.",
+    "answer": "PARTYLIST",
+    "fact": "Party-list groups represent sectors rather than geographic areas."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "A House member represents a specific area called a ___.",
+    "answer": "DISTRICT",
+    "fact": "The House has both district seats and party-list seats."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "A House seat tied to a specific geographic area is a ___ seat.",
+    "answer": "DISTRICT",
+    "fact": "The House has both district seats and party-list seats."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "A House member serves a term of ___ years.",
+    "answer": "THREE",
+    "fact": "House members may serve up to three consecutive terms."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "A House member's term of office lasts ___ years before re-election is needed.",
+    "answer": "THREE",
+    "fact": "House members may serve up to three consecutive terms."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "medium",
+    "category": "fraud",
+    "prompt": "Manipulating district-level results is a form of ___-bawas.",
+    "answer": "DAGDAG",
+    "fact": "It refers to padding some counts while shaving others."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "medium",
+    "category": "fraud",
+    "prompt": "District-level results aren't immune to the padding scheme called ___-bawas.",
+    "answer": "DAGDAG",
+    "fact": "It refers to padding some counts while shaving others."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "medium",
+    "category": "fraud",
+    "prompt": "Repeated multiple registration to enable double voting is an election ___.",
+    "answer": "OFFENSE",
+    "fact": "It can lead to perpetual disqualification from holding public office."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "medium",
+    "category": "fraud",
+    "prompt": "Repeated multiple registration to enable double voting is itself an election ___.",
+    "answer": "OFFENSE",
+    "fact": "It can lead to perpetual disqualification from holding public office."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "medium",
+    "category": "candidate",
+    "prompt": "A candidate named to replace a withdrawn or disqualified nominee is a ___.",
+    "answer": "SUBSTITUTE",
+    "fact": "The substitute must belong to the same party as the original."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "medium",
+    "category": "candidate",
+    "prompt": "A replacement for a withdrawn or disqualified congressional nominee must share the original's party, as a ___.",
+    "answer": "SUBSTITUTE",
+    "fact": "The substitute must belong to the same party as the original."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "medium",
+    "category": "candidate",
+    "prompt": "A person nominated by a party-list group to take its seat is a ___.",
+    "answer": "NOMINEE",
+    "fact": "Each group submits a ranked list of nominees before the election."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "medium",
+    "category": "candidate",
+    "prompt": "A party-list group's ranked list of seat-fillers is made up of its ___s.",
+    "answer": "NOMINEE",
+    "fact": "Each group submits a ranked list of nominees before the election."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "medium",
+    "category": "candidate",
+    "prompt": "A candidacy filed only to confuse voters may be ruled a ___.",
+    "answer": "NUISANCE",
+    "fact": "COMELEC can cancel it under Section 69 of the Omnibus Election Code."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "medium",
+    "category": "candidate",
+    "prompt": "A congressional candidacy filed only to confuse voters may be tagged ___.",
+    "answer": "NUISANCE",
+    "fact": "COMELEC can cancel it under Section 69 of the Omnibus Election Code."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "Talking a bill to a standstill to block a vote is a ___.",
+    "answer": "FILIBUSTER",
+    "fact": "A filibuster delays action rather than losing an actual vote."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "Talking a bill to a standstill without an actual vote is a ___.",
+    "answer": "FILIBUSTER",
+    "fact": "A filibuster delays action rather than losing an actual vote."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "The written record of an official session of Congress is the ___.",
+    "answer": "JOURNAL",
+    "fact": "The journal and minutes together form the official record."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "An official session's written record is kept as the ___.",
+    "answer": "JOURNAL",
+    "fact": "The journal and minutes together form the official record."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "A legislature made up of two separate chambers is called ___.",
+    "answer": "BICAMERAL",
+    "fact": "The Senate and House together form a bicameral Congress."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "A legislature split into two separate chambers is called ___.",
+    "answer": "BICAMERAL",
+    "fact": "The Senate and House together form a bicameral Congress."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "The head of the House of Representatives is the ___.",
+    "answer": "SPEAKER",
+    "fact": "The Speaker is elected by the members of the House itself."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "The House chooses its own presiding officer, called the ___.",
+    "answer": "SPEAKER",
+    "fact": "The Speaker is elected by the members of the House itself."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "fraud",
+    "prompt": "A body that resolves disputes over a lawmaker's seat is a ___.",
+    "answer": "TRIBUNAL",
+    "fact": "Separate electoral tribunals exist for the Senate and the House."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "fraud",
+    "prompt": "Disputes over a lawmaker's seat go before an electoral ___.",
+    "answer": "TRIBUNAL",
+    "fact": "Separate electoral tribunals exist for the Senate and the House."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "fraud",
+    "prompt": "Barring an already-elected lawmaker from taking their seat is to ___ them.",
+    "answer": "DISQUALIFY",
+    "fact": "An electoral tribunal can disqualify a winner after the fact."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "fraud",
+    "prompt": "Removing an already-elected lawmaker from their seat is to ___ them.",
+    "answer": "DISQUALIFY",
+    "fact": "An electoral tribunal can disqualify a winner after the fact."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "candidate",
+    "prompt": "Term limits for party-list nominees apply to the person, not the ___.",
+    "answer": "ORGANIZATION",
+    "fact": "A party-list group cannot rotate nominees to dodge term limits."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "candidate",
+    "prompt": "Party-list term limits bind the individual nominee, not the ___.",
+    "answer": "ORGANIZATION",
+    "fact": "A party-list group cannot rotate nominees to dodge term limits."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "candidate",
+    "prompt": "Setting aside money for a specific national purpose is an ___.",
+    "answer": "APPROPRIATION",
+    "fact": "The national budget is itself an appropriations law passed by Congress."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "candidate",
+    "prompt": "Setting aside national funds for a specific purpose is an ___.",
+    "answer": "APPROPRIATION",
+    "fact": "The national budget is itself an appropriations law passed by Congress."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "Awarding seats in proportion to votes won describes ___ representation.",
+    "answer": "PROPORTIONAL",
+    "fact": "The party-list system is the proportional element of Congress."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "Seats awarded roughly in line with votes won describes ___ representation.",
+    "answer": "PROPORTIONAL",
+    "fact": "The party-list system is the proportional element of Congress."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "The body of voters that elected a particular lawmaker is their ___.",
+    "answer": "CONSTITUENCY",
+    "fact": "A lawmaker is expected to answer to that whole constituency."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "The voters who elected a specific lawmaker form that lawmaker's ___.",
+    "answer": "CONSTITUENCY",
+    "fact": "A lawmaker is expected to answer to that whole constituency."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "Careful, unhurried discussion of a bill before a vote is ___.",
+    "answer": "DELIBERATION",
+    "fact": "Committee hearings exist mainly to allow this deliberation."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "Unhurried discussion of a bill before a final vote is ___.",
+    "answer": "DELIBERATION",
+    "fact": "Committee hearings exist mainly to allow this deliberation."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "The formal act of writing and passing laws is called ___.",
+    "answer": "LEGISLATION",
+    "fact": "All legislation begins as a bill introduced in either chamber."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "Writing and passing laws is the formal activity called ___.",
+    "answer": "LEGISLATION",
+    "fact": "All legislation begins as a bill introduced in either chamber."
+  }
+]

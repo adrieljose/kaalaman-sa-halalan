@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="EnemyMove" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_move.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/images/moves/ballot_defacer.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+move_id = "ballot_defacer"
+move_name = "Ballot Defacer"
+description = "Scribbles across your ballot until it cannot be counted."
+icon = ExtResource("2")
+direct_damage = 9
+animation_style = "spray"
+effect_color = Color(0.85, 0.20, 0.24, 0.95)

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="EnemyMove" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_move.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/images/moves/tong_collection.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+move_id = "tong_collection"
+move_name = "Tong Collection"
+description = "His cut comes off the top, before anybody else eats."
+icon = ExtResource("2")
+direct_damage = 10
+animation_style = "volley"
+effect_color = Color(0.95, 0.80, 0.30, 0.95)
