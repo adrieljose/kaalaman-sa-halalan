@@ -265,6 +265,10 @@ func _on_character_chosen(character: String) -> void:
 	Audio.play_sfx("button_click")
 	GameState.character = character
 	character_panel.hide()
+	# Refreshed here, not just at boot: this is the moment the player actually
+	# sees the panel, and the unlock picture can have changed since — beating
+	# Easy earlier in the same sitting is exactly what should show up now.
+	_apply_difficulty_hints()
 	difficulty_panel.show()
 
 func _on_character_back_pressed() -> void:
@@ -274,7 +278,14 @@ func _on_character_back_pressed() -> void:
 ## Difficulty is recorded on GameState rather than pushed into QuestionBank
 ## here, because it belongs to the run: the battle scene re-applies it on load,
 ## so it survives Try Again without the menu being involved.
+##
+## Re-checks the unlock independently of the button's disabled state, the same
+## defensive habit the certificate claim path already follows — a disabled
+## button should make this unreachable, but the button is not the source of
+## truth and this function should not trust it blindly.
 func _start_run(difficulty: String) -> void:
+	if not GameState.is_tier_unlocked(GameState.chapter_number(), difficulty):
+		return
 	Audio.play_sfx("button_click")
 	GameState.difficulty = difficulty
 	GameState.reset_chapter()
@@ -335,12 +346,31 @@ func _on_quit_pressed() -> void:
 ## promise cannot drift from the timer. And the example words are read out of
 ## the question bank, so rewriting the bank can never again leave the menu
 ## advertising words the game no longer asks about.
+## Also GATES the buttons: Medium needs Easy beaten this sitting, Hard needs
+## Medium. Called at boot (nothing unlocked yet) and again every time the
+## difficulty panel is about to be shown, since the picture can change between
+## those two moments — the player may have beaten Easy since the panel was
+## last open, in the same continuous session.
 func _apply_difficulty_hints() -> void:
 	var chapter_no := GameState.chapter_number()
-	for tier in ["easy", "medium", "hard"]:
+	var buttons := {"easy": easy_button, "medium": medium_button, "hard": hard_button}
+	for tier in QuestionBank.DIFFICULTY_ORDER:
 		var label := difficulty_panel.get_node_or_null("VBox/%sHint" % tier.capitalize()) as Label
 		if label == null:
 			push_warning("MainMenu: no hint label for '%s' difficulty" % tier)
+			continue
+		var button: Button = buttons[tier]
+		var unlocked := GameState.is_tier_unlocked(chapter_no, tier)
+		button.disabled = not unlocked
+		# Dimmed rather than hidden — same convention as the certificate's
+		# LOCKED state and the map's locked chapter pins: a player always knows
+		# the tier exists rather than wondering if a button went missing.
+		button.modulate.a = 1.0 if unlocked else 0.5
+		if not unlocked:
+			var idx := QuestionBank.DIFFICULTY_ORDER.find(tier)
+			var prev: String = QuestionBank.DIFFICULTY_ORDER[idx - 1]
+			label.text = "Beat %s first, this sitting, to unlock %s." % [
+				prev.capitalize(), tier.capitalize()]
 			continue
 		var seconds := int(round(GameState.question_seconds(tier)))
 		# The clock gets its own line, in caps, above the flavour: it is the one
@@ -891,13 +921,15 @@ func _certificate_unlocked() -> bool:
 ## panel opens (not just once at startup) because completing chapter 1 always
 ## happens in the battle scene — the menu has to notice the change the next
 ## time the player looks, not assume it already knew.
-## Names exactly which tiers are already beaten and which remain, so a player
-## who has cleared Easy and Medium sees that reflected rather than the same
-## generic "Locked." they saw before playing anything at all.
+## Names exactly which tiers are already beaten THIS SESSION and which remain,
+## so a player partway up the climb sees that reflected rather than the same
+## generic "Locked." they saw before playing anything at all. Deliberately
+## reads session progress, not the permanent record — this message describes
+## the current sitting, which is exactly the thing that resets if they leave.
 func _certificate_progress_message(chapter_title: String) -> String:
-	var done := GameState.completed_tiers_for(CERTIFICATE_CHAPTER)
+	var done := GameState.session_completed_tiers_for(CERTIFICATE_CHAPTER)
 	if done.is_empty():
-		return ("Beat %s on Easy, Medium AND Hard difficulty to unlock your Certificate of Completion."
+		return ("Beat %s on Easy, then Medium, then Hard — all in one sitting — to unlock your Certificate of Completion."
 			% chapter_title)
 	var done_labels: Array[String] = []
 	var remaining_labels: Array[String] = []
@@ -906,8 +938,8 @@ func _certificate_progress_message(chapter_title: String) -> String:
 			done_labels.append(tier.capitalize())
 		else:
 			remaining_labels.append(tier.capitalize())
-	return ("%s done on %s! Beat it on %s too to unlock your Certificate of Completion."
-		% [chapter_title, ", ".join(done_labels), " and ".join(remaining_labels)])
+	return ("%s done on %s this sitting! Beat %s next, without leaving, to unlock your Certificate of Completion."
+		% [chapter_title, ", ".join(done_labels), " then ".join(remaining_labels)])
 
 func _refresh_certificate() -> void:
 	var chapter_title := String(CHAPTER_TITLES.get(CERTIFICATE_CHAPTER, "Chapter %d" % CERTIFICATE_CHAPTER))

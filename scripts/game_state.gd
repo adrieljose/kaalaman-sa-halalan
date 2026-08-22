@@ -76,18 +76,25 @@ const STARTING_POTION_COUNT := 2
 
 var potions: Dictionary = {}
 
-## Which difficulty tiers the player has beaten at least once, per chapter.
-## Keyed chapter_no -> Dictionary{tier: true}. This is the game's only
-## persisted state — everything else in GameState is scoped to the current run
-## and starts fresh each launch. It has to survive the app closing, because
-## the certificate is a one-time unlock, not something the current session
-## remembers.
+## Whether a chapter's certificate has been earned. Keyed chapter_no -> true.
+## This is the game's only persisted state — everything else in GameState is
+## scoped to the current run and starts fresh each launch. It has to survive
+## the app closing, because the certificate, once earned, should stay earned.
 ##
-## The certificate requires EASY, MEDIUM and HARD all recorded for the same
-## chapter — beating it once on Easy does not prove the player handled every
-## tier, which is the whole point of a completion certificate. See
-## is_chapter_completed().
-var completed_difficulties: Dictionary = {}
+## What is deliberately NOT persisted is progress TOWARD earning it — see
+## _session_tier_progress below. Earning the certificate requires beating
+## Easy, then Medium, then Hard, all in one continuous sitting: leaving and
+## coming back (closing the tab, refreshing, relaunching) resets the climb
+## back to the start. Only the fact that it was ever fully earned survives.
+var certificate_earned: Dictionary = {}
+
+## Which tiers have been beaten THIS SESSION, per chapter. Keyed
+## chapter_no -> Dictionary{tier: true}. Deliberately run-scoped — never
+## written by _save_progress(), never read back by _load_progress() — because
+## this is what makes the climb "continuous": a fresh process (a relaunch, or
+## a page reload on web) starts this at {} again regardless of what the player
+## achieved in an earlier sitting.
+var _session_tier_progress: Dictionary = {}
 ## Whatever name the player last typed onto a certificate, remembered so they
 ## are not retyping it every time they come back to claim one. Empty until
 ## they claim a certificate for the first time.
@@ -101,32 +108,47 @@ func _ready() -> void:
 		push_warning("GameState: could not load chapter at %s" % CHAPTER_PATH)
 	_load_progress()
 
-## Records ONE difficulty tier as beaten for a chapter, and saves immediately.
-## Called once, right when the last encounter of a run is won — not on every
-## visit — so re-clearing an already-recorded tier does not thrash the save
-## file.
+## Records ONE difficulty tier as beaten for THIS SESSION, and — if that
+## completes the full Easy -> Medium -> Hard climb — marks the certificate
+## earned and saves that one fact permanently. Called once, right when the
+## last encounter of a run is won.
 func mark_difficulty_completed(chapter_no: int, tier: String) -> void:
-	var tiers: Dictionary = completed_difficulties.get(chapter_no, {})
-	if tiers.get(tier, false):
-		return
+	var tiers: Dictionary = _session_tier_progress.get(chapter_no, {})
 	tiers[tier] = true
-	completed_difficulties[chapter_no] = tiers
+	_session_tier_progress[chapter_no] = tiers
+	for required in QuestionBank.DIFFICULTY_ORDER:
+		if not tiers.get(required, false):
+			return
+	if certificate_earned.get(chapter_no, false):
+		return
+	certificate_earned[chapter_no] = true
 	_save_progress()
 
-## True once EASY, MEDIUM and HARD have all been beaten at least once on this
-## chapter. Finishing on only one tier does not count.
+## True once the certificate has actually been earned — Easy, Medium and Hard
+## all beaten in one sitting, at some point (this fact persists; the climb
+## toward it does not). Finishing tiers across separate sessions never
+## satisfies this, by design.
 func is_chapter_completed(chapter_no: int) -> bool:
-	var tiers: Dictionary = completed_difficulties.get(chapter_no, {})
-	for tier in QuestionBank.DIFFICULTY_ORDER:
-		if not tiers.get(tier, false):
-			return false
-	return true
+	return certificate_earned.get(chapter_no, false)
 
-## Which of the three tiers are already beaten for a chapter, in fixed order —
-## lets the certificate panel show real progress ("Easy, Medium done") instead
-## of a flat locked/unlocked state.
-func completed_tiers_for(chapter_no: int) -> Array[String]:
-	var tiers: Dictionary = completed_difficulties.get(chapter_no, {})
+## Is `tier` reachable right now, given what has been beaten THIS SESSION?
+## Easy is always open; Medium needs Easy done this session; Hard needs Medium
+## done this session. Used both to grey out the difficulty buttons and to
+## defend _start_run() against launching a tier the player has not actually
+## earned access to.
+func is_tier_unlocked(chapter_no: int, tier: String) -> bool:
+	var idx := QuestionBank.DIFFICULTY_ORDER.find(tier)
+	if idx <= 0:
+		return true
+	var prev_tier: String = QuestionBank.DIFFICULTY_ORDER[idx - 1]
+	return _session_tier_progress.get(chapter_no, {}).get(prev_tier, false)
+
+## Which tiers are done THIS SESSION, in fixed order — lets the certificate
+## panel show real progress ("Easy, Medium done — this sitting") instead of a
+## flat locked/unlocked state. Resets with the session, same as the progress
+## it describes.
+func session_completed_tiers_for(chapter_no: int) -> Array[String]:
+	var tiers: Dictionary = _session_tier_progress.get(chapter_no, {})
 	var out: Array[String] = []
 	for tier in QuestionBank.DIFFICULTY_ORDER:
 		if tiers.get(tier, false):
@@ -134,7 +156,7 @@ func completed_tiers_for(chapter_no: int) -> Array[String]:
 	return out
 
 ## Records the name typed onto a certificate. Saved immediately, same as
-## mark_chapter_completed — but only when it actually changed, so opening the
+## mark_difficulty_completed — but only when it actually changed, so opening the
 ## certificate panel and closing it again without touching the name field
 ## never writes to disk.
 func set_player_name(typed: String) -> void:
@@ -150,14 +172,14 @@ func _save_progress() -> void:
 		push_warning("GameState: could not write %s (%s)" % [
 			PROGRESS_SAVE_PATH, error_string(FileAccess.get_open_error())])
 		return
-	# JSON object keys must be strings, so chapter numbers are stringified;
-	# each chapter's tier set is stored as a plain array of tier names rather
-	# than a dictionary, since only the keys ever mattered.
+	# Only the earned flag persists -- session climb progress is intentionally
+	# never written here. JSON object keys must be strings, so chapter numbers
+	# are stringified.
 	var serializable: Dictionary = {}
-	for chapter_no in completed_difficulties:
-		serializable[str(chapter_no)] = (completed_difficulties[chapter_no] as Dictionary).keys()
+	for chapter_no in certificate_earned:
+		serializable[str(chapter_no)] = true
 	file.store_string(JSON.stringify({
-		"completed_difficulties": serializable,
+		"certificate_earned": serializable,
 		"player_name": player_name,
 	}))
 
@@ -174,16 +196,15 @@ func _load_progress() -> void:
 		push_warning("GameState: %s is not a JSON object, ignoring" % PROGRESS_SAVE_PATH)
 		return
 	var data := parsed as Dictionary
-	# Older saves used a flat "completed_chapters" list with no record of which
-	# difficulty was cleared. That single bit cannot satisfy the new all-three-
-	# tiers rule honestly, so it is intentionally NOT migrated — a save from
-	# before this change simply starts the three-tier count at zero rather than
-	# guessing which tier the old completion was on.
-	for chapter_key in data.get("completed_difficulties", {}):
-		var tiers: Dictionary = {}
-		for tier in (data["completed_difficulties"][chapter_key] as Array):
-			tiers[String(tier)] = true
-		completed_difficulties[int(chapter_key)] = tiers
+	# Older saves ("completed_chapters", then briefly "completed_difficulties")
+	# recorded progress in ways that did not require one continuous sitting.
+	# Neither can honestly satisfy the current rule, so neither is migrated --
+	# a save from before this change starts the certificate at un-earned
+	# rather than crediting a climb that was never actually done in one
+	# sitting.
+	for chapter_key in data.get("certificate_earned", {}):
+		if bool(data["certificate_earned"][chapter_key]):
+			certificate_earned[int(chapter_key)] = true
 	player_name = String(data.get("player_name", ""))
 
 ## The enemy for the encounter currently being fought, or null once the player
