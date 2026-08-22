@@ -577,58 +577,6 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 13
 text = "Title Page"
 
-[node name="PauseOptionsPanel" type="PanelContainer" parent="PauseOverlay" unique_id=791472063]
-visible = false
-layout_mode = 0
-offset_left = 195.0
-offset_top = 135.0
-offset_right = 445.0
-offset_bottom = 325.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
-
-[node name="VBox" type="VBoxContainer" parent="PauseOverlay/PauseOptionsPanel" unique_id=384341580]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="OptionsTitle" type="Label" parent="PauseOverlay/PauseOptionsPanel/VBox" unique_id=503911319]
-layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.85, 0.5, 1)
-theme_override_font_sizes/font_size = 16
-text = "OPTIONS"
-horizontal_alignment = 1
-
-[node name="MusicLabel" type="Label" parent="PauseOverlay/PauseOptionsPanel/VBox" unique_id=685036846]
-layout_mode = 2
-theme_override_font_sizes/font_size = 11
-text = "Music volume"
-
-[node name="MusicSlider" type="HSlider" parent="PauseOverlay/PauseOptionsPanel/VBox" unique_id=2049878248]
-custom_minimum_size = Vector2(0, 16)
-layout_mode = 2
-theme_override_styles/slider = SubResource("StyleBoxFlat_timer_bg")
-theme_override_styles/grabber_area = SubResource("StyleBoxFlat_timer_fill")
-theme_override_styles/grabber_area_highlight = SubResource("StyleBoxFlat_timer_fill")
-value = 100.0
-
-[node name="SfxLabel" type="Label" parent="PauseOverlay/PauseOptionsPanel/VBox" unique_id=202549293]
-layout_mode = 2
-theme_override_font_sizes/font_size = 11
-text = "Sound effects volume"
-
-[node name="SfxSlider" type="HSlider" parent="PauseOverlay/PauseOptionsPanel/VBox" unique_id=803446455]
-custom_minimum_size = Vector2(0, 16)
-layout_mode = 2
-theme_override_styles/slider = SubResource("StyleBoxFlat_timer_bg")
-theme_override_styles/grabber_area = SubResource("StyleBoxFlat_timer_fill")
-theme_override_styles/grabber_area_highlight = SubResource("StyleBoxFlat_timer_fill")
-value = 100.0
-
-[node name="BackButton" type="Button" parent="PauseOverlay/PauseOptionsPanel/VBox" unique_id=92382695]
-custom_minimum_size = Vector2(0, 26)
-layout_mode = 2
-theme_override_font_sizes/font_size = 12
-text = "Back"
-
 [node name="ResultOverlay" type="PanelContainer" parent="." unique_id=2000654719]
 visible = false
 layout_mode = 0

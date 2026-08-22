@@ -151,11 +151,10 @@ var _certificate_column: VBoxContainer
 ## Options is built in code rather than in the scene, the same as the reviewer
 ## and certificate panels: it needs per-row layout and live value readouts that
 ## are far easier to keep aligned here than in a .tscn.
-var options_panel: PanelContainer
+var options_panel: SettingsPanel
+## Convenience handles onto the shared panel's own sliders.
 var music_slider: HSlider
 var sfx_slider: HSlider
-var _music_value_label: Label
-var _sfx_value_label: Label
 
 var _certificate_status_label: Label
 var _certificate_name_input: LineEdit
@@ -300,8 +299,7 @@ func _on_options_pressed() -> void:
 	map_panel.hide()
 	_reviewer_panel.hide()
 	_certificate_panel.hide()
-	_refresh_volume_labels()
-	_pop_panel(options_panel)
+	options_panel.pop_open()
 
 func _on_credits_pressed() -> void:
 	Audio.play_sfx("button_click")
@@ -321,18 +319,6 @@ func _on_close_panels() -> void:
 func _on_quit_pressed() -> void:
 	Audio.play_sfx("button_click")
 	get_tree().quit()
-
-func _on_music_volume_changed(value: float) -> void:
-	Audio.set_music_volume_percent(value)
-	_music_value_label.text = "%d%%" % int(round(value))
-	_flash_value(_music_value_label)
-
-func _on_sfx_volume_changed(value: float) -> void:
-	Audio.set_sfx_volume_percent(value)
-	_sfx_value_label.text = "%d%%" % int(round(value))
-	_flash_value(_sfx_value_label)
-	if value > 0.0:
-		Audio.play_sfx("tile_tap")
 
 # --------------------------------------------------------------------------
 # Difficulty hints
@@ -494,40 +480,36 @@ func _build_reviewer() -> void:
 	_reviewer_entries.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll.add_child(_reviewer_entries)
 
-	var close := _make_close_button(_on_reviewer_close_pressed)
+	var close := SettingsPanel.make_back_button(_on_reviewer_close_pressed)
 	column.add_child(close)
 
 	_refresh_reviewer()
 
-## The dark red "Back" button style shared by every overlay panel built in
-## code (reviewer, certificate). Factored out so the two can never drift into
-## slightly different reds.
-func _make_close_button(handler: Callable) -> Button:
-	var close := Button.new()
-	close.text = "Back"
-	close.custom_minimum_size = Vector2(0, 24)
-	close.add_theme_font_size_override("font_size", 12)
-	close.add_theme_color_override("font_color", Color(1, 0.96, 0.85))
-	var close_style := StyleBoxFlat.new()
-	close_style.bg_color = Color(0.55, 0.2, 0.18, 0.85)
-	close_style.set_border_width_all(2)
-	close_style.border_color = Color(0.85, 0.75, 0.5, 0.8)
-	close_style.set_corner_radius_all(3)
-	for state in ["normal", "focus"]:
-		close.add_theme_stylebox_override(state, close_style)
-	# Previously all four states shared one stylebox, so the button never
-	# acknowledged the cursor at all. Resting appearance is untouched; hover
-	# lifts, press sinks.
-	var hover_style: StyleBoxFlat = close_style.duplicate()
-	hover_style.bg_color = Color(0.68, 0.26, 0.22, 0.92)
-	hover_style.border_color = Color(1.0, 0.9, 0.62, 0.95)
-	close.add_theme_stylebox_override("hover", hover_style)
-	var pressed_style: StyleBoxFlat = close_style.duplicate()
-	pressed_style.bg_color = Color(0.4, 0.14, 0.13, 0.95)
-	pressed_style.border_color = Color(0.7, 0.6, 0.4, 0.8)
-	close.add_theme_stylebox_override("pressed", pressed_style)
-	close.pressed.connect(handler)
-	return close
+
+# --- options panel ---------------------------------------------------------
+
+## Panel geometry, in the 640x480 viewport the game is authored at. Narrower
+## than the old 340px panel on purpose: this sits over the title art, and the
+## menu behind it should stay readable.
+const OPTIONS_PANEL_RECT := Rect2(176.0, 158.0, 288.0, 168.0)
+
+## The panel itself is SettingsPanel, shared with the battle scene's pause
+## menu. Only its placement lives here -- the styling, the sliders and the Back
+## button all belong to the shared component, so the two screens cannot drift
+## into looking like different settings systems.
+func _build_options() -> void:
+	options_panel = SettingsPanel.new()
+	options_panel.name = "OptionsPanel"
+	options_panel.offset_left = OPTIONS_PANEL_RECT.position.x
+	options_panel.offset_top = OPTIONS_PANEL_RECT.position.y
+	options_panel.offset_right = OPTIONS_PANEL_RECT.position.x + OPTIONS_PANEL_RECT.size.x
+	options_panel.offset_bottom = OPTIONS_PANEL_RECT.position.y + OPTIONS_PANEL_RECT.size.y
+	options_panel.size = OPTIONS_PANEL_RECT.size
+	add_child(options_panel)
+	options_panel.build(_on_close_panels)
+	options_panel.hide()
+	music_slider = options_panel.music_slider
+	sfx_slider = options_panel.sfx_slider
 
 ## Slots a REVIEWER button into the existing menu stack, directly under PLAY —
 ## it belongs with playing, not with the Options/Credits housekeeping below it.
@@ -796,195 +778,6 @@ func _on_reviewer_close_pressed() -> void:
 ## outlives the current session, not just an in-memory flag), then a CLAIM
 ## button that hands the player the certificate PDF. Built in code for the
 ## same reason as the reviewer: no .tscn to lose to an editor auto-revert.
-# --- options panel ---------------------------------------------------------
-#
-# Built from the game's own UI art rather than from flat StyleBoxFlat colours:
-# panel_ornate for the frame, bar_track/bar_fill for the sliders. The previous
-# version was a plain rounded rectangle with unstyled HSliders, which is why two
-# grey grabber circles appeared to float unattached at the right-hand end -- the
-# theme's `grabber` is an ICON, not a stylebox, and nothing had overridden it.
-
-## Panel geometry, in the 640x480 viewport the game is authored at. Narrower
-## than the old 340px panel on purpose: this sits over the title art, and the
-## menu behind it should stay readable.
-const OPTIONS_PANEL_RECT := Rect2(176.0, 158.0, 288.0, 168.0)
-## panel_ornate is 96x96 with a 5px brass frame and a rivet in each corner.
-## Slicing at 12 leaves the rivets whole while the wood between them tiles.
-const OPTIONS_FRAME_SLICE := 12.0
-
-func _build_options() -> void:
-	options_panel = PanelContainer.new()
-	options_panel.name = "OptionsPanel"
-	options_panel.add_theme_stylebox_override("panel", _ornate_panel_style())
-	options_panel.offset_left = OPTIONS_PANEL_RECT.position.x
-	options_panel.offset_top = OPTIONS_PANEL_RECT.position.y
-	options_panel.offset_right = OPTIONS_PANEL_RECT.position.x + OPTIONS_PANEL_RECT.size.x
-	options_panel.offset_bottom = OPTIONS_PANEL_RECT.position.y + OPTIONS_PANEL_RECT.size.y
-	# Scaling on show pushes out from the middle rather than the corner.
-	options_panel.pivot_offset = OPTIONS_PANEL_RECT.size * 0.5
-	options_panel.hide()
-	add_child(options_panel)
-
-	var margin := MarginContainer.new()
-	margin.add_theme_constant_override("margin_left", 14)
-	margin.add_theme_constant_override("margin_right", 14)
-	margin.add_theme_constant_override("margin_top", 10)
-	margin.add_theme_constant_override("margin_bottom", 10)
-	options_panel.add_child(margin)
-
-	var column := VBoxContainer.new()
-	column.add_theme_constant_override("separation", 9)
-	margin.add_child(column)
-
-	var title := Label.new()
-	title.text = "OPTIONS"
-	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title.add_theme_font_override("font", load("res://assets/fonts/TitanOne-Regular.ttf"))
-	title.add_theme_font_size_override("font_size", 20)
-	title.add_theme_color_override("font_color", Color(1, 0.85, 0.5))
-	# Carved-into-the-wood look, matching the menu signs behind the panel.
-	title.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.65))
-	title.add_theme_constant_override("shadow_offset_x", 0)
-	title.add_theme_constant_override("shadow_offset_y", 2)
-	column.add_child(title)
-
-	var rule := ColorRect.new()
-	rule.color = Color(0.72, 0.56, 0.22, 0.55)
-	rule.custom_minimum_size = Vector2(0, 2)
-	column.add_child(rule)
-
-	music_slider = HSlider.new()
-	_music_value_label = Label.new()
-	column.add_child(_make_setting_row(
-		"res://assets/images/ui/icon_music.png", "Music", music_slider, _music_value_label))
-
-	sfx_slider = HSlider.new()
-	_sfx_value_label = Label.new()
-	column.add_child(_make_setting_row(
-		"res://assets/images/ui/icon_sfx.png", "Sound", sfx_slider, _sfx_value_label))
-
-	music_slider.value_changed.connect(_on_music_volume_changed)
-	sfx_slider.value_changed.connect(_on_sfx_volume_changed)
-
-	column.add_child(_make_close_button(_on_close_panels))
-	_refresh_volume_labels()
-
-## The panel background: the game's ornate wood-and-brass frame, nine-sliced so
-## it holds at any size instead of the frame stretching with the panel.
-func _ornate_panel_style() -> StyleBoxTexture:
-	var style := StyleBoxTexture.new()
-	style.texture = load("res://assets/images/ui/panel_ornate.png")
-	style.texture_margin_left = OPTIONS_FRAME_SLICE
-	style.texture_margin_top = OPTIONS_FRAME_SLICE
-	style.texture_margin_right = OPTIONS_FRAME_SLICE
-	style.texture_margin_bottom = OPTIONS_FRAME_SLICE
-	# Keeps content off the brass, which the frame would otherwise overlap.
-	style.set_content_margin_all(6.0)
-	return style
-
-## One settings row: icon, name, slider, live percentage.
-##
-## The fixed widths on the name and the readout are what line the two sliders up
-## with one another. Without them each row sizes to its own text, so "Music" and
-## "Sound" start their tracks at different x positions -- a small misalignment
-## that reads as carelessness even when nobody can say why.
-func _make_setting_row(icon_path: String, label_text: String,
-		slider: HSlider, value_label: Label) -> HBoxContainer:
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 8)
-
-	var icon := TextureRect.new()
-	icon.texture = load(icon_path)
-	icon.custom_minimum_size = Vector2(18, 18)
-	icon.stretch_mode = TextureRect.STRETCH_KEEP_CENTERED
-	row.add_child(icon)
-
-	var name_label := Label.new()
-	name_label.text = label_text
-	name_label.custom_minimum_size = Vector2(50, 0)
-	name_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	name_label.add_theme_font_size_override("font_size", 12)
-	name_label.add_theme_color_override("font_color", Color(0.92, 0.86, 0.72))
-	row.add_child(name_label)
-
-	_style_volume_slider(slider)
-	slider.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	slider.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	row.add_child(slider)
-
-	value_label.custom_minimum_size = Vector2(34, 0)
-	value_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	value_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	value_label.add_theme_font_size_override("font_size", 12)
-	value_label.add_theme_color_override("font_color", Color(1, 0.85, 0.5))
-	row.add_child(value_label)
-	return row
-
-## Dresses an HSlider in the game's own bar art.
-##
-## The three pieces are theme items of different KINDS, which is exactly what
-## the old panel got wrong: `slider` and `grabber_area` are styleboxes, but
-## `grabber` is an ICON. Overriding only the styleboxes leaves Godot drawing its
-## default grey circle for the knob, floating clear of the track.
-func _style_volume_slider(slider: HSlider) -> void:
-	slider.max_value = 100.0
-	slider.step = 1.0
-	slider.custom_minimum_size = Vector2(0, 18)
-
-	var track := StyleBoxTexture.new()
-	track.texture = load("res://assets/images/ui/bar_track.png")
-	# bar_track is 64x14 with 4px end caps; slicing there keeps the caps square
-	# however far the middle is stretched.
-	track.texture_margin_left = 4.0
-	track.texture_margin_right = 4.0
-	# The vertical margins are not decoration: Slider draws its track at the
-	# stylebox's MINIMUM height, and a stylebox with only horizontal margins
-	# reports a minimum height of zero -- so the track draws 0px tall and
-	# vanishes, leaving the grabber apparently floating on nothing. 7+7 makes
-	# the minimum the art's own 14px height.
-	track.texture_margin_top = 7.0
-	track.texture_margin_bottom = 7.0
-	slider.add_theme_stylebox_override("slider", track)
-
-	var fill := StyleBoxTexture.new()
-	fill.texture = load("res://assets/images/ui/bar_fill.png")
-	fill.texture_margin_left = 4.0
-	fill.texture_margin_right = 4.0
-	fill.texture_margin_top = 7.0
-	fill.texture_margin_bottom = 7.0
-	# The art is near-white so it can be tinted per use; brass here, so the
-	# panel stays a two-colour object instead of introducing a fourth hue.
-	fill.modulate_color = Color(0.93, 0.74, 0.33)
-	slider.add_theme_stylebox_override("grabber_area", fill)
-
-	var fill_hot: StyleBoxTexture = fill.duplicate()
-	fill_hot.modulate_color = Color(1.0, 0.88, 0.52)
-	slider.add_theme_stylebox_override("grabber_area_highlight", fill_hot)
-
-	var knob: Texture2D = load("res://assets/images/ui/slider_knob.png")
-	slider.add_theme_icon_override("grabber", knob)
-	slider.add_theme_icon_override("grabber_highlight", knob)
-
-## Repaints both readouts from the volumes actually in force, so the panel opens
-## showing the truth rather than whatever the sliders were built with.
-func _refresh_volume_labels() -> void:
-	if music_slider != null:
-		music_slider.set_value_no_signal(Audio.music_volume_percent())
-		_music_value_label.text = "%d%%" % int(round(music_slider.value))
-	if sfx_slider != null:
-		sfx_slider.set_value_no_signal(Audio.sfx_volume_percent())
-		_sfx_value_label.text = "%d%%" % int(round(sfx_slider.value))
-
-## Confirms a change on the readout itself: a brief lift, then back.
-## Sound effects already answer audibly; music has no such feedback, and a
-## number that changes silently is easy to miss mid-drag.
-func _flash_value(label: Label) -> void:
-	label.modulate = Color(1.6, 1.5, 1.3)
-	var tween := create_tween()
-	tween.tween_property(label, "modulate", Color(1, 1, 1), 0.22) \
-		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-
-## Opens a panel with a short push out from its own centre. Subtle on purpose --
 ## this is a settings box, not a reward screen.
 func _pop_panel(panel: Control) -> void:
 	panel.show()
@@ -1059,7 +852,7 @@ func _build_certificate() -> void:
 	_certificate_claim_button.pressed.connect(_on_certificate_claim_pressed)
 	column.add_child(_certificate_claim_button)
 
-	column.add_child(_make_close_button(_on_certificate_close_pressed))
+	column.add_child(SettingsPanel.make_back_button(_on_certificate_close_pressed))
 
 	_refresh_certificate()
 

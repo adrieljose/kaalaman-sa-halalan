@@ -198,14 +198,15 @@ const HUD_DIFFICULTY_COLORS := {
 @onready var result_label: Label = $ResultOverlay/VBox/ResultLabel
 @onready var try_again_button: Button = $ResultOverlay/VBox/TryAgainButton
 @onready var pause_overlay: Control = $PauseOverlay
+## The in-battle settings panel is the SAME component the title screen
+## uses, built in code rather than laid out in the scene. Two hand-built
+## panels drift: this one had stayed a plain dark rectangle with unstyled
+## sliders long after the title version was rebuilt in the game's own art.
+var pause_options_panel: SettingsPanel
 @onready var pause_main_panel: PanelContainer = $PauseOverlay/PauseMainPanel
-@onready var pause_options_panel: PanelContainer = $PauseOverlay/PauseOptionsPanel
 @onready var resume_button: Button = $PauseOverlay/PauseMainPanel/VBox/ResumeButton
 @onready var pause_options_button: Button = $PauseOverlay/PauseMainPanel/VBox/OptionsButton
 @onready var title_button: Button = $PauseOverlay/PauseMainPanel/VBox/TitleButton
-@onready var pause_music_slider: HSlider = $PauseOverlay/PauseOptionsPanel/VBox/MusicSlider
-@onready var pause_sfx_slider: HSlider = $PauseOverlay/PauseOptionsPanel/VBox/SfxSlider
-@onready var pause_options_back_button: Button = $PauseOverlay/PauseOptionsPanel/VBox/BackButton
 @onready var encounter_label: Label = $TopBar/EnemyPanel/EncounterLabel
 @onready var chapter_banner: TextureRect = $ChapterBanner
 @onready var header_bar: ColorRect = $HeaderBar
@@ -302,10 +303,8 @@ func _ready() -> void:
 	try_again_button.pressed.connect(_on_try_again_pressed)
 	resume_button.pressed.connect(_on_resume_pressed)
 	pause_options_button.pressed.connect(_on_pause_options_pressed)
-	pause_options_back_button.pressed.connect(_on_pause_options_back_pressed)
 	title_button.pressed.connect(_on_title_pressed)
-	pause_music_slider.value_changed.connect(Audio.set_music_volume_percent)
-	pause_sfx_slider.value_changed.connect(_on_pause_sfx_volume_changed)
+	_build_pause_options()
 	pause_overlay.hide()
 	encounter_banner.hide()
 	transition_veil.color.a = 0.0
@@ -360,6 +359,10 @@ func _flash_question_panel() -> void:
 	var tween := create_tween()
 	tween.tween_property(question_panel, "modulate", Color.WHITE, 0.4) 		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 
+## Where both pages of the pause menu sit. Matches PauseMainPanel's own rect
+## in word_battle.tscn so switching pages does not move the box.
+const PAUSE_PANEL_RECT := Rect2(195.0, 135.0, 250.0, 190.0)
+
 func _on_menu_pressed() -> void:
 	Audio.play_sfx("button_click")
 	_open_pause_menu()
@@ -380,19 +383,35 @@ func _on_resume_pressed() -> void:
 	get_tree().paused = false
 	pause_overlay.hide()
 
+## Builds the in-battle settings panel. Centred on the same rect the pause
+## menu's own page uses, so the two pages of the pause menu sit in one place
+## rather than jumping as the player moves between them.
+func _build_pause_options() -> void:
+	pause_options_panel = SettingsPanel.new()
+	pause_options_panel.name = "PauseOptionsPanel"
+	pause_options_panel.offset_left = PAUSE_PANEL_RECT.position.x
+	pause_options_panel.offset_top = PAUSE_PANEL_RECT.position.y
+	pause_options_panel.offset_right = PAUSE_PANEL_RECT.position.x + PAUSE_PANEL_RECT.size.x
+	pause_options_panel.offset_bottom = PAUSE_PANEL_RECT.position.y + PAUSE_PANEL_RECT.size.y
+	pause_options_panel.size = PAUSE_PANEL_RECT.size
+	# The overlay runs WHEN_PAUSED so its controls stay live while the tree is
+	# frozen; a child added in code has to be told the same, or the sliders go
+	# dead the moment the game is actually paused.
+	pause_options_panel.process_mode = Node.PROCESS_MODE_WHEN_PAUSED
+	pause_overlay.add_child(pause_options_panel)
+	pause_options_panel.build(_on_pause_options_back_pressed)
+	pause_options_panel.hide()
+
 func _on_pause_options_pressed() -> void:
 	Audio.play_sfx("button_click")
 	pause_main_panel.hide()
-	pause_options_panel.show()
+	pause_options_panel.pop_open()
 
 func _on_pause_options_back_pressed() -> void:
 	Audio.play_sfx("button_click")
 	pause_options_panel.hide()
 	pause_main_panel.show()
 
-func _on_pause_sfx_volume_changed(value: float) -> void:
-	Audio.set_sfx_volume_percent(value)
-	Audio.play_sfx("tile_tap")
 
 ## Must unpause before changing scenes — a scene loaded while the tree is
 ## still paused would arrive frozen, with nothing on it able to process.
@@ -1375,12 +1394,13 @@ func _play_attack_sequence(damage: int, is_answer: bool, tier: Dictionary) -> vo
 	# One of five swings, picked at random — see _play_player_attack. Each still
 	# spends the tier's own reach, so a longer word visibly carries further
 	# whichever style comes up, and nothing about the damage changes.
-	await _play_player_attack(tier)
-	await _spawn_bolts(player_character, enemy_character,
-		Color(1, 0.86, 0.42, 0.95),
-		int(tier["bolts"]), float(tier["bolt_size"]), float(tier["rate"]))
+	# The throw launches its own projectiles on the beat the hand opens and
+	# hands back whatever flight time is still outstanding, so the impact waits
+	# for the bolts rather than for the animation.
+	var in_flight := await _play_player_attack(tier)
+	if in_flight > 0.0:
+		await get_tree().create_timer(in_flight).timeout
 
-	Audio.play_sfx("attack_impact")
 	Audio.play_sfx("enemy_hurt")
 	_shake_screen(float(tier["shake"]))
 	var enemy_flinching := enemy_character.play_hit()
@@ -1388,11 +1408,6 @@ func _play_attack_sequence(damage: int, is_answer: bool, tier: Dictionary) -> vo
 	enemy_heart_row.set_value(_enemy_hp)
 	if enemy_flinching:
 		await enemy_character.one_shot_finished
-
-	# Only now does the player walk back — after the blow, the bolts and the
-	# flinch have all landed at contact range. Before the win check, so a
-	# killing blow cannot leave the player stranded across the field.
-	await _player_recover()
 
 	if _enemy_hp <= 0:
 		_sequence_running = false
@@ -1538,14 +1553,26 @@ func _spawn_bolt(from: Control, to: Control, tint: Color, bolt_size: float,
 	tween.tween_callback(orb.queue_free)
 
 ## Fires `count` bolts and waits for the last of them to land.
-func _spawn_bolts(from: Control, to: Control, tint: Color, count: int,
-		bolt_size: float, rate: float) -> void:
+## Fires `count` bolts and returns how long the last one needs to land,
+## WITHOUT waiting for it. The player's throw keeps animating while they fly:
+## awaiting here is what used to freeze the thrower mid-motion and make the
+## projectile look bolted on rather than thrown.
+func _launch_bolts(from: Control, to: Control, tint: Color, count: int,
+		bolt_size: float, rate: float) -> float:
 	var travel := TRAVEL_TIME * rate
 	var stagger := travel * 0.22
 	for i in count:
 		_spawn_bolt(from, to, tint, bolt_size, travel, stagger * float(i),
 			0.0 if count == 1 else randf_range(-14.0, 14.0))
-	await get_tree().create_timer(travel + stagger * float(maxi(0, count - 1))).timeout
+	return travel + stagger * float(maxi(0, count - 1))
+
+## Fires `count` bolts and waits for the last of them to land. The rival's
+## skills use this; the player's throws use _launch_bolts directly so their
+## follow-through can run over the top of the flight.
+func _spawn_bolts(from: Control, to: Control, tint: Color, count: int,
+		bolt_size: float, rate: float) -> void:
+	await get_tree().create_timer(
+		_launch_bolts(from, to, tint, count, bolt_size, rate)).timeout
 
 ## Plays one enemy skill. Every style moves the rival and crosses the gap
 ## differently, so the three moves on a roster never look alike even though
@@ -1707,151 +1734,231 @@ func _fx_impact(move_id: String, shake: float, color: Color, flash: float = 0.22
 
 # --- player attacks -------------------------------------------------------
 #
-# Five different swings, chosen at random, so the same word does not always
-# look like the same punch. Purely presentational: the damage, the tier and
-# the timing of everything the caller does are untouched — each style just
-# spends the tier's own `lunge` reach differently.
+# Juan and Maria fight at range: they hold their ground and throw. Nothing here
+# travels toward the rival -- an earlier pass had every style walk the whole
+# field and back, which is right for a melee skill and wrong for a thrown one.
+# The rival's own melee moves still cross the gap; see _melee_advance.
 #
-# The player is the one character with a real 9-frame walk clip, so the charge
-# uses it for genuine leg animation; the leap uses the cut-out rig; the rest
-# shape the body with beats.
+# What sells a thrown attack is the body, not the projectile. Each style runs
+# the same five phases, and the projectile leaves on the exact beat the hand
+# opens rather than after the animation has finished:
+#
+#   anticipation -> the coil. Weight drops, torso winds AWAY from the throw
+#   drive        -> the uncoil, weight transferring onto the front foot
+#   release      -> bolts launch HERE, and the attack clip plays for the arm
+#   follow       -> the arm's momentum carries the body past the release
+#   recover      -> the settle back to stance
+#
+# The body is animated three ways at once, because one alone reads as a slide:
+# `_beat` moves and rotates the whole figure, the cut-out rig swings legs,
+# torso and head against each other, and the 7-frame attack clip supplies the
+# arm. The rig and the clip cannot both be up (the rig slices whichever frame
+# was showing when it was raised), so every style rigs the wind-up, drops the
+# rig at the release and lets the clip carry the throw.
 
-const PLAYER_ATTACK_STYLES := ["jab", "haymaker", "charge", "leap", "spin"]
-## Never the same style twice running — random that repeats itself reads as
-## broken rather than random.
+## One phase of a throw. Every field is optional; a phase that only sets `legs`
+## and `torso` is a pure rig pose, one that only sets `dx` is pure travel.
+##
+##   dx, dy   offset from the resting stance, in pixels
+##   rot      whole-body tilt, degrees
+##   sx, sy   squash and stretch
+##   legs,
+##   torso,
+##   head     rig joint angles, degrees -- the actual body articulation
+##   bob      lifts the whole rigged figure, for a rise onto the toes
+##   t        seconds
+##   release  true on the single phase where the projectile leaves the hand
+func _phase(d: Dictionary) -> Dictionary:
+	return d
+
+## Juan throws like a boy who plays street games: wide stance, big shoulder,
+## everything committed. Maria is quicker and more upright, more wrist and
+## rotation than shoulder. They share no style outright -- even where both have
+## a two-handed cast, the timing and the joint angles differ.
+##
+## Keyed by character so a new character means a new entry, not an edit here.
+func _ranged_styles(who: String) -> Dictionary:
+	if who == "female":
+		return _maria_styles()
+	return _juan_styles()
+
+## JUAN -- grounded, athletic, throws from the shoulder.
+func _juan_styles() -> Dictionary:
+	return {
+		# Overhand baseball throw: the whole body behind one arm.
+		"overhand": [
+			_phase({"dx": -9, "dy": 3, "rot": -7, "legs": 5, "torso": -12, "head": -5, "t": 0.20}),
+			_phase({"dx": -13, "dy": 1, "rot": -10, "legs": 8, "torso": -18, "head": -8, "t": 0.10}),
+			_phase({"dx": 8, "dy": -4, "rot": 9, "sx": 1.06, "sy": 0.95, "t": 0.07, "release": true}),
+			_phase({"dx": 13, "dy": 2, "rot": 14, "sx": 1.04, "sy": 0.97, "t": 0.09}),
+			_phase({"dx": 4, "dy": 0, "rot": 4, "t": 0.16}),
+		],
+		# Side-arm skimmer, thrown low across the body like a flat stone.
+		"sidearm": [
+			_phase({"dx": -7, "dy": 4, "rot": -4, "legs": 10, "torso": -16, "head": -3, "t": 0.17}),
+			_phase({"dx": 10, "dy": 5, "rot": 7, "sx": 1.08, "sy": 0.93, "t": 0.07, "release": true}),
+			_phase({"dx": 15, "dy": 3, "rot": 11, "t": 0.10}),
+			_phase({"dx": 3, "dy": 0, "rot": 3, "t": 0.15}),
+		],
+		# Two-handed shove: both palms out, a push rather than a throw.
+		"shove": [
+			_phase({"dx": -6, "dy": 5, "rot": 0, "legs": 6, "torso": -8, "head": 4, "sy": 1.05, "t": 0.18}),
+			_phase({"dx": -9, "dy": 7, "rot": 0, "legs": 9, "torso": -11, "sy": 1.08, "t": 0.08}),
+			_phase({"dx": 12, "dy": -2, "rot": 0, "sx": 1.12, "sy": 0.9, "t": 0.06, "release": true}),
+			_phase({"dx": 16, "dy": 0, "rot": 2, "sx": 1.06, "sy": 0.96, "t": 0.10}),
+			_phase({"dx": 2, "dy": 0, "rot": 0, "t": 0.16}),
+		],
+		# Quick snap: barely any wind-up, over before it is read.
+		"snap": [
+			_phase({"dx": -4, "dy": 1, "rot": -3, "legs": 3, "torso": -6, "t": 0.08}),
+			_phase({"dx": 9, "dy": -2, "rot": 6, "sx": 1.04, "sy": 0.97, "t": 0.05, "release": true}),
+			_phase({"dx": 5, "dy": 0, "rot": 3, "t": 0.09}),
+		],
+		# Charged heave: sinks into both knees, then throws everything upward.
+		"heave": [
+			_phase({"dx": -5, "dy": 10, "rot": 0, "legs": 14, "torso": -6, "head": 6, "sx": 1.06, "sy": 0.9, "t": 0.26}),
+			_phase({"dx": -8, "dy": 12, "rot": -4, "legs": 17, "torso": -10, "head": 8, "sx": 1.08, "sy": 0.88, "t": 0.12}),
+			_phase({"dx": 10, "dy": -12, "rot": 8, "sx": 0.94, "sy": 1.12, "t": 0.08, "release": true}),
+			_phase({"dx": 16, "dy": -4, "rot": 13, "sx": 1.05, "sy": 0.96, "t": 0.12}),
+			_phase({"dx": 4, "dy": 3, "rot": 3, "sy": 1.02, "t": 0.18}),
+		],
+		# Full turn into the throw, using the rotation for power.
+		"turnthrow": [
+			_phase({"dx": -6, "dy": 2, "rot": -22, "legs": 7, "torso": -14, "head": -10, "t": 0.16}),
+			_phase({"dx": -2, "dy": 0, "rot": -150, "t": 0.13}),
+			_phase({"dx": 9, "dy": -3, "rot": -330, "sx": 1.06, "sy": 0.95, "t": 0.09, "release": true}),
+			_phase({"dx": 12, "dy": 1, "rot": -368, "t": 0.10}),
+			_phase({"dx": 3, "dy": 0, "rot": -360, "t": 0.14}),
+		],
+		# Braced stance, then a straight punch of a throw down the middle.
+		"brace": [
+			_phase({"dx": -8, "dy": 6, "rot": 0, "legs": 12, "torso": -5, "head": 3, "t": 0.22}),
+			_phase({"dx": 11, "dy": -1, "rot": 4, "sx": 1.05, "sy": 0.96, "t": 0.06, "release": true}),
+			_phase({"dx": 14, "dy": 1, "rot": 7, "t": 0.09}),
+			_phase({"dx": 3, "dy": 0, "rot": 2, "t": 0.15}),
+		],
+	}
+
+## MARIA -- lighter and faster, throws from the wrist and the hips. Her
+## wind-ups are shorter, her recoveries land more upright, and she rises onto
+## the front foot where Juan digs into both.
+func _maria_styles() -> Dictionary:
+	return {
+		# A long sweeping arc across the body, unhurried and deliberate.
+		"arc": [
+			_phase({"dx": -8, "dy": 1, "rot": -9, "legs": 4, "torso": -14, "head": -6, "bob": -2, "t": 0.22}),
+			_phase({"dx": -10, "dy": -2, "rot": -12, "legs": 5, "torso": -17, "head": -8, "bob": -4, "t": 0.10}),
+			_phase({"dx": 9, "dy": -5, "rot": 10, "sx": 1.03, "sy": 1.02, "t": 0.07, "release": true}),
+			_phase({"dx": 14, "dy": -2, "rot": 15, "t": 0.10}),
+			_phase({"dx": 3, "dy": 0, "rot": 4, "t": 0.17}),
+		],
+		# Wrist flick: almost nothing moves but the forearm and the hips.
+		"flick": [
+			_phase({"dx": -3, "dy": 0, "rot": -4, "legs": 2, "torso": -5, "head": -3, "t": 0.07}),
+			_phase({"dx": 7, "dy": -3, "rot": 7, "sx": 1.02, "sy": 1.01, "t": 0.04, "release": true}),
+			_phase({"dx": 4, "dy": 0, "rot": 3, "t": 0.08}),
+		],
+		# Both hands together at the sternum, then opened outward.
+		"twincast": [
+			_phase({"dx": -4, "dy": 3, "rot": 0, "legs": 4, "torso": -4, "head": 5, "sx": 0.95, "sy": 1.05, "t": 0.20}),
+			_phase({"dx": -6, "dy": 4, "rot": 0, "legs": 6, "torso": -6, "head": 7, "sx": 0.92, "sy": 1.08, "t": 0.10}),
+			_phase({"dx": 10, "dy": -4, "rot": 0, "sx": 1.12, "sy": 0.94, "t": 0.06, "release": true}),
+			_phase({"dx": 13, "dy": -1, "rot": 0, "sx": 1.05, "sy": 0.98, "t": 0.10}),
+			_phase({"dx": 2, "dy": 0, "rot": 0, "t": 0.16}),
+		],
+		# Pirouette: a dancer's turn that lets the throw trail out of it.
+		"pirouette": [
+			_phase({"dx": -4, "dy": -3, "rot": -14, "legs": 3, "torso": -10, "head": -6, "bob": -5, "t": 0.15}),
+			_phase({"dx": 0, "dy": -6, "rot": 160, "bob": -7, "sy": 1.06, "t": 0.14}),
+			_phase({"dx": 8, "dy": -4, "rot": 344, "sx": 1.04, "sy": 1.0, "t": 0.08, "release": true}),
+			_phase({"dx": 11, "dy": -1, "rot": 372, "t": 0.10}),
+			_phase({"dx": 2, "dy": 0, "rot": 360, "t": 0.15}),
+		],
+		# Drops to one knee, gathers, then rises releasing on the way up.
+		"kneel": [
+			_phase({"dx": -5, "dy": 12, "rot": -5, "legs": 16, "torso": -8, "head": 4, "sy": 0.9, "t": 0.24}),
+			_phase({"dx": -6, "dy": 14, "rot": -7, "legs": 19, "torso": -11, "head": 6, "sy": 0.88, "t": 0.10}),
+			_phase({"dx": 8, "dy": -10, "rot": 6, "sx": 0.96, "sy": 1.12, "t": 0.08, "release": true}),
+			_phase({"dx": 12, "dy": -5, "rot": 10, "t": 0.11}),
+			_phase({"dx": 2, "dy": 2, "rot": 3, "t": 0.18}),
+		],
+		# Backhand: the arm crosses first, then whips out the far side.
+		"backhand": [
+			_phase({"dx": 4, "dy": 1, "rot": 8, "legs": 3, "torso": 12, "head": 6, "t": 0.18}),
+			_phase({"dx": 6, "dy": 0, "rot": 11, "legs": 4, "torso": 15, "head": 8, "t": 0.08}),
+			_phase({"dx": 9, "dy": -3, "rot": -9, "sx": 1.05, "sy": 0.97, "t": 0.06, "release": true}),
+			_phase({"dx": 13, "dy": 0, "rot": -13, "t": 0.10}),
+			_phase({"dx": 3, "dy": 0, "rot": -3, "t": 0.15}),
+		],
+		# Rises onto the toes and casts high, the most weightless of the set.
+		"skycast": [
+			_phase({"dx": -4, "dy": 4, "rot": -3, "legs": 6, "torso": -6, "head": -8, "t": 0.20}),
+			_phase({"dx": -2, "dy": -8, "rot": 0, "legs": 2, "torso": -3, "head": -12, "bob": -9, "sy": 1.08, "t": 0.12}),
+			_phase({"dx": 7, "dy": -11, "rot": 5, "sx": 1.02, "sy": 1.04, "t": 0.07, "release": true}),
+			_phase({"dx": 10, "dy": -5, "rot": 9, "t": 0.11}),
+			_phase({"dx": 2, "dy": 0, "rot": 2, "t": 0.17}),
+		],
+	}
+
+## Which style comes next. Never the same one twice running -- random that
+## repeats itself reads as broken rather than random.
 var _last_player_attack: String = ""
 
-func _pick_player_attack() -> String:
-	var pool: Array = PLAYER_ATTACK_STYLES.filter(
+func _pick_player_attack(styles: Dictionary) -> String:
+	var pool: Array = styles.keys().filter(
 		func(s: String) -> bool: return s != _last_player_attack)
 	if pool.is_empty():
-		pool = PLAYER_ATTACK_STYLES
+		pool = styles.keys()
 	_last_player_attack = pool[randi() % pool.size()]
 	return _last_player_attack
 
-## Runs one of the five. `tier` is the word-length tier the caller already
-## resolved; only its `lunge` value is read, and only as the overshoot past the
-## point of contact, so a longer word still visibly hits harder whichever style
-## comes up. Damage, tier and the caller's timing are untouched.
+## Runs one ranged attack and returns how long the projectiles still need to
+## land, so the caller can wait for them without freezing the follow-through.
 ##
-## Leaves the player standing at contact range — _player_recover() brings it
-## home once the hit has actually landed.
-func _play_player_attack(tier: Dictionary) -> void:
-	var reach: float = maxf(float(tier.get("lunge", 20.0)), 10.0)
-	var style := _pick_player_attack()
+## `tier` is the word-length tier the caller already resolved. Only its own
+## values are read; damage and timing are the caller's business, untouched.
+func _play_player_attack(tier: Dictionary) -> float:
+	var styles := _ranged_styles(GameState.character)
+	var phases: Array = styles[_pick_player_attack(styles)]
+	# A longer word throws harder: the whole body commits further, but from the
+	# same spot. This scales the motion, never the position on the field.
+	var power: float = clampf(float(tier.get("lunge", 20.0)) / 26.0, 0.6, 1.6)
+
 	_body_begin(player_character, BODY_FEET)
-	_body_bring_forward(player_character)
-	# Every one of the five is a physical swing, so every one of them closes the
-	# distance; `reach` is no longer the travel but the overshoot on top of it,
-	# which is what keeps a longer word hitting visibly harder.
-	var dx := _player_melee_dx()
-	match style:
-		"haymaker": await _player_haymaker(dx, reach)
-		"charge": await _player_charge(dx, reach)
-		"leap": await _player_leap(dx, reach)
-		"spin": await _player_spin(dx, reach)
-		_: await _player_jab(dx, reach)
-
-## Walks the player home again. Deliberately NOT part of the swing: the bolts
-## and the rival's flinch have to land while the two are still touching, and
-## returning before them is exactly what made the old lunge read as a punch
-## thrown at empty air.
-func _player_recover() -> void:
-	if _travel_layer_node != player_character:
-		return
-	player_character.play_walk()
-	await _body_play(player_character, [
-		_beat(0, 0, 0, 1.0, 1.0, 0.28, Tween.TRANS_SINE, Tween.EASE_IN_OUT),
-	])
-	player_character.play_idle()
-	_body_send_back(player_character)
-	await _body_end(player_character, 0.12)
-
-## Short, fast, and over before you can read it.
-func _player_jab(dx: float, reach: float) -> void:
-	await _body_play(player_character, [
-		_beat(-5, 1, -3, 1.0, 1.0, 0.07, Tween.TRANS_QUAD, Tween.EASE_OUT),   # tiny load
-	])
-	player_character.play_walk()
-	await _body_play(player_character, [
-		_beat(dx, 0, 3, 1.0, 1.0, 0.24, Tween.TRANS_SINE, Tween.EASE_IN_OUT), # steps in
-	])
-	player_character.play_idle()
-	player_character.play_attack()
-	await _body_play(player_character, [
-		_beat(dx + reach * 0.25, -2, 6, 1.04, 0.97, 0.06, Tween.TRANS_QUAD, Tween.EASE_IN),
-		_beat(dx, 0, 2, 1.0, 1.0, 0.1, Tween.TRANS_BACK, Tween.EASE_OUT),
-	])
-
-## Winds all the way back, then throws everything forward.
-func _player_haymaker(dx: float, reach: float) -> void:
-	player_character.play_walk()
-	await _body_play(player_character, [
-		_beat(dx, 0, 2, 1.0, 1.0, 0.26, Tween.TRANS_SINE, Tween.EASE_IN_OUT),
-	])
-	player_character.play_idle()
-	await _body_play(player_character, [
-		_beat(dx - 13, 3, -15, 0.97, 1.02, 0.18, Tween.TRANS_QUAD, Tween.EASE_OUT),
-	])
-	player_character.play_attack()
-	await _body_play(player_character, [
-		_beat(dx + reach * 0.35, -4, 18, 1.1, 0.92, 0.08, Tween.TRANS_QUAD, Tween.EASE_IN),
-		_beat(dx, 2, 10, 1.02, 0.98, 0.18, Tween.TRANS_BACK, Tween.EASE_OUT),
-	])
-
-## Strides in on the walk clip — the one attack with real, hand-drawn leg
-## animation — hits at close range, then walks back.
-func _player_charge(dx: float, reach: float) -> void:
-	player_character.play_walk()
-	await _body_play(player_character, [
-		_beat(dx * 0.45, 0, 4, 1.0, 1.0, 0.18, Tween.TRANS_SINE, Tween.EASE_IN),
-		_beat(dx, 0, 7, 1.0, 1.0, 0.2, Tween.TRANS_SINE, Tween.EASE_OUT),
-	])
-	player_character.play_idle()
-	player_character.play_attack()
-	await _body_play(player_character, [
-		_beat(dx + reach * 0.3, -2, 13, 1.06, 0.96, 0.08, Tween.TRANS_QUAD, Tween.EASE_IN),
-	])
-
-## Tucks and jumps, striking on the way down. The rig is what tucks the legs
-## up mid-air; a flat sprite arcing through the air just reads as a slide.
-func _player_leap(dx: float, reach: float) -> void:
 	player_character.rig_enable()
-	player_character.rig_pose(-16.0, 8.0, -4.0, 4.0, 0.0, 0.12)
-	await _body_play(player_character, [
-		_beat(-6, 8, -6, 1.06, 0.9, 0.13, Tween.TRANS_QUAD, Tween.EASE_OUT),   # crouch
-	])
-	player_character.rig_pose(22.0, -10.0, 6.0, -4.0, 0.0, 0.14)
-	# One arc that carries the whole way, rather than a hop into open space.
-	await _body_play(player_character, [
-		_beat(dx * 0.55, -38, 8, 0.94, 1.12, 0.16, Tween.TRANS_QUAD, Tween.EASE_OUT),
-		_beat(dx, -6, 4, 1.0, 1.02, 0.13, Tween.TRANS_QUAD, Tween.EASE_IN),    # lands close
-	])
-	player_character.rig_pose(0.0, 0.0, 0.0, 0.0, 0.0, 0.08)
-	await get_tree().create_timer(0.06).timeout
-	player_character.rig_disable()
-	player_character.play_attack()
-	await _body_play(player_character, [
-		_beat(dx + reach * 0.3, 6, 15, 1.12, 0.88, 0.09, Tween.TRANS_QUAD, Tween.EASE_IN),
-		_beat(dx, 0, 6, 1.0, 1.0, 0.14, Tween.TRANS_BACK, Tween.EASE_OUT),
-	])
 
-## A full turn into the swing, so the hit arrives from an unexpected angle.
-func _player_spin(dx: float, reach: float) -> void:
-	await _body_play(player_character, [
-		_beat(-8, 2, -26, 1.0, 1.0, 0.12, Tween.TRANS_QUAD, Tween.EASE_OUT),
-	])
-	player_character.play_attack()
-	# The turn carries it across the gap instead of happening on the spot.
-	await _body_play(player_character, [
-		_beat(dx * 0.5, -3, 150, 1.02, 0.99, 0.16, Tween.TRANS_QUAD, Tween.EASE_IN),
-		_beat(dx + reach * 0.2, 0, 332, 1.05, 0.96, 0.16, Tween.TRANS_QUAD, Tween.EASE_OUT),
-	])
-	# Unwind instantly rather than letting the recovery spin it backwards.
-	player_character.rotation = 0.0
-	await _body_play(player_character, [
-		_beat(dx, 0, 5, 1.0, 1.0, 0.12, Tween.TRANS_BACK, Tween.EASE_OUT),
-	])
+	var remaining := 0.0
+	for phase: Dictionary in phases:
+		if bool(phase.get("release", false)):
+			# The rig has to come down before the attack clip can show: the rig
+			# is a slice of whichever frame was up when it was raised, so the
+			# clip would play underneath it, invisible.
+			player_character.rig_disable()
+			player_character.play_attack()
+			Audio.play_sfx("attack_impact")
+			remaining = _launch_bolts(player_character, enemy_character,
+				Color(1, 0.86, 0.42, 0.95), int(tier["bolts"]),
+				float(tier["bolt_size"]), float(tier["rate"]))
+		elif player_character.is_rigged():
+			player_character.rig_pose(
+				float(phase.get("legs", 0.0)), float(phase.get("torso", 0.0)),
+				float(phase.get("head", 0.0)), float(phase.get("bob", 0.0)),
+				0.0, float(phase.get("t", 0.12)))
+
+		var t := float(phase.get("t", 0.12))
+		await _body_play(player_character, [_beat(
+			float(phase.get("dx", 0.0)) * power,
+			float(phase.get("dy", 0.0)) * power,
+			float(phase.get("rot", 0.0)),
+			float(phase.get("sx", 1.0)), float(phase.get("sy", 1.0)),
+			t, Tween.TRANS_QUAD,
+			Tween.EASE_OUT if bool(phase.get("release", false)) else Tween.EASE_IN_OUT)])
+		remaining = maxf(0.0, remaining - t)
+
+	if player_character.is_rigged():
+		player_character.rig_disable()
+	await _body_end(player_character, 0.14)
+	return remaining
 
 # --- body choreography ----------------------------------------------------
 #
@@ -1951,6 +2058,10 @@ const MELEE_THROUGH_X := -150.0
 ## edge MELEE_GAP from the rival's. The mirror of _melee_target_x, and measured
 ## the same way for the same reason: node bounds leave 374px of transparent air
 ## between the two, so a lunge sized in node pixels never arrives.
+##
+## Nothing calls this today — Juan and Maria fight purely at range and hold
+## their ground. It is kept as the hook for a player melee skill, which is the
+## one case that SHOULD cross the field; see the note above _ranged_styles.
 func _player_melee_dx() -> float:
 	return AnimatedCharacter.melee_rest_x(
 		player_character, enemy_character, MELEE_GAP, true) 		- float(_body_home["pos"].x)
