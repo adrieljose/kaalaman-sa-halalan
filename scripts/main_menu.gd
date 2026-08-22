@@ -779,9 +779,10 @@ func _on_reviewer_close_pressed() -> void:
 # Certificate
 # --------------------------------------------------------------------------
 
-## A reward screen, not a settings panel: locked until chapter 1 is beaten
+## A reward screen, not a settings panel: locked until chapter 1 is beaten on
+## EVERY difficulty tier — Easy, Medium and Hard all recorded, not just one
 ## (GameState.is_chapter_completed, loaded from disk — a save file that
-## outlives the current session, not just an in-memory flag), then a CLAIM
+## outlives the current session, not just an in-memory flag) — then a CLAIM
 ## button that hands the player the certificate PDF. Built in code for the
 ## same reason as the reviewer: no .tscn to lose to an editor auto-revert.
 ## this is a settings box, not a reward screen.
@@ -890,6 +891,24 @@ func _certificate_unlocked() -> bool:
 ## panel opens (not just once at startup) because completing chapter 1 always
 ## happens in the battle scene — the menu has to notice the change the next
 ## time the player looks, not assume it already knew.
+## Names exactly which tiers are already beaten and which remain, so a player
+## who has cleared Easy and Medium sees that reflected rather than the same
+## generic "Locked." they saw before playing anything at all.
+func _certificate_progress_message(chapter_title: String) -> String:
+	var done := GameState.completed_tiers_for(CERTIFICATE_CHAPTER)
+	if done.is_empty():
+		return ("Beat %s on Easy, Medium AND Hard difficulty to unlock your Certificate of Completion."
+			% chapter_title)
+	var done_labels: Array[String] = []
+	var remaining_labels: Array[String] = []
+	for tier in QuestionBank.DIFFICULTY_ORDER:
+		if done.has(tier):
+			done_labels.append(tier.capitalize())
+		else:
+			remaining_labels.append(tier.capitalize())
+	return ("%s done on %s! Beat it on %s too to unlock your Certificate of Completion."
+		% [chapter_title, ", ".join(done_labels), " and ".join(remaining_labels)])
+
 func _refresh_certificate() -> void:
 	var chapter_title := String(CHAPTER_TITLES.get(CERTIFICATE_CHAPTER, "Chapter %d" % CERTIFICATE_CHAPTER))
 	var done := _certificate_unlocked()
@@ -908,13 +927,14 @@ func _refresh_certificate() -> void:
 		_certificate_name_input.text = ""
 	else:
 		# Two different reasons to be locked, and the player is owed the right
-		# one: "finish the chapter" is a lie when finishing it would not help.
+		# one: "finish the chapter" is a lie when finishing it would not help,
+		# and once real progress exists a flat "Locked." reads as a bug rather
+		# than the player being partway there.
 		if CERTIFICATE_LOCKED:
 			_certificate_status_label.text = (
 				"Certificates are not available yet. Check back in a later update.")
 		else:
-			_certificate_status_label.text = (
-				"Locked. Finish %s to unlock your Certificate of Completion." % chapter_title)
+			_certificate_status_label.text = _certificate_progress_message(chapter_title)
 		_certificate_claim_button.text = "LOCKED"
 		_certificate_claim_button.disabled = true
 		# Dimmed rather than hidden — a locked chapter pin on the map works the

@@ -2960,9 +2960,10 @@ func _finish_chapter() -> void:
 	result_label.text = "Chapter Complete!\n%s" % title
 	result_overlay.show()
 	# Persisted immediately, before reset_chapter() below touches anything —
-	# this is what unlocks the certificate on the title screen, and has to
-	# survive the app closing, not just this run.
-	GameState.mark_chapter_completed(GameState.chapter_number())
+	# this records the TIER just cleared. The certificate needs Easy, Medium
+	# and Hard all recorded before it unlocks, and has to survive the app
+	# closing, not just this run.
+	GameState.mark_difficulty_completed(GameState.chapter_number(), GameState.difficulty)
 	# Beating the boss rewinds to the top so Try Again is a fresh run rather
 	# than dropping the player back onto an already-cleared boss.
 	GameState.reset_chapter()

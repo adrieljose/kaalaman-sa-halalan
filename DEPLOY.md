@@ -3,7 +3,73 @@
 The game exports to HTML5 and runs in a browser. `build/web/` is a plain static
 site — any static host will serve it.
 
-## Build
+## Quick deploy (Windows PowerShell)
+
+This is the one you actually run, in your own terminal, every time you've made
+changes in the Godot editor and want the live site to show them. Copy each
+block into PowerShell in the project folder (`D:\klhgamefinal`) and run it.
+
+**Step 1 — export the game to a web build.**
+
+```powershell
+if (-not (Test-Path "build\web")) { New-Item -ItemType Directory -Path "build\web" | Out-Null }
+& "D:\GODOT\standard\Godot_v4.7.1-stable_win64_console.exe" --headless --path . --export-release "Web" "D:\klhgamefinal\build\web\index.html"
+```
+
+Two PowerShell-specific things baked into that command, both of which cause a
+red error if left out:
+- **The `&` at the front is required.** PowerShell treats a quoted path on its
+  own as just a string — `&` (the "call operator") is what tells it to actually
+  run that file. Leave it off and PowerShell tries to parse `--headless` as the
+  `--` decrement operator instead, which is the "operator works only on
+  variables or properties" error.
+- **Paths use `D:\...`, never `/d/...`.** The `/d/` shorthand only exists in Git
+  Bash; PowerShell doesn't understand it.
+
+This takes a minute or two. When it finishes, `build\web\` will contain
+`index.html`, `index.wasm`, `index.pck`, and a few other files.
+
+**Step 2 — copy the deploy config into the build.**
+
+```powershell
+Copy-Item vercel.json build\web\ -Force
+```
+
+`vercel.json` tells Vercel to serve `.wasm` and `.pck` with the right content
+type and caching headers. Skip this and the game may fail to start in the
+browser even though the files uploaded fine.
+
+**Step 3 — deploy to Vercel.**
+
+```powershell
+npx vercel deploy build\web --prod --yes
+```
+
+The first time ever, this will ask you to log in and link the project — follow
+its prompts. `--prod` means "this is the real live site." It prints a URL at
+the end, like `https://web-xxxxxxxxx-jaysuz1s-projects.vercel.app` — **that is
+your new live link.** Vercel mints a fresh URL on every deploy; anyone with an
+older link is still seeing the old build.
+
+**Step 4 — check it's actually live.**
+
+```powershell
+$url = "https://PASTE-YOUR-NEW-URL-HERE.vercel.app"
+(Invoke-WebRequest -Uri $url -Method Head -UseBasicParsing).StatusCode
+```
+
+You want `200`. If you get `302`, Vercel's "Deployment Protection" got
+switched back on — turn it off in your Vercel dashboard under **Project →
+Settings → Deployment Protection → "Require Log In."**
+
+That's the whole loop — **export, copy config, deploy, verify** — repeat all
+four steps every time you want the live site to catch up with your changes.
+
+## Build (reference / for Claude's Bash tool)
+
+The steps below use POSIX/Bash syntax (`/d/...` paths, no `&` needed). They're
+what Claude runs when asked to deploy from within a session, and are kept here
+as the canonical reference for anyone scripting this outside PowerShell.
 
 Exporting needs the **standard (non-.NET) Godot 4.7.1**, not the Mono build.
 Godot 4's .NET builds cannot export to Web at all. This project is pure

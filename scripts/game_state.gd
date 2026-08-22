@@ -76,12 +76,18 @@ const STARTING_POTION_COUNT := 2
 
 var potions: Dictionary = {}
 
-## Which chapters the player has beaten at least once, keyed by chapter number.
-## This is the game's only persisted state — everything else in GameState is
-## scoped to the current run and starts fresh each launch. It has to survive
-## the app closing, because "beat chapter 1" is a one-time unlock (the
-## certificate) rather than something the current session remembers.
-var completed_chapters: Dictionary = {}
+## Which difficulty tiers the player has beaten at least once, per chapter.
+## Keyed chapter_no -> Dictionary{tier: true}. This is the game's only
+## persisted state — everything else in GameState is scoped to the current run
+## and starts fresh each launch. It has to survive the app closing, because
+## the certificate is a one-time unlock, not something the current session
+## remembers.
+##
+## The certificate requires EASY, MEDIUM and HARD all recorded for the same
+## chapter — beating it once on Easy does not prove the player handled every
+## tier, which is the whole point of a completion certificate. See
+## is_chapter_completed().
+var completed_difficulties: Dictionary = {}
 ## Whatever name the player last typed onto a certificate, remembered so they
 ## are not retyping it every time they come back to claim one. Empty until
 ## they claim a certificate for the first time.
@@ -95,17 +101,37 @@ func _ready() -> void:
 		push_warning("GameState: could not load chapter at %s" % CHAPTER_PATH)
 	_load_progress()
 
-## Records a chapter as beaten and saves immediately. Called once, right when
-## the last encounter is won — not on every visit — so re-clearing an
-## already-completed chapter does not thrash the save file.
-func mark_chapter_completed(chapter_no: int) -> void:
-	if completed_chapters.get(chapter_no, false):
+## Records ONE difficulty tier as beaten for a chapter, and saves immediately.
+## Called once, right when the last encounter of a run is won — not on every
+## visit — so re-clearing an already-recorded tier does not thrash the save
+## file.
+func mark_difficulty_completed(chapter_no: int, tier: String) -> void:
+	var tiers: Dictionary = completed_difficulties.get(chapter_no, {})
+	if tiers.get(tier, false):
 		return
-	completed_chapters[chapter_no] = true
+	tiers[tier] = true
+	completed_difficulties[chapter_no] = tiers
 	_save_progress()
 
+## True once EASY, MEDIUM and HARD have all been beaten at least once on this
+## chapter. Finishing on only one tier does not count.
 func is_chapter_completed(chapter_no: int) -> bool:
-	return completed_chapters.get(chapter_no, false)
+	var tiers: Dictionary = completed_difficulties.get(chapter_no, {})
+	for tier in QuestionBank.DIFFICULTY_ORDER:
+		if not tiers.get(tier, false):
+			return false
+	return true
+
+## Which of the three tiers are already beaten for a chapter, in fixed order —
+## lets the certificate panel show real progress ("Easy, Medium done") instead
+## of a flat locked/unlocked state.
+func completed_tiers_for(chapter_no: int) -> Array[String]:
+	var tiers: Dictionary = completed_difficulties.get(chapter_no, {})
+	var out: Array[String] = []
+	for tier in QuestionBank.DIFFICULTY_ORDER:
+		if tiers.get(tier, false):
+			out.append(tier)
+	return out
 
 ## Records the name typed onto a certificate. Saved immediately, same as
 ## mark_chapter_completed — but only when it actually changed, so opening the
@@ -124,12 +150,14 @@ func _save_progress() -> void:
 		push_warning("GameState: could not write %s (%s)" % [
 			PROGRESS_SAVE_PATH, error_string(FileAccess.get_open_error())])
 		return
-	# Keys only — a chapter is either completed or it isn't, there's no value
-	# worth storing per chapter. JSON.stringify needs an Array, not a
-	# Dictionary's raw key set, hence the explicit collection.
-	var completed: Array = completed_chapters.keys()
+	# JSON object keys must be strings, so chapter numbers are stringified;
+	# each chapter's tier set is stored as a plain array of tier names rather
+	# than a dictionary, since only the keys ever mattered.
+	var serializable: Dictionary = {}
+	for chapter_no in completed_difficulties:
+		serializable[str(chapter_no)] = (completed_difficulties[chapter_no] as Dictionary).keys()
 	file.store_string(JSON.stringify({
-		"completed_chapters": completed,
+		"completed_difficulties": serializable,
 		"player_name": player_name,
 	}))
 
@@ -146,8 +174,16 @@ func _load_progress() -> void:
 		push_warning("GameState: %s is not a JSON object, ignoring" % PROGRESS_SAVE_PATH)
 		return
 	var data := parsed as Dictionary
-	for chapter_no in data.get("completed_chapters", []):
-		completed_chapters[int(chapter_no)] = true
+	# Older saves used a flat "completed_chapters" list with no record of which
+	# difficulty was cleared. That single bit cannot satisfy the new all-three-
+	# tiers rule honestly, so it is intentionally NOT migrated — a save from
+	# before this change simply starts the three-tier count at zero rather than
+	# guessing which tier the old completion was on.
+	for chapter_key in data.get("completed_difficulties", {}):
+		var tiers: Dictionary = {}
+		for tier in (data["completed_difficulties"][chapter_key] as Array):
+			tiers[String(tier)] = true
+		completed_difficulties[int(chapter_key)] = tiers
 	player_name = String(data.get("player_name", ""))
 
 ## The enemy for the encounter currently being fought, or null once the player
