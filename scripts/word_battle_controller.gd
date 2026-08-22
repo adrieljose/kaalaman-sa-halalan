@@ -2029,12 +2029,30 @@ var _player_attack: Dictionary = {}
 ## counts it down as the follow-through plays over the top of the flight.
 var _pending_flight: float = 0.0
 
+## The kinds of the last two attacks, so a third of the same kind can be ruled
+## out. Uniform random over ten styles is genuinely fair but streaky, and a run
+## of four melee in a row reads as "the player only ever charges" -- which is
+## exactly how an even 5/5 split got mistaken for an all-melee pool.
+var _recent_kinds: Array[String] = []
+
 func _pick_player_attack(pool: Dictionary) -> String:
 	var keys: Array = pool.keys().filter(
 		func(s: String) -> bool: return s != _last_player_attack)
 	if keys.is_empty():
 		keys = pool.keys()
+
+	# Two of a kind already: the third must be the other kind.
+	if _recent_kinds.size() >= 2 and _recent_kinds[0] == _recent_kinds[1]:
+		var wanted := "ranged" if _recent_kinds[0] == "melee" else "melee"
+		var switched: Array = keys.filter(
+			func(s: String) -> bool: return String(pool[s].get("kind", "")) == wanted)
+		if not switched.is_empty():
+			keys = switched
+
 	_last_player_attack = keys[randi() % keys.size()]
+	_recent_kinds.push_back(String(pool[_last_player_attack].get("kind", "")))
+	while _recent_kinds.size() > 2:
+		_recent_kinds.pop_front()
 	return _last_player_attack
 
 ## Runs an attack up to and including the moment it lands.
@@ -2148,7 +2166,20 @@ const BODY_CENTRE := Vector2(0.5, 0.5)
 
 ## The rival's stance before a performance, so every beat is relative and the
 ## body always returns exactly where it started.
+## Keyed BY CHARACTER, not one shared slot. The player and the rival can both
+## be mid-choreography at once -- a rival's turn beginning while the player is
+## still walking home overwrote the player's rest pose, and the walk then had
+## nowhere to return to. The symptom was the player stranded at contact range,
+## which made every following attack look like a melee one whatever it was.
 var _body_home: Dictionary = {}
+
+## Where `who` was standing when its choreography began, or where it is now if
+## it has none captured. Never indexes blind: a missing entry used to throw and
+## abandon whatever walk was in progress.
+func _body_home_x(who: Control) -> float:
+	if _body_home.has(who):
+		return float((_body_home[who]["pos"] as Vector2).x)
+	return who.position.x
 
 func _beat(dx: float, dy: float, deg: float, sx: float, sy: float, secs: float,
 		trans: Tween.TransitionType = Tween.TRANS_SINE,
@@ -2157,7 +2188,7 @@ func _beat(dx: float, dy: float, deg: float, sx: float, sy: float, secs: float,
 		"trans": trans, "ease": ease}
 
 func _body_begin(who: Control, pivot: Vector2) -> void:
-	_body_home = {
+	_body_home[who] = {
 		"pos": who.position, "rot": who.rotation,
 		"scale": who.scale, "pivot": who.pivot_offset,
 	}
@@ -2166,9 +2197,9 @@ func _body_begin(who: Control, pivot: Vector2) -> void:
 	who.pivot_offset = Vector2(who.size.x * pivot.x, who.size.y * pivot.y)
 
 func _body_play(who: Control, beats: Array) -> void:
-	if _body_home.is_empty():
+	if not _body_home.has(who):
 		return
-	var home: Vector2 = _body_home["pos"]
+	var home: Vector2 = _body_home[who]["pos"]
 	for beat: Dictionary in beats:
 		var tween := create_tween().set_parallel(true)
 		var secs: float = beat["secs"]
@@ -2181,18 +2212,21 @@ func _body_play(who: Control, beats: Array) -> void:
 		await tween.finished
 
 func _body_end(who: Control, secs: float = 0.18) -> void:
-	if _body_home.is_empty():
+	if not _body_home.has(who):
 		return
+	var home: Dictionary = _body_home[who]
 	var tween := create_tween().set_parallel(true)
-	tween.tween_property(who, "position", _body_home["pos"], secs) \
+	tween.tween_property(who, "position", home["pos"], secs) \
 		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-	tween.tween_property(who, "rotation", _body_home["rot"], secs) \
+	tween.tween_property(who, "rotation", home["rot"], secs) \
 		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-	tween.tween_property(who, "scale", _body_home["scale"], secs) \
+	tween.tween_property(who, "scale", home["scale"], secs) \
 		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	await tween.finished
-	who.pivot_offset = _body_home["pivot"]
-	_body_home = {}
+	who.pivot_offset = home["pivot"]
+	# Only this character's entry -- clearing the lot would strand anyone else
+	# who happens to be mid-move.
+	_body_home.erase(who)
 
 ## Fires the sprite's arm clip WITHOUT waiting for it, so it overlaps the body
 ## choreography instead of adding its full second on top. Used only on the
@@ -2232,7 +2266,7 @@ const MELEE_THROUGH_X := -150.0
 ## one case that SHOULD cross the field; see the note above _ranged_styles.
 func _player_melee_dx() -> float:
 	return AnimatedCharacter.melee_rest_x(
-		player_character, enemy_character, MELEE_GAP, true) 		- float(_body_home["pos"].x)
+		player_character, enemy_character, MELEE_GAP, true) 		- _body_home_x(player_character)
 
 func _melee_target_x() -> float:
 	# Measured between the VISIBLE bodies, not the node rectangles. Each
@@ -2301,7 +2335,7 @@ func _body_play_walking(who: AnimatedCharacter, beats: Array, cadence: float = 1
 ## The travel itself, as beats relative to the resting stance. Each gait moves
 ## the same distance but arrives telling a different story.
 func _melee_advance(gait: String, secs: float) -> Array:
-	var dx := _melee_target_x() - float(_body_home["pos"].x)
+	var dx := _melee_target_x() - _body_home_x(enemy_character)
 	match gait:
 		"charge":
 			# Drops low, then accelerates the whole way in, leaning further
@@ -2346,7 +2380,7 @@ func _melee_advance(gait: String, secs: float) -> Array:
 
 ## Walking it back, deliberately less urgent than the way in.
 func _melee_retreat(secs: float, gait: String = "walk") -> Array:
-	var dx := _melee_target_x() - float(_body_home["pos"].x)
+	var dx := _melee_target_x() - _body_home_x(enemy_character)
 	if gait == "hop":
 		return [
 			_beat(dx * 0.6, -22, -8, 0.96, 1.08, secs * 0.5, Tween.TRANS_QUAD, Tween.EASE_OUT),
@@ -2427,7 +2461,7 @@ func _sig_dynasty_power(move_id: String, tint: Color) -> void:
 
 	# Arrives, rears up over the player, then drives down.
 	_body_swing(enemy_character)
-	var dx := _melee_target_x() - float(_body_home["pos"].x)
+	var dx := _melee_target_x() - _body_home_x(enemy_character)
 	await _body_play(enemy_character, [
 		_beat(dx, -18, -14, 1.06, 1.14, 0.16, Tween.TRANS_QUAD, Tween.EASE_OUT),
 		_beat(dx - 10, 12, 20, 1.16, 0.84, 0.1, Tween.TRANS_QUAD, Tween.EASE_IN),
@@ -2509,7 +2543,7 @@ func _sig_poster_paste(move_id: String, tint: Color) -> void:
 	_fx_charge(enemy_character, tint, 0.3)
 	await _body_play_walking(enemy_character, _melee_advance("walk", 0.68), 13.0)
 
-	var dx := _melee_target_x() - float(_body_home["pos"].x)
+	var dx := _melee_target_x() - _body_home_x(enemy_character)
 	await _body_play(enemy_character, [
 		_beat(dx + 4, -18, -8, 0.92, 1.18, 0.2, Tween.TRANS_QUAD, Tween.EASE_OUT),  # reaches up
 	])
@@ -2555,7 +2589,7 @@ func _sig_spray_and_run(move_id: String, tint: Color) -> void:
 	_fx_splatter(player_character, tint, 4, 20.0, 0.5)
 
 	# Straight out the far side, then back as if nothing happened.
-	var home: Vector2 = _body_home["pos"]
+	var home := Vector2(_body_home_x(enemy_character), enemy_character.position.y)
 	var through := create_tween()
 	through.tween_property(enemy_character, "position:x", MELEE_THROUGH_X, 0.2) \
 		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
@@ -2603,7 +2637,7 @@ func _sig_sabaw_splash(move_id: String, tint: Color) -> void:
 	await _body_play_walking(enemy_character, _melee_advance("lunge", 0.56), 7.0)
 
 	_body_swing(enemy_character)
-	var dx := _melee_target_x() - float(_body_home["pos"].x)
+	var dx := _melee_target_x() - _body_home_x(enemy_character)
 	await _body_play(enemy_character, [
 		_beat(dx + 6, -6, -18, 0.94, 1.1, 0.12, Tween.TRANS_QUAD, Tween.EASE_OUT),  # winds the pot back
 		_beat(dx - 14, 4, 16, 1.12, 0.9, 0.09, Tween.TRANS_QUAD, Tween.EASE_IN),    # throws it
@@ -2703,7 +2737,7 @@ func _sig_under_the_table(move_id: String, tint: Color) -> void:
 	_fx_charge(enemy_character, tint, 0.42)
 	await _body_play_walking(enemy_character, _melee_advance("creep", 0.74), 6.0)
 
-	var dx := _melee_target_x() - float(_body_home["pos"].x)
+	var dx := _melee_target_x() - _body_home_x(enemy_character)
 	_body_swing(enemy_character)
 	await _body_play(enemy_character, [
 		_beat(dx - 8, 22, 14, 1.16, 0.74, 0.12, Tween.TRANS_QUAD, Tween.EASE_IN),   # slides it under
@@ -2770,7 +2804,7 @@ func _sig_relief_goods_blitz(move_id: String, tint: Color) -> void:
 	_fx_charge(enemy_character, tint, 0.36)
 	await _body_play_walking(enemy_character, _melee_advance("walk", 0.6), 13.0)
 
-	var dx := _melee_target_x() - float(_body_home["pos"].x)
+	var dx := _melee_target_x() - _body_home_x(enemy_character)
 	Audio.play_move_sfx(move_id, "hit")
 	for i in 3:
 		var effort := 1.0 + 0.14 * float(i)
