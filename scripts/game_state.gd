@@ -18,14 +18,14 @@ var encounter_index: int = 0
 ## the title screen and the battle scene read the same source.
 const PLAYER_CHARACTERS := {
 	"male": {
-		"label": "BOY",
+		"label": "JUAN",
 		"idle_dir": "res://assets/images/characters/player_idle", "idle_count": 5,
 		"attack_dir": "res://assets/images/characters/player_attack", "attack_count": 7,
 		"hit_dir": "res://assets/images/characters/player_hit", "hit_count": 5,
 		"walk_dir": "res://assets/images/characters/player_walk", "walk_count": 9,
 	},
 	"female": {
-		"label": "GIRL",
+		"label": "MARIA",
 		"idle_dir": "res://assets/images/characters/player_female_idle", "idle_count": 5,
 		"attack_dir": "res://assets/images/characters/player_female_attack", "attack_count": 7,
 		"hit_dir": "res://assets/images/characters/player_female_hit", "hit_count": 5,

@@ -34,3 +34,9 @@ extends Resource
 ## rest fall back to the cut-out rig for their melee approach.
 @export var walk_dir: String = ""
 @export var walk_count: int = 0
+
+## Mirrors a rival whose frames were drawn facing right. The player stands on
+## the left, so a rival that faces right is turned away from the fight. This is
+## a display flag rather than re-drawn art: the sprites are near enough to
+## front-on that a flip costs nothing and needs no new generation credits.
+@export var flip_h: bool = false

@@ -17,13 +17,6 @@ config/icon="res://icon.svg"
 
 [audio]
 
-; Godot defaults the web platform to "Sample" playback (1) while desktop uses
-; "Stream" (0). The two are different code paths, and Sample does not carry the
-; bus routing this game relies on -- every player is assigned to a "Music" or
-; "SFX" bus that AudioManager creates at RUNTIME via AudioServer.add_bus().
-; The result was a build that was audible on desktop and completely silent in
-; the browser. Forcing Stream puts the web export on the same path as desktop.
-; Costs some audio latency on web, which a turn-based word game will not feel.
 general/default_playback_type.web=0
 
 [autoload]

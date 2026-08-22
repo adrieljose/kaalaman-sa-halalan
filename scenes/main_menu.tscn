@@ -510,7 +510,7 @@ theme_override_styles/normal = SubResource("StyleBoxTexture_menu_button")
 theme_override_styles/pressed = SubResource("StyleBoxTexture_menu_button")
 theme_override_styles/hover = SubResource("StyleBoxTexture_menu_button")
 theme_override_styles/focus = SubResource("StyleBoxTexture_menu_button")
-text = "BOY"
+text = "JUAN"
 
 [node name="FemaleButton" type="Button" parent="CharacterPanel/VBox/ButtonRow"]
 custom_minimum_size = Vector2(120, 34)
@@ -522,7 +522,7 @@ theme_override_styles/normal = SubResource("StyleBoxTexture_menu_button")
 theme_override_styles/pressed = SubResource("StyleBoxTexture_menu_button")
 theme_override_styles/hover = SubResource("StyleBoxTexture_menu_button")
 theme_override_styles/focus = SubResource("StyleBoxTexture_menu_button")
-text = "GIRL"
+text = "MARIA"
 
 [node name="CharacterHint" type="Label" parent="CharacterPanel/VBox"]
 layout_mode = 2

@@ -23,3 +23,4 @@ attack_dir = "res://assets/images/characters/senator_sabaw_attack"
 attack_count = 7
 hit_dir = "res://assets/images/characters/senator_sabaw_hit"
 hit_count = 5
+flip_h = true

@@ -76,6 +76,7 @@ func configure_from(enemy: EnemyData) -> void:
 	# just set what it has.
 	clips["walk_dir"] = enemy.walk_dir
 	clips["walk_count"] = enemy.walk_count
+	clips["flip_h"] = enemy.flip_h
 	configure_clips(clips)
 
 func _load_frames(dir: String, count: int) -> Array[Texture2D]:
@@ -282,6 +283,12 @@ func rig_enable() -> void:
 		piece.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		piece.stretch_mode = TextureRect.STRETCH_SCALE
 		piece.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		# Child nodes do not inherit flip_h, so each band mirrors itself. The
+		# bands span the full texture width and share one centre, so flipping
+		# them individually is equivalent to flipping the whole figure -- and
+		# without it a mirrored rival would face the wrong way for exactly as
+		# long as the rig is up.
+		piece.flip_h = flip_h
 		piece.size = Vector2(draw_size.x, region.size.y * scale_fit)
 		var here := Vector2(origin.x, origin.y + band.x * tex_size.y * scale_fit)
 		# Children are positioned relative to their parent part.
