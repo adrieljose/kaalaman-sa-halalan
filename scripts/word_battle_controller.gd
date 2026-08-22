@@ -1394,12 +1394,10 @@ func _play_attack_sequence(damage: int, is_answer: bool, tier: Dictionary) -> vo
 	# One of five swings, picked at random — see _play_player_attack. Each still
 	# spends the tier's own reach, so a longer word visibly carries further
 	# whichever style comes up, and nothing about the damage changes.
-	# The throw launches its own projectiles on the beat the hand opens and
-	# hands back whatever flight time is still outstanding, so the impact waits
-	# for the bolts rather than for the animation.
-	var in_flight := await _play_player_attack(tier)
-	if in_flight > 0.0:
-		await get_tree().create_timer(in_flight).timeout
+	# Returns with the hit already landed -- the projectile arrived, or a melee
+	# attacker is standing over the rival. Either way the flinch below plays at
+	# the right moment rather than after the animation has finished.
+	await _play_player_attack(tier)
 
 	Audio.play_sfx("enemy_hurt")
 	_shake_screen(float(tier["shake"]))
@@ -1408,6 +1406,10 @@ func _play_attack_sequence(damage: int, is_answer: bool, tier: Dictionary) -> vo
 	enemy_heart_row.set_value(_enemy_hp)
 	if enemy_flinching:
 		await enemy_character.one_shot_finished
+
+	# Only now does a melee attacker walk home. Before the win check, so a
+	# killing blow cannot leave the player stranded mid-field.
+	await _player_attack_recover()
 
 	if _enemy_hp <= 0:
 		_sequence_running = false
@@ -1734,231 +1736,397 @@ func _fx_impact(move_id: String, shake: float, color: Color, flash: float = 0.22
 
 # --- player attacks -------------------------------------------------------
 #
-# Juan and Maria fight at range: they hold their ground and throw. Nothing here
-# travels toward the rival -- an earlier pass had every style walk the whole
-# field and back, which is right for a melee skill and wrong for a thrown one.
-# The rival's own melee moves still cross the gap; see _melee_advance.
+# Juan and Maria fight with a mixed pool: some attacks close the distance and
+# land a physical blow, others hold ground and throw. Which one comes up is
+# random, so a run of attacks reads as a fight rather than one move on repeat.
 #
-# What sells a thrown attack is the body, not the projectile. Each style runs
-# the same five phases, and the projectile leaves on the exact beat the hand
-# opens rather than after the animation has finished:
+# The two kinds are deliberately built to look nothing alike:
 #
-#   anticipation -> the coil. Weight drops, torso winds AWAY from the throw
-#   drive        -> the uncoil, weight transferring onto the front foot
-#   release      -> bolts launch HERE, and the attack clip plays for the arm
-#   follow       -> the arm's momentum carries the body past the release
-#   recover      -> the settle back to stance
+#   ranged  the character holds position. Anticipation, then the projectile
+#           leaves ON the release beat -- not after the animation, which is
+#           what used to make the orb look bolted on rather than thrown.
 #
-# The body is animated three ways at once, because one alone reads as a slide:
-# `_beat` moves and rotates the whole figure, the cut-out rig swings legs,
-# torso and head against each other, and the 7-frame attack clip supplies the
-# arm. The rig and the clip cannot both be up (the rig slices whichever frame
-# was showing when it was raised), so every style rigs the wind-up, drops the
-# rig at the release and lets the clip carry the throw.
+#   melee   the character crosses the gap, strikes at contact range, and walks
+#           back. The gap is ~374px of mostly transparent air, so the distance
+#           is measured between the VISIBLE bodies (see _player_melee_dx).
+#
+# A style is two phase lists rather than one. `strike` runs up to and including
+# the moment the hit lands; the caller then plays the rival's flinch and applies
+# damage while a melee attacker is still standing over them, and only then is
+# `recover` run. Merging the two would put the walk home before the hit.
+#
+# Body motion comes from three layers at once, because any one alone reads as a
+# sliding sprite: `_beat` moves and tilts the whole figure, the cut-out rig
+# swings legs, torso and head against each other, and the 7-frame attack clip
+# supplies the arm. The rig and the clip cannot both be up -- the rig is a slice
+# of whichever frame was showing when it was raised -- so every style rigs its
+# wind-up and drops the rig on the beat that strikes.
 
-## One phase of a throw. Every field is optional; a phase that only sets `legs`
-## and `torso` is a pure rig pose, one that only sets `dx` is pure travel.
+## One phase. Every field is optional.
 ##
-##   dx, dy   offset from the resting stance, in pixels
-##   rot      whole-body tilt, degrees
-##   sx, sy   squash and stretch
+##   approach  fraction of the way to contact range, MELEE ONLY. 0 is home,
+##             1 is standing over the rival. Scaled to the real gap, so it
+##             holds whatever the two sprites' widths are.
+##   dx, dy    offset from the stance in pixels, on top of `approach`
+##   rot       whole-body tilt, degrees
+##   sx, sy    squash and stretch
 ##   legs,
 ##   torso,
-##   head     rig joint angles, degrees -- the actual body articulation
-##   bob      lifts the whole rigged figure, for a rise onto the toes
-##   t        seconds
-##   release  true on the single phase where the projectile leaves the hand
+##   head      rig joint angles in degrees -- the actual articulation
+##   bob       lifts the rigged figure, for a rise onto the toes
+##   walk      run the real walk clip through this phase instead of the rig
+##   t         seconds
+##   release   RANGED: the projectile leaves the hand on this beat
+##   contact   MELEE: the blow lands on this beat
 func _phase(d: Dictionary) -> Dictionary:
 	return d
 
-## Juan throws like a boy who plays street games: wide stance, big shoulder,
-## everything committed. Maria is quicker and more upright, more wrist and
-## rotation than shoulder. They share no style outright -- even where both have
-## a two-handed cast, the timing and the joint angles differ.
-##
-## Keyed by character so a new character means a new entry, not an edit here.
-func _ranged_styles(who: String) -> Dictionary:
+## Which pool a character draws from. Keyed by character so adding a third
+## means adding an entry, not editing a branch.
+func _attack_pool(who: String) -> Dictionary:
 	if who == "female":
-		return _maria_styles()
-	return _juan_styles()
+		return _maria_attacks()
+	return _juan_attacks()
 
-## JUAN -- grounded, athletic, throws from the shoulder.
-func _juan_styles() -> Dictionary:
+## JUAN -- grounded and committed. He throws from the shoulder and hits with
+## his whole weight behind it; his melee is straight-line and forceful.
+func _juan_attacks() -> Dictionary:
 	return {
-		# Overhand baseball throw: the whole body behind one arm.
-		"overhand": [
-			_phase({"dx": -9, "dy": 3, "rot": -7, "legs": 5, "torso": -12, "head": -5, "t": 0.20}),
-			_phase({"dx": -13, "dy": 1, "rot": -10, "legs": 8, "torso": -18, "head": -8, "t": 0.10}),
-			_phase({"dx": 8, "dy": -4, "rot": 9, "sx": 1.06, "sy": 0.95, "t": 0.07, "release": true}),
-			_phase({"dx": 13, "dy": 2, "rot": 14, "sx": 1.04, "sy": 0.97, "t": 0.09}),
-			_phase({"dx": 4, "dy": 0, "rot": 4, "t": 0.16}),
-		],
-		# Side-arm skimmer, thrown low across the body like a flat stone.
-		"sidearm": [
-			_phase({"dx": -7, "dy": 4, "rot": -4, "legs": 10, "torso": -16, "head": -3, "t": 0.17}),
-			_phase({"dx": 10, "dy": 5, "rot": 7, "sx": 1.08, "sy": 0.93, "t": 0.07, "release": true}),
-			_phase({"dx": 15, "dy": 3, "rot": 11, "t": 0.10}),
-			_phase({"dx": 3, "dy": 0, "rot": 3, "t": 0.15}),
-		],
-		# Two-handed shove: both palms out, a push rather than a throw.
-		"shove": [
-			_phase({"dx": -6, "dy": 5, "rot": 0, "legs": 6, "torso": -8, "head": 4, "sy": 1.05, "t": 0.18}),
-			_phase({"dx": -9, "dy": 7, "rot": 0, "legs": 9, "torso": -11, "sy": 1.08, "t": 0.08}),
-			_phase({"dx": 12, "dy": -2, "rot": 0, "sx": 1.12, "sy": 0.9, "t": 0.06, "release": true}),
-			_phase({"dx": 16, "dy": 0, "rot": 2, "sx": 1.06, "sy": 0.96, "t": 0.10}),
-			_phase({"dx": 2, "dy": 0, "rot": 0, "t": 0.16}),
-		],
-		# Quick snap: barely any wind-up, over before it is read.
-		"snap": [
-			_phase({"dx": -4, "dy": 1, "rot": -3, "legs": 3, "torso": -6, "t": 0.08}),
-			_phase({"dx": 9, "dy": -2, "rot": 6, "sx": 1.04, "sy": 0.97, "t": 0.05, "release": true}),
-			_phase({"dx": 5, "dy": 0, "rot": 3, "t": 0.09}),
-		],
-		# Charged heave: sinks into both knees, then throws everything upward.
-		"heave": [
-			_phase({"dx": -5, "dy": 10, "rot": 0, "legs": 14, "torso": -6, "head": 6, "sx": 1.06, "sy": 0.9, "t": 0.26}),
-			_phase({"dx": -8, "dy": 12, "rot": -4, "legs": 17, "torso": -10, "head": 8, "sx": 1.08, "sy": 0.88, "t": 0.12}),
-			_phase({"dx": 10, "dy": -12, "rot": 8, "sx": 0.94, "sy": 1.12, "t": 0.08, "release": true}),
-			_phase({"dx": 16, "dy": -4, "rot": 13, "sx": 1.05, "sy": 0.96, "t": 0.12}),
-			_phase({"dx": 4, "dy": 3, "rot": 3, "sy": 1.02, "t": 0.18}),
-		],
-		# Full turn into the throw, using the rotation for power.
-		"turnthrow": [
-			_phase({"dx": -6, "dy": 2, "rot": -22, "legs": 7, "torso": -14, "head": -10, "t": 0.16}),
-			_phase({"dx": -2, "dy": 0, "rot": -150, "t": 0.13}),
-			_phase({"dx": 9, "dy": -3, "rot": -330, "sx": 1.06, "sy": 0.95, "t": 0.09, "release": true}),
-			_phase({"dx": 12, "dy": 1, "rot": -368, "t": 0.10}),
-			_phase({"dx": 3, "dy": 0, "rot": -360, "t": 0.14}),
-		],
-		# Braced stance, then a straight punch of a throw down the middle.
-		"brace": [
-			_phase({"dx": -8, "dy": 6, "rot": 0, "legs": 12, "torso": -5, "head": 3, "t": 0.22}),
-			_phase({"dx": 11, "dy": -1, "rot": 4, "sx": 1.05, "sy": 0.96, "t": 0.06, "release": true}),
-			_phase({"dx": 14, "dy": 1, "rot": 7, "t": 0.09}),
-			_phase({"dx": 3, "dy": 0, "rot": 2, "t": 0.15}),
-		],
+		# ---- ranged ----------------------------------------------------
+		"overhand": {"kind": "ranged", "sfx": "attack_impact",
+			"strike": [
+				_phase({"dx": -9, "dy": 3, "rot": -7, "legs": 5, "torso": -12, "head": -5, "t": 0.20}),
+				_phase({"dx": -13, "dy": 1, "rot": -10, "legs": 8, "torso": -18, "head": -8, "t": 0.10}),
+				_phase({"dx": 8, "dy": -4, "rot": 9, "sx": 1.06, "sy": 0.95, "t": 0.07, "release": true}),
+			],
+			"recover": [
+				_phase({"dx": 13, "dy": 2, "rot": 14, "sx": 1.04, "sy": 0.97, "t": 0.09}),
+				_phase({"dx": 4, "rot": 4, "t": 0.16}),
+			]},
+		"sidearm": {"kind": "ranged", "sfx": "attack_impact",
+			"strike": [
+				_phase({"dx": -7, "dy": 4, "rot": -4, "legs": 10, "torso": -16, "head": -3, "t": 0.17}),
+				_phase({"dx": 10, "dy": 5, "rot": 7, "sx": 1.08, "sy": 0.93, "t": 0.07, "release": true}),
+			],
+			"recover": [
+				_phase({"dx": 15, "dy": 3, "rot": 11, "t": 0.10}),
+				_phase({"dx": 3, "rot": 3, "t": 0.15}),
+			]},
+		"snap": {"kind": "ranged", "sfx": "tile_tap",
+			"strike": [
+				_phase({"dx": -4, "dy": 1, "rot": -3, "legs": 3, "torso": -6, "t": 0.08}),
+				_phase({"dx": 9, "dy": -2, "rot": 6, "sx": 1.04, "sy": 0.97, "t": 0.05, "release": true}),
+			],
+			"recover": [_phase({"dx": 5, "rot": 3, "t": 0.09})]},
+		"heave": {"kind": "ranged", "sfx": "attack_impact",
+			"strike": [
+				_phase({"dx": -5, "dy": 10, "legs": 14, "torso": -6, "head": 6, "sx": 1.06, "sy": 0.9, "t": 0.26}),
+				_phase({"dx": -8, "dy": 12, "rot": -4, "legs": 17, "torso": -10, "head": 8, "sx": 1.08, "sy": 0.88, "t": 0.12}),
+				_phase({"dx": 10, "dy": -12, "rot": 8, "sx": 0.94, "sy": 1.12, "t": 0.08, "release": true}),
+			],
+			"recover": [
+				_phase({"dx": 16, "dy": -4, "rot": 13, "sx": 1.05, "sy": 0.96, "t": 0.12}),
+				_phase({"dx": 4, "dy": 3, "rot": 3, "sy": 1.02, "t": 0.18}),
+			]},
+		"turnthrow": {"kind": "ranged", "sfx": "attack_impact",
+			"strike": [
+				_phase({"dx": -6, "dy": 2, "rot": -22, "legs": 7, "torso": -14, "head": -10, "t": 0.16}),
+				_phase({"dx": -2, "rot": -150, "t": 0.13}),
+				_phase({"dx": 9, "dy": -3, "rot": -330, "sx": 1.06, "sy": 0.95, "t": 0.09, "release": true}),
+			],
+			"recover": [
+				_phase({"dx": 12, "dy": 1, "rot": -368, "t": 0.10}),
+				_phase({"dx": 3, "rot": -360, "t": 0.14}),
+			]},
+
+		# ---- melee -----------------------------------------------------
+		# Straight cross: runs in, plants, drives one fist through.
+		"cross": {"kind": "melee", "sfx": "attack_impact", "shake": 7.0,
+			"strike": [
+				_phase({"dx": -8, "dy": 2, "legs": 6, "torso": -9, "head": -4, "t": 0.13}),
+				_phase({"approach": 0.55, "walk": true, "t": 0.20}),
+				_phase({"approach": 1.0, "walk": true, "t": 0.16}),
+				_phase({"approach": 1.0, "dx": -6, "rot": -8, "legs": 9, "torso": -12, "t": 0.08}),
+				_phase({"approach": 1.0, "dx": 10, "dy": -2, "rot": 11, "sx": 1.08, "sy": 0.94, "t": 0.06, "contact": true}),
+			],
+			"recover": [
+				_phase({"approach": 1.0, "dx": 6, "rot": 6, "t": 0.10}),
+				_phase({"approach": 0.45, "walk": true, "t": 0.20}),
+				_phase({"approach": 0.0, "walk": true, "t": 0.18}),
+			]},
+		# Flying kick: a short run, then both feet leave the ground.
+		"flyingkick": {"kind": "melee", "sfx": "attack_impact", "shake": 9.0,
+			"strike": [
+				_phase({"dx": -5, "dy": 8, "legs": 13, "torso": -6, "sy": 0.9, "t": 0.16}),
+				_phase({"approach": 0.5, "walk": true, "t": 0.18}),
+				_phase({"approach": 0.85, "dy": -26, "rot": 12, "sx": 0.94, "sy": 1.1, "t": 0.14}),
+				_phase({"approach": 1.0, "dy": -14, "rot": 18, "sx": 1.12, "sy": 0.9, "t": 0.07, "contact": true}),
+			],
+			"recover": [
+				_phase({"approach": 1.0, "dy": 2, "rot": 6, "sy": 0.96, "t": 0.12}),
+				_phase({"approach": 0.4, "walk": true, "t": 0.20}),
+				_phase({"approach": 0.0, "walk": true, "t": 0.18}),
+			]},
+		# Shoulder charge: no wind-up, just a full-speed barge.
+		"barge": {"kind": "melee", "sfx": "attack_impact", "shake": 10.0,
+			"strike": [
+				_phase({"dx": -11, "rot": -6, "legs": 8, "torso": -10, "t": 0.14}),
+				_phase({"approach": 0.7, "walk": true, "rot": 6, "t": 0.18}),
+				_phase({"approach": 1.0, "rot": 12, "sx": 1.1, "sy": 0.92, "t": 0.09, "contact": true}),
+			],
+			"recover": [
+				_phase({"approach": 1.0, "dx": 4, "rot": 4, "t": 0.10}),
+				_phase({"approach": 0.0, "walk": true, "t": 0.26}),
+			]},
+		# Uppercut: steps in close, sinks, then drives upward.
+		"uppercut": {"kind": "melee", "sfx": "attack_impact", "shake": 8.0,
+			"strike": [
+				_phase({"approach": 0.5, "walk": true, "t": 0.20}),
+				_phase({"approach": 1.0, "walk": true, "t": 0.16}),
+				_phase({"approach": 1.0, "dy": 9, "legs": 15, "torso": -7, "sy": 0.9, "t": 0.11}),
+				_phase({"approach": 1.0, "dy": -16, "rot": 9, "sx": 0.95, "sy": 1.14, "t": 0.07, "contact": true}),
+			],
+			"recover": [
+				_phase({"approach": 1.0, "dy": -4, "rot": 4, "t": 0.11}),
+				_phase({"approach": 0.0, "walk": true, "t": 0.24}),
+			]},
+		# Stomp: closes, rises onto one leg, brings the heel down.
+		"stomp": {"kind": "melee", "sfx": "attack_impact", "shake": 11.0,
+			"strike": [
+				_phase({"approach": 0.6, "walk": true, "t": 0.22}),
+				_phase({"approach": 1.0, "walk": true, "t": 0.15}),
+				_phase({"approach": 1.0, "dy": -20, "rot": -6, "sy": 1.12, "t": 0.13}),
+				_phase({"approach": 1.0, "dy": 6, "rot": 4, "sx": 1.14, "sy": 0.86, "t": 0.06, "contact": true}),
+			],
+			"recover": [
+				_phase({"approach": 1.0, "dy": 0, "sy": 0.98, "t": 0.12}),
+				_phase({"approach": 0.0, "walk": true, "t": 0.26}),
+			]},
 	}
 
-## MARIA -- lighter and faster, throws from the wrist and the hips. Her
-## wind-ups are shorter, her recoveries land more upright, and she rises onto
-## the front foot where Juan digs into both.
-func _maria_styles() -> Dictionary:
+## MARIA -- lighter and faster. She throws from the wrist and the hips, and her
+## melee is built on rotation and footwork rather than mass.
+func _maria_attacks() -> Dictionary:
 	return {
-		# A long sweeping arc across the body, unhurried and deliberate.
-		"arc": [
-			_phase({"dx": -8, "dy": 1, "rot": -9, "legs": 4, "torso": -14, "head": -6, "bob": -2, "t": 0.22}),
-			_phase({"dx": -10, "dy": -2, "rot": -12, "legs": 5, "torso": -17, "head": -8, "bob": -4, "t": 0.10}),
-			_phase({"dx": 9, "dy": -5, "rot": 10, "sx": 1.03, "sy": 1.02, "t": 0.07, "release": true}),
-			_phase({"dx": 14, "dy": -2, "rot": 15, "t": 0.10}),
-			_phase({"dx": 3, "dy": 0, "rot": 4, "t": 0.17}),
-		],
-		# Wrist flick: almost nothing moves but the forearm and the hips.
-		"flick": [
-			_phase({"dx": -3, "dy": 0, "rot": -4, "legs": 2, "torso": -5, "head": -3, "t": 0.07}),
-			_phase({"dx": 7, "dy": -3, "rot": 7, "sx": 1.02, "sy": 1.01, "t": 0.04, "release": true}),
-			_phase({"dx": 4, "dy": 0, "rot": 3, "t": 0.08}),
-		],
-		# Both hands together at the sternum, then opened outward.
-		"twincast": [
-			_phase({"dx": -4, "dy": 3, "rot": 0, "legs": 4, "torso": -4, "head": 5, "sx": 0.95, "sy": 1.05, "t": 0.20}),
-			_phase({"dx": -6, "dy": 4, "rot": 0, "legs": 6, "torso": -6, "head": 7, "sx": 0.92, "sy": 1.08, "t": 0.10}),
-			_phase({"dx": 10, "dy": -4, "rot": 0, "sx": 1.12, "sy": 0.94, "t": 0.06, "release": true}),
-			_phase({"dx": 13, "dy": -1, "rot": 0, "sx": 1.05, "sy": 0.98, "t": 0.10}),
-			_phase({"dx": 2, "dy": 0, "rot": 0, "t": 0.16}),
-		],
-		# Pirouette: a dancer's turn that lets the throw trail out of it.
-		"pirouette": [
-			_phase({"dx": -4, "dy": -3, "rot": -14, "legs": 3, "torso": -10, "head": -6, "bob": -5, "t": 0.15}),
-			_phase({"dx": 0, "dy": -6, "rot": 160, "bob": -7, "sy": 1.06, "t": 0.14}),
-			_phase({"dx": 8, "dy": -4, "rot": 344, "sx": 1.04, "sy": 1.0, "t": 0.08, "release": true}),
-			_phase({"dx": 11, "dy": -1, "rot": 372, "t": 0.10}),
-			_phase({"dx": 2, "dy": 0, "rot": 360, "t": 0.15}),
-		],
-		# Drops to one knee, gathers, then rises releasing on the way up.
-		"kneel": [
-			_phase({"dx": -5, "dy": 12, "rot": -5, "legs": 16, "torso": -8, "head": 4, "sy": 0.9, "t": 0.24}),
-			_phase({"dx": -6, "dy": 14, "rot": -7, "legs": 19, "torso": -11, "head": 6, "sy": 0.88, "t": 0.10}),
-			_phase({"dx": 8, "dy": -10, "rot": 6, "sx": 0.96, "sy": 1.12, "t": 0.08, "release": true}),
-			_phase({"dx": 12, "dy": -5, "rot": 10, "t": 0.11}),
-			_phase({"dx": 2, "dy": 2, "rot": 3, "t": 0.18}),
-		],
-		# Backhand: the arm crosses first, then whips out the far side.
-		"backhand": [
-			_phase({"dx": 4, "dy": 1, "rot": 8, "legs": 3, "torso": 12, "head": 6, "t": 0.18}),
-			_phase({"dx": 6, "dy": 0, "rot": 11, "legs": 4, "torso": 15, "head": 8, "t": 0.08}),
-			_phase({"dx": 9, "dy": -3, "rot": -9, "sx": 1.05, "sy": 0.97, "t": 0.06, "release": true}),
-			_phase({"dx": 13, "dy": 0, "rot": -13, "t": 0.10}),
-			_phase({"dx": 3, "dy": 0, "rot": -3, "t": 0.15}),
-		],
-		# Rises onto the toes and casts high, the most weightless of the set.
-		"skycast": [
-			_phase({"dx": -4, "dy": 4, "rot": -3, "legs": 6, "torso": -6, "head": -8, "t": 0.20}),
-			_phase({"dx": -2, "dy": -8, "rot": 0, "legs": 2, "torso": -3, "head": -12, "bob": -9, "sy": 1.08, "t": 0.12}),
-			_phase({"dx": 7, "dy": -11, "rot": 5, "sx": 1.02, "sy": 1.04, "t": 0.07, "release": true}),
-			_phase({"dx": 10, "dy": -5, "rot": 9, "t": 0.11}),
-			_phase({"dx": 2, "dy": 0, "rot": 2, "t": 0.17}),
-		],
+		# ---- ranged ----------------------------------------------------
+		"arc": {"kind": "ranged", "sfx": "attack_impact",
+			"strike": [
+				_phase({"dx": -8, "dy": 1, "rot": -9, "legs": 4, "torso": -14, "head": -6, "bob": -2, "t": 0.22}),
+				_phase({"dx": -10, "dy": -2, "rot": -12, "legs": 5, "torso": -17, "head": -8, "bob": -4, "t": 0.10}),
+				_phase({"dx": 9, "dy": -5, "rot": 10, "sx": 1.03, "sy": 1.02, "t": 0.07, "release": true}),
+			],
+			"recover": [
+				_phase({"dx": 14, "dy": -2, "rot": 15, "t": 0.10}),
+				_phase({"dx": 3, "rot": 4, "t": 0.17}),
+			]},
+		"flick": {"kind": "ranged", "sfx": "tile_tap",
+			"strike": [
+				_phase({"dx": -3, "rot": -4, "legs": 2, "torso": -5, "head": -3, "t": 0.07}),
+				_phase({"dx": 7, "dy": -3, "rot": 7, "sx": 1.02, "sy": 1.01, "t": 0.04, "release": true}),
+			],
+			"recover": [_phase({"dx": 4, "rot": 3, "t": 0.08})]},
+		"twincast": {"kind": "ranged", "sfx": "attack_impact",
+			"strike": [
+				_phase({"dx": -4, "dy": 3, "legs": 4, "torso": -4, "head": 5, "sx": 0.95, "sy": 1.05, "t": 0.20}),
+				_phase({"dx": -6, "dy": 4, "legs": 6, "torso": -6, "head": 7, "sx": 0.92, "sy": 1.08, "t": 0.10}),
+				_phase({"dx": 10, "dy": -4, "sx": 1.12, "sy": 0.94, "t": 0.06, "release": true}),
+			],
+			"recover": [
+				_phase({"dx": 13, "dy": -1, "sx": 1.05, "sy": 0.98, "t": 0.10}),
+				_phase({"dx": 2, "t": 0.16}),
+			]},
+		"pirouette": {"kind": "ranged", "sfx": "attack_impact",
+			"strike": [
+				_phase({"dx": -4, "dy": -3, "rot": -14, "legs": 3, "torso": -10, "head": -6, "bob": -5, "t": 0.15}),
+				_phase({"dy": -6, "rot": 160, "bob": -7, "sy": 1.06, "t": 0.14}),
+				_phase({"dx": 8, "dy": -4, "rot": 344, "sx": 1.04, "t": 0.08, "release": true}),
+			],
+			"recover": [
+				_phase({"dx": 11, "dy": -1, "rot": 372, "t": 0.10}),
+				_phase({"dx": 2, "rot": 360, "t": 0.15}),
+			]},
+		"skycast": {"kind": "ranged", "sfx": "attack_impact",
+			"strike": [
+				_phase({"dx": -4, "dy": 4, "rot": -3, "legs": 6, "torso": -6, "head": -8, "t": 0.20}),
+				_phase({"dx": -2, "dy": -8, "legs": 2, "torso": -3, "head": -12, "bob": -9, "sy": 1.08, "t": 0.12}),
+				_phase({"dx": 7, "dy": -11, "rot": 5, "sx": 1.02, "sy": 1.04, "t": 0.07, "release": true}),
+			],
+			"recover": [
+				_phase({"dx": 10, "dy": -5, "rot": 9, "t": 0.11}),
+				_phase({"dx": 2, "rot": 2, "t": 0.17}),
+			]},
+
+		# ---- melee -----------------------------------------------------
+		# Spin kick: carries her turn into the leg.
+		"spinkick": {"kind": "melee", "sfx": "attack_impact", "shake": 8.0,
+			"strike": [
+				_phase({"dx": -5, "dy": -2, "rot": -12, "legs": 4, "torso": -10, "bob": -4, "t": 0.14}),
+				_phase({"approach": 0.6, "walk": true, "t": 0.18}),
+				_phase({"approach": 1.0, "rot": 190, "dy": -8, "t": 0.14}),
+				_phase({"approach": 1.0, "rot": 350, "dy": -4, "sx": 1.1, "sy": 0.93, "t": 0.07, "contact": true}),
+			],
+			"recover": [
+				_phase({"approach": 1.0, "rot": 372, "t": 0.10}),
+				_phase({"approach": 0.0, "rot": 360, "walk": true, "t": 0.24}),
+			]},
+		# Palm strike: closes quietly, then one short sharp push.
+		"palm": {"kind": "melee", "sfx": "attack_impact", "shake": 6.0,
+			"strike": [
+				_phase({"approach": 0.55, "walk": true, "t": 0.20}),
+				_phase({"approach": 1.0, "walk": true, "t": 0.15}),
+				_phase({"approach": 1.0, "dx": -5, "dy": 3, "legs": 6, "torso": -7, "head": 4, "t": 0.10}),
+				_phase({"approach": 1.0, "dx": 9, "dy": -1, "sx": 1.1, "sy": 0.94, "t": 0.05, "contact": true}),
+			],
+			"recover": [
+				_phase({"approach": 1.0, "dx": 4, "t": 0.10}),
+				_phase({"approach": 0.0, "walk": true, "t": 0.22}),
+			]},
+		# Sliding sweep: drops low on the way in and takes the legs.
+		"sweep": {"kind": "melee", "sfx": "attack_impact", "shake": 9.0,
+			"strike": [
+				_phase({"dx": -4, "dy": 6, "legs": 12, "sy": 0.92, "t": 0.14}),
+				_phase({"approach": 0.65, "dy": 14, "rot": -8, "sx": 1.12, "sy": 0.82, "t": 0.20}),
+				_phase({"approach": 1.0, "dy": 16, "rot": -12, "sx": 1.16, "sy": 0.8, "t": 0.09, "contact": true}),
+			],
+			"recover": [
+				_phase({"approach": 1.0, "dy": 6, "rot": -4, "sy": 0.94, "t": 0.13}),
+				_phase({"approach": 0.0, "walk": true, "t": 0.24}),
+			]},
+		# Two quick jabs, the second one carrying the weight.
+		"doublejab": {"kind": "melee", "sfx": "tile_tap", "shake": 5.0,
+			"strike": [
+				_phase({"approach": 0.6, "walk": true, "t": 0.18}),
+				_phase({"approach": 1.0, "walk": true, "t": 0.14}),
+				_phase({"approach": 1.0, "dx": 7, "rot": 5, "sx": 1.05, "t": 0.05}),
+				_phase({"approach": 1.0, "dx": 1, "rot": 0, "t": 0.05}),
+				_phase({"approach": 1.0, "dx": 10, "rot": 8, "sx": 1.08, "sy": 0.95, "t": 0.05, "contact": true}),
+			],
+			"recover": [
+				_phase({"approach": 1.0, "dx": 5, "rot": 3, "t": 0.09}),
+				_phase({"approach": 0.0, "walk": true, "t": 0.22}),
+			]},
+		# Axe kick: rises high on the approach, then drops the heel.
+		"axekick": {"kind": "melee", "sfx": "attack_impact", "shake": 10.0,
+			"strike": [
+				_phase({"approach": 0.55, "walk": true, "t": 0.20}),
+				_phase({"approach": 1.0, "dy": -24, "rot": -5, "sy": 1.12, "bob": -8, "t": 0.15}),
+				_phase({"approach": 1.0, "dy": 8, "rot": 6, "sx": 1.12, "sy": 0.85, "t": 0.06, "contact": true}),
+			],
+			"recover": [
+				_phase({"approach": 1.0, "dy": 1, "sy": 0.97, "t": 0.12}),
+				_phase({"approach": 0.0, "walk": true, "t": 0.24}),
+			]},
 	}
 
-## Which style comes next. Never the same one twice running -- random that
+## Which attack comes next. Never the same one twice running -- random that
 ## repeats itself reads as broken rather than random.
 var _last_player_attack: String = ""
+## The style currently mid-swing, so _player_attack_recover() knows whether it
+## has a walk home to play and whether the raised z-order needs dropping.
+var _player_attack: Dictionary = {}
+## Projectile flight still outstanding from the release beat. A phase can only
+## report its own duration, so the launch records here and _play_player_attack
+## counts it down as the follow-through plays over the top of the flight.
+var _pending_flight: float = 0.0
 
-func _pick_player_attack(styles: Dictionary) -> String:
-	var pool: Array = styles.keys().filter(
+func _pick_player_attack(pool: Dictionary) -> String:
+	var keys: Array = pool.keys().filter(
 		func(s: String) -> bool: return s != _last_player_attack)
-	if pool.is_empty():
-		pool = styles.keys()
-	_last_player_attack = pool[randi() % pool.size()]
+	if keys.is_empty():
+		keys = pool.keys()
+	_last_player_attack = keys[randi() % keys.size()]
 	return _last_player_attack
 
-## Runs one ranged attack and returns how long the projectiles still need to
-## land, so the caller can wait for them without freezing the follow-through.
+## Runs an attack up to and including the moment it lands.
 ##
-## `tier` is the word-length tier the caller already resolved. Only its own
-## values are read; damage and timing are the caller's business, untouched.
-func _play_player_attack(tier: Dictionary) -> float:
-	var styles := _ranged_styles(GameState.character)
-	var phases: Array = styles[_pick_player_attack(styles)]
-	# A longer word throws harder: the whole body commits further, but from the
-	# same spot. This scales the motion, never the position on the field.
+## Returns with the hit already delivered, so the caller can play the rival's
+## flinch and apply damage while a melee attacker is still standing over them.
+## _player_attack_recover() must be called afterwards, whatever happens next --
+## it is what walks a melee attacker home and restores the z-order.
+func _play_player_attack(tier: Dictionary) -> void:
+	var pool := _attack_pool(GameState.character)
+	_player_attack = pool[_pick_player_attack(pool)]
+	var melee: bool = _player_attack.get("kind", "ranged") == "melee"
+	# A longer word commits the body further. This scales the motion, never the
+	# distance travelled -- that is set by where the rival actually stands.
 	var power: float = clampf(float(tier.get("lunge", 20.0)) / 26.0, 0.6, 1.6)
 
 	_body_begin(player_character, BODY_FEET)
+	if melee:
+		# Crossing the field means passing over the board, which is drawn after
+		# the characters; the rival's melee skills raise themselves the same way.
+		_body_bring_forward(player_character)
+	var dist := _player_melee_dx() if melee else 0.0
 	player_character.rig_enable()
 
-	var remaining := 0.0
-	for phase: Dictionary in phases:
-		if bool(phase.get("release", false)):
-			# The rig has to come down before the attack clip can show: the rig
-			# is a slice of whichever frame was up when it was raised, so the
-			# clip would play underneath it, invisible.
-			player_character.rig_disable()
-			player_character.play_attack()
-			Audio.play_sfx("attack_impact")
-			remaining = _launch_bolts(player_character, enemy_character,
-				Color(1, 0.86, 0.42, 0.95), int(tier["bolts"]),
-				float(tier["bolt_size"]), float(tier["rate"]))
-		elif player_character.is_rigged():
-			player_character.rig_pose(
-				float(phase.get("legs", 0.0)), float(phase.get("torso", 0.0)),
-				float(phase.get("head", 0.0)), float(phase.get("bob", 0.0)),
-				0.0, float(phase.get("t", 0.12)))
+	_pending_flight = 0.0
+	for phase: Dictionary in _player_attack["strike"]:
+		var spent := await _run_attack_phase(phase, dist, power, tier)
+		_pending_flight = maxf(0.0, _pending_flight - spent)
+	# A ranged attack lands when its projectile arrives, not when the arm stops.
+	if _pending_flight > 0.0:
+		await get_tree().create_timer(_pending_flight).timeout
+		_pending_flight = 0.0
 
-		var t := float(phase.get("t", 0.12))
-		await _body_play(player_character, [_beat(
-			float(phase.get("dx", 0.0)) * power,
-			float(phase.get("dy", 0.0)) * power,
-			float(phase.get("rot", 0.0)),
-			float(phase.get("sx", 1.0)), float(phase.get("sy", 1.0)),
-			t, Tween.TRANS_QUAD,
-			Tween.EASE_OUT if bool(phase.get("release", false)) else Tween.EASE_IN_OUT)])
-		remaining = maxf(0.0, remaining - t)
-
+## Walks a melee attacker home and puts everything back. Safe to call for a
+## ranged attack, which simply plays its follow-through in place.
+func _player_attack_recover() -> void:
+	if _player_attack.is_empty():
+		return
+	var dist := _player_melee_dx() if _player_attack.get("kind", "") == "melee" else 0.0
+	for phase: Dictionary in _player_attack.get("recover", []):
+		await _run_attack_phase(phase, dist, 1.0, {})
 	if player_character.is_rigged():
 		player_character.rig_disable()
+	player_character.play_idle()
+	_body_send_back(player_character)
 	await _body_end(player_character, 0.14)
-	return remaining
+	_player_attack = {}
+
+## One phase of an attack. Returns how long it took, so the caller can subtract
+## it from any projectile flight still outstanding.
+func _run_attack_phase(phase: Dictionary, dist: float, power: float,
+		tier: Dictionary) -> float:
+	var t := float(phase.get("t", 0.12))
+	var hit: bool = bool(phase.get("release", false)) or bool(phase.get("contact", false))
+
+	if hit:
+		# The rig has to come down before the attack clip can show: the rig is a
+		# slice of whichever frame was up when it was raised, so the clip would
+		# otherwise play underneath it, invisible.
+		if player_character.is_rigged():
+			player_character.rig_disable()
+		player_character.play_attack()
+		Audio.play_sfx(String(_player_attack.get("sfx", "attack_impact")))
+
+	if bool(phase.get("release", false)):
+		_pending_flight = _launch_bolts(player_character, enemy_character,
+			Color(1, 0.86, 0.42, 0.95), int(tier.get("bolts", 1)),
+			float(tier.get("bolt_size", 14.0)), float(tier.get("rate", 1.0)))
+	elif bool(phase.get("contact", false)):
+		# A melee hit has no projectile to sell it, so the impact carries the
+		# whole blow: a ring at the point of contact, spatter, and a shake.
+		_fx_ring(enemy_character, Color(1, 0.9, 0.55, 0.9), 54.0, 0.24)
+		_fx_splatter(enemy_character, Color(1, 0.86, 0.42, 0.95), 4, 20.0, 0.4)
+		_shake_screen(float(_player_attack.get("shake", 7.0)))
+	elif bool(phase.get("walk", false)) and player_character.walk_count >= 2:
+		# Real leg animation for the run-in, rather than the rig's paper stride.
+		if player_character.is_rigged():
+			player_character.rig_disable()
+		player_character.play_walk()
+	elif player_character.is_rigged():
+		player_character.rig_pose(
+			float(phase.get("legs", 0.0)), float(phase.get("torso", 0.0)),
+			float(phase.get("head", 0.0)), float(phase.get("bob", 0.0)), 0.0, t)
+
+	await _body_play(player_character, [_beat(
+		float(phase.get("approach", 0.0)) * dist + float(phase.get("dx", 0.0)) * power,
+		float(phase.get("dy", 0.0)) * power,
+		float(phase.get("rot", 0.0)),
+		float(phase.get("sx", 1.0)), float(phase.get("sy", 1.0)),
+		t, Tween.TRANS_QUAD,
+		Tween.EASE_OUT if hit else Tween.EASE_IN_OUT)])
+	return t
 
 # --- body choreography ----------------------------------------------------
 #
