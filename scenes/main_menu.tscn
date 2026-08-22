@@ -134,14 +134,27 @@ texture_filter = 2
 
 [node name="PlayerCharacter" type="TextureRect" parent="."]
 layout_mode = 0
-offset_left = 78.0
-offset_top = 208.0
-offset_right = 238.0
-offset_bottom = 448.0
+offset_left = 128.0
+offset_top = 214.0
+offset_right = 248.0
+offset_bottom = 434.0
 expand_mode = 1
 stretch_mode = 5
 script = ExtResource("6")
 idle_dir = "res://assets/images/characters/player_idle"
+idle_count = 5
+
+[node name="PlayerCharacterFemale" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 262.0
+offset_top = 214.0
+offset_right = 382.0
+offset_bottom = 434.0
+expand_mode = 1
+stretch_mode = 5
+flip_h = true
+script = ExtResource("6")
+idle_dir = "res://assets/images/characters/player_female_idle"
 idle_count = 5
 
 [node name="Menu" type="VBoxContainer" parent="."]

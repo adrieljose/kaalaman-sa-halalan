@@ -105,6 +105,7 @@ const MENU_STACK_SAFE_TOP := 144.0
 @onready var female_preview: AnimatedCharacter = $CharacterPanel/VBox/PreviewRow/FemalePreview
 @onready var character_back_button: Button = $CharacterPanel/VBox/BackButton
 @onready var title_character: AnimatedCharacter = $PlayerCharacter
+@onready var title_character_female: AnimatedCharacter = $PlayerCharacterFemale
 @onready var difficulty_panel: PanelContainer = $DifficultyPanel
 @onready var easy_button: Button = $DifficultyPanel/VBox/EasyButton
 @onready var medium_button: Button = $DifficultyPanel/VBox/MediumButton
@@ -188,9 +189,12 @@ func _ready() -> void:
 	_apply_difficulty_hints()
 	_build_reviewer()
 	_build_certificate()
-	# The title screen shows whoever is currently selected, so the choice is
-	# visible from the moment it is made rather than only once battle starts.
-	title_character.configure_clips(GameState.character_clips())
+	# Both characters stand on the plaza, Juan on the left and Maria on the
+	# right, rather than only whoever happens to be selected. They are the two
+	# faces of the game and the title screen is where a player meets them; the
+	# selection is made on its own screen a click later anyway.
+	title_character.configure_clips(GameState.PLAYER_CHARACTERS["male"])
+	title_character_female.configure_clips(GameState.PLAYER_CHARACTERS["female"])
 
 ## Wired by index rather than one handler per pin, so adding chapter 6 means
 ## adding a node and bumping TOTAL_CHAPTERS — no new signal code.
@@ -260,7 +264,6 @@ func _show_soon_toast() -> void:
 func _on_character_chosen(character: String) -> void:
 	Audio.play_sfx("button_click")
 	GameState.character = character
-	title_character.configure_clips(GameState.character_clips())
 	character_panel.hide()
 	difficulty_panel.show()
 

@@ -14,6 +14,14 @@ config/name="Kaalaman sa Halalan"
 run/main_scene="res://scenes/main_menu.tscn"
 config/features=PackedStringArray("4.7", "Forward Plus")
 config/icon="res://icon.svg"
+; Without these Godot shows its own logo while the web build streams in, which
+; on a 38MB wasm is the first thing a player sees for several seconds. The
+; game's own title art on the panel-wood colour reads as the game starting
+; rather than as an engine booting.
+boot_splash/bg_color=Color(0.09, 0.06, 0.04, 1)
+boot_splash/image="res://assets/images/ui/title_logo.png"
+boot_splash/fullsize=false
+boot_splash/use_filter=true
 
 [audio]
 
