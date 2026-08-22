@@ -1920,7 +1920,7 @@ func _maria_attacks() -> Dictionary:
 	return {
 		# ---- ranged ----------------------------------------------------
 		"arc": {"kind": "ranged", "sfx": "attack_impact",
-			"clip": "res://assets/images/characters/maria_throw", "frames": 7,
+			"clip": "res://assets/images/characters/maria_throw", "frames": 5,
 			"strike": [
 				_phase({"dx": -8, "dy": 1, "rot": -9, "legs": 4, "torso": -14, "head": -6, "bob": -2, "t": 0.22}),
 				_phase({"dx": -10, "dy": -2, "rot": -12, "legs": 5, "torso": -17, "head": -8, "bob": -4, "t": 0.10}),
@@ -1931,14 +1931,14 @@ func _maria_attacks() -> Dictionary:
 				_phase({"dx": 3, "rot": 4, "t": 0.17}),
 			]},
 		"flick": {"kind": "ranged", "sfx": "tile_tap",
-			"clip": "res://assets/images/characters/maria_punch", "frames": 6,
+			"clip": "res://assets/images/characters/maria_throw", "frames": 5,
 			"strike": [
 				_phase({"dx": -3, "rot": -4, "legs": 2, "torso": -5, "head": -3, "t": 0.07}),
 				_phase({"dx": 7, "dy": -3, "rot": 7, "sx": 1.02, "sy": 1.01, "t": 0.04, "release": true}),
 			],
 			"recover": [_phase({"dx": 4, "rot": 3, "t": 0.08})]},
 		"twincast": {"kind": "ranged", "sfx": "attack_impact",
-			"clip": "res://assets/images/characters/maria_uppercut", "frames": 7,
+			"clip": "res://assets/images/characters/maria_throw", "frames": 5,
 			"strike": [
 				_phase({"dx": -4, "dy": 3, "legs": 4, "torso": -4, "head": 5, "sx": 0.95, "sy": 1.05, "t": 0.20}),
 				_phase({"dx": -6, "dy": 4, "legs": 6, "torso": -6, "head": 7, "sx": 0.92, "sy": 1.08, "t": 0.10}),
@@ -1949,7 +1949,7 @@ func _maria_attacks() -> Dictionary:
 				_phase({"dx": 2, "t": 0.16}),
 			]},
 		"pirouette": {"kind": "ranged", "sfx": "attack_impact",
-			"clip": "res://assets/images/characters/maria_throw", "frames": 7,
+			"clip": "res://assets/images/characters/maria_throw", "frames": 5,
 			"strike": [
 				_phase({"dx": -4, "dy": -3, "rot": -14, "legs": 3, "torso": -10, "head": -6, "bob": -5, "t": 0.15}),
 				_phase({"dy": -6, "rot": 160, "bob": -7, "sy": 1.06, "t": 0.14}),
@@ -1960,7 +1960,7 @@ func _maria_attacks() -> Dictionary:
 				_phase({"dx": 2, "rot": 360, "t": 0.15}),
 			]},
 		"skycast": {"kind": "ranged", "sfx": "attack_impact",
-			"clip": "res://assets/images/characters/maria_uppercut", "frames": 7,
+			"clip": "res://assets/images/characters/maria_throw", "frames": 5,
 			"strike": [
 				_phase({"dx": -4, "dy": 4, "rot": -3, "legs": 6, "torso": -6, "head": -8, "t": 0.20}),
 				_phase({"dx": -2, "dy": -8, "legs": 2, "torso": -3, "head": -12, "bob": -9, "sy": 1.08, "t": 0.12}),
@@ -1974,7 +1974,7 @@ func _maria_attacks() -> Dictionary:
 		# ---- melee -----------------------------------------------------
 		# Spin kick: carries her turn into the leg.
 		"spinkick": {"kind": "melee", "sfx": "attack_impact", "shake": 8.0,
-			"clip": "res://assets/images/characters/maria_kick", "frames": 7,
+			"clip": "res://assets/images/characters/maria_kick", "frames": 5,
 			"strike": [
 				_phase({"dx": -5, "dy": -2, "rot": -12, "legs": 4, "torso": -10, "bob": -4, "t": 0.14}),
 				_phase({"approach": 0.6, "walk": true, "t": 0.18}),
@@ -1987,7 +1987,7 @@ func _maria_attacks() -> Dictionary:
 			]},
 		# Palm strike: closes quietly, then one short sharp push.
 		"palm": {"kind": "melee", "sfx": "attack_impact", "shake": 6.0,
-			"clip": "res://assets/images/characters/maria_punch", "frames": 6,
+			"clip": "res://assets/images/characters/maria_punch", "frames": 5,
 			"strike": [
 				_phase({"approach": 0.55, "walk": true, "t": 0.20}),
 				_phase({"approach": 1.0, "walk": true, "t": 0.15}),
@@ -2000,7 +2000,7 @@ func _maria_attacks() -> Dictionary:
 			]},
 		# Sliding sweep: drops low on the way in and takes the legs.
 		"sweep": {"kind": "melee", "sfx": "attack_impact", "shake": 9.0,
-			"clip": "res://assets/images/characters/maria_kick", "frames": 7,
+			"clip": "res://assets/images/characters/maria_kick", "frames": 5,
 			"strike": [
 				_phase({"dx": -4, "dy": 6, "legs": 12, "sy": 0.92, "t": 0.14}),
 				_phase({"approach": 0.65, "dy": 14, "rot": -8, "sx": 1.12, "sy": 0.82, "t": 0.20}),
@@ -2012,7 +2012,7 @@ func _maria_attacks() -> Dictionary:
 			]},
 		# Two quick jabs, the second one carrying the weight.
 		"doublejab": {"kind": "melee", "sfx": "tile_tap", "shake": 5.0,
-			"clip": "res://assets/images/characters/maria_punch", "frames": 6,
+			"clip": "res://assets/images/characters/maria_punch", "frames": 5,
 			"strike": [
 				_phase({"approach": 0.6, "walk": true, "t": 0.18}),
 				_phase({"approach": 1.0, "walk": true, "t": 0.14}),
@@ -2026,7 +2026,7 @@ func _maria_attacks() -> Dictionary:
 			]},
 		# Axe kick: rises high on the approach, then drops the heel.
 		"axekick": {"kind": "melee", "sfx": "attack_impact", "shake": 10.0,
-			"clip": "res://assets/images/characters/maria_uppercut", "frames": 7,
+			"clip": "res://assets/images/characters/maria_kick", "frames": 5,
 			"strike": [
 				_phase({"approach": 0.55, "walk": true, "t": 0.20}),
 				_phase({"approach": 1.0, "dy": -24, "rot": -5, "sy": 1.12, "bob": -8, "t": 0.15}),
