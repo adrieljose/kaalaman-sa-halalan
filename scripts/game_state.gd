@@ -111,8 +111,8 @@ func is_chapter_completed(chapter_no: int) -> bool:
 ## mark_chapter_completed — but only when it actually changed, so opening the
 ## certificate panel and closing it again without touching the name field
 ## never writes to disk.
-func set_player_name(name: String) -> void:
-	var trimmed := name.strip_edges()
+func set_player_name(typed: String) -> void:
+	var trimmed := typed.strip_edges()
 	if trimmed == player_name:
 		return
 	player_name = trimmed

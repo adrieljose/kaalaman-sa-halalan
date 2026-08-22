@@ -386,6 +386,9 @@ func _example_answers(chapter_no: int, tier: String, wanted: int) -> Array[Strin
 	for word in single_words:
 		lengths.append(word.length())
 	lengths.sort()
+	# Truncating is the point: for an even count either middle element is an
+	# equally good centre to sort distance from.
+	@warning_ignore("integer_division")
 	var median: int = lengths[lengths.size() / 2]
 	single_words.sort_custom(func(a: String, b: String) -> bool:
 		var da := absi(a.length() - median)
@@ -956,7 +959,7 @@ func _on_certificate_claim_pressed() -> void:
 ## expected, temporary state rather than an error — the art is being made
 ## separately and simply is not in the repo yet — so the status label says so
 ## plainly instead of the button silently doing nothing.
-func _generate_and_open_certificate(name: String) -> void:
+func _generate_and_open_certificate(claimed_name: String) -> void:
 	if not FileAccess.file_exists(CERTIFICATE_TEMPLATE_PATH):
 		_certificate_status_label.text = (
 			"The certificate template hasn't been added to the game yet — check back soon!")
@@ -964,7 +967,7 @@ func _generate_and_open_certificate(name: String) -> void:
 		push_warning("MainMenu: certificate claimed but %s is missing" % CERTIFICATE_TEMPLATE_PATH)
 		return
 
-	var image := await _render_certificate_image(name)
+	var image := await _render_certificate_image(claimed_name)
 	if image == null:
 		_certificate_status_label.text = "Something went wrong generating the certificate."
 		_fit_certificate_panel()
@@ -987,7 +990,7 @@ func _generate_and_open_certificate(name: String) -> void:
 	_certificate_status_label.text = "Certificate saved! Opening it now..."
 	_fit_certificate_panel()
 
-## Draws the player's name onto the template, off-screen, and reads the result
+## Draws the player's claimed_name onto the template, off-screen, and reads the result
 ## back as an Image. Godot has no way to paint text onto an Image directly —
 ## text is a draw call, and draw calls need something to render into — so a
 ## SubViewport stands in for a canvas: a background TextureRect plus a Label
@@ -997,26 +1000,26 @@ func _generate_and_open_certificate(name: String) -> void:
 ## (CERTIFICATE_NAME_Y_FRACTION etc.), measured directly against the current
 ## certificate_template.png — see the constants' own comments for the pixel
 ## measurements they came from. Retune them together if the template changes.
-func _render_certificate_image(name: String) -> Image:
+func _render_certificate_image(claimed_name: String) -> Image:
 	var template := load(CERTIFICATE_TEMPLATE_PATH) as Texture2D
 	if template == null:
 		push_warning("MainMenu: %s did not load as a texture" % CERTIFICATE_TEMPLATE_PATH)
 		return null
-	var size := template.get_size()
+	var template_size := template.get_size()
 
 	var viewport := SubViewport.new()
-	viewport.size = Vector2i(size)
+	viewport.size = Vector2i(template_size)
 	viewport.transparent_bg = false
 	viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
 
 	var background := TextureRect.new()
 	background.texture = template
-	background.size = size
+	background.size = template_size
 	background.stretch_mode = TextureRect.STRETCH_SCALE
 	viewport.add_child(background)
 
 	var name_label := Label.new()
-	name_label.text = name
+	name_label.text = claimed_name
 	# A FontVariation over the variable Playfair Display file, rather than a
 	# second static font file, to get a weight that reads as confidently as
 	# the template's own "Atty. Keinth L. Horario" signature line.
@@ -1024,19 +1027,19 @@ func _render_certificate_image(name: String) -> Image:
 	name_font.base_font = load(CERTIFICATE_NAME_FONT_PATH)
 	name_font.variation_opentype = {"wght": CERTIFICATE_NAME_FONT_WEIGHT}
 	name_label.add_theme_font_override("font", name_font)
-	var font_size := int(clampf(size.x * CERTIFICATE_NAME_FONT_FRACTION, 18.0, 160.0))
+	var font_size := int(clampf(template_size.x * CERTIFICATE_NAME_FONT_FRACTION, 18.0, 160.0))
 	name_label.add_theme_font_size_override("font_size", font_size)
 	# Matches the template's own ink colour (sampled from its signature text)
-	# rather than pure black, so the printed name doesn't stand out as an
+	# rather than pure black, so the printed claimed_name doesn't stand out as an
 	# obviously separate layer from the rest of the design.
 	name_label.add_theme_color_override("font_color", Color(0.14, 0.14, 0.14))
 	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	name_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	var label_width := size.x * CERTIFICATE_NAME_WIDTH_FRACTION
+	var label_width := template_size.x * CERTIFICATE_NAME_WIDTH_FRACTION
 	var label_height := font_size * 1.4
 	name_label.size = Vector2(label_width, label_height)
 	name_label.position = Vector2(
-		(size.x - label_width) * 0.5, size.y * CERTIFICATE_NAME_Y_FRACTION - label_height * 0.5)
+		(template_size.x - label_width) * 0.5, template_size.y * CERTIFICATE_NAME_Y_FRACTION - label_height * 0.5)
 	viewport.add_child(name_label)
 
 	add_child(viewport)
