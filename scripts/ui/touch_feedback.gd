@@ -37,7 +37,11 @@ const HOVER_TINT := Color(1.12, 1.12, 1.08)
 ## Disabled has to read as "not available" without looking broken. Desaturating
 ## toward grey does that better than fading, which on a busy background just
 ## looks like a rendering glitch.
-const DISABLED_TINT := Color(0.52, 0.52, 0.56)
+##
+## Not darker than this: the game's wooden button art is already dark, and
+## multiplying it by much less turned the disabled Attack button into bare text
+## floating on the backdrop with no button visible around it at all.
+const DISABLED_TINT := Color(0.72, 0.70, 0.70)
 
 const STATES := ["pressed", "hover", "disabled"]
 const TINTS := [PRESS_TINT, HOVER_TINT, DISABLED_TINT]
@@ -61,11 +65,19 @@ static func apply(button: BaseButton) -> void:
 	button.set_meta("touch_feedback", true)
 	for i in STATES.size():
 		var state: String = STATES[i]
-		# Only fill in states that are not already saying something. A box that
-		# is a different OBJECT from `normal` was authored deliberately —
-		# settings_panel.gd's Back button does this — and is not ours to
-		# overwrite. A box that is the same object is the flat case above.
-		if button.get_theme_stylebox(state) != normal:
+		# Only leave alone what someone deliberately authored: an explicit
+		# OVERRIDE that differs from `normal` (settings_panel.gd's Back button
+		# is the only one). An override equal to normal is the flat case above,
+		# and no override at all means the button is falling through to the
+		# default theme.
+		#
+		# That last case is why this tests for an override rather than just
+		# comparing boxes. No button in this project authors a `disabled` box,
+		# so comparing alone found the default theme's grey there, decided
+		# somebody meant it, and skipped — leaving a disabled Attack rendered as
+		# bare text with no button visible around it.
+		if button.has_theme_stylebox_override(state) \
+				and button.get_theme_stylebox(state) != normal:
 			continue
 		var tinted := _tinted(normal, TINTS[i])
 		if tinted != null:

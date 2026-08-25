@@ -304,12 +304,10 @@ func _ready() -> void:
 	QuestionBank.set_context(GameState.chapter_number(), GameState.difficulty)
 	player_character.configure_clips(GameState.character_clips())
 	_question_time = GameState.question_seconds()
-	# The button rerolls the question AND reseeds the board, and costs the turn
-	# either way — "Shuffle" covers all of that in one word that fits a phone,
-	# where the old "New Question" had to be abbreviated to an unreadable
-	# "New Q". The layout passes set this too; it is here so the button reads
-	# correctly on the very first frame.
-	shuffle_button.text = "Shuffle"
+	# Named for what it does — it rerolls the question, not the letters. It fits
+	# unabbreviated on a phone now that the potions have moved off this row; the
+	# layout passes set it too, so this is only about the very first frame.
+	shuffle_button.text = "New Question"
 	shuffle_button.add_theme_font_size_override("font_size", 12)
 	_screen_home = position
 	# Captured before anything re-styles them, so the WIDE layout can hand the
@@ -489,7 +487,7 @@ func _layout_battle_wide(profile: LayoutProfile) -> void:
 		button.clip_text = false
 		button.custom_minimum_size = Vector2.ZERO
 		button.add_theme_font_size_override("font_size", 12)
-	shuffle_button.text = "Shuffle"
+	shuffle_button.text = "New Question"
 	potion_row.add_theme_constant_override("separation", 4)
 	purify_potion_button.visible = false
 	for potion in [health_potion_button, power_potion_button]:
@@ -527,17 +525,29 @@ func _layout_battle_portrait(profile: LayoutProfile) -> void:
 	_show_compact_chrome(true)
 
 	# --- from the top
+	#
+	# The potions share the move-strip row rather than the action bar below.
+	# Two chips plus three labelled buttons on one 320-unit line leaves every
+	# label touching its own border — "New Question" could not fit at all, which
+	# is what forced the unreadable "New Q". Lifting the potions out gives the
+	# three actions a full row to themselves and costs ten units of height,
+	# where a second action row would have cost fifty and come out of the board.
 	var y: float = _hud["height"] + gap
-	_place_node(_move_strip, Rect2(margin, y, w, 24.0))
-	y += 24.0 + gap
+	_prepare_compact_potions()
+	var strip_h := 34.0
+	var potion_w: float = maxf(potion_panel.get_combined_minimum_size().x, 74.0)
+	_place_node(_move_strip, Rect2(margin, y, w - potion_w - gap, strip_h))
+	_place_node(potion_panel, Rect2(margin + w - potion_w, y, potion_w, strip_h))
+	y += strip_h + gap
 	var question_h: float = clampf(d.y * 0.10, 58.0, 78.0)
 	_place_node(question_panel, Rect2(margin, y, w, question_h))
 	var content_top: float = y + question_h + gap
 
 	# --- from the bottom
-	var controls_h: float = TOUCH_TARGET + 8.0
+	var rows := _compact_action_rows(w, true, false)
+	var controls_h: float = (TOUCH_TARGET + 8.0) if rows == 1 		else (TOUCH_TARGET * 2.0 + 13.0)
 	var controls_y: float = d.y - margin * 0.7 - controls_h
-	_layout_compact_controls(Rect2(margin, controls_y, w, controls_h), true)
+	_layout_compact_controls(Rect2(margin, controls_y, w, controls_h), true, false, rows)
 
 	var tray_h := 30.0
 	var available: float = controls_y - gap - content_top - tray_h - gap * 2.0
@@ -590,9 +600,12 @@ func _layout_battle_landscape(profile: LayoutProfile) -> void:
 	word_preview_label.visible = false
 	y += tray_h + gap
 
+	# A rotated phone has no vertical room for a second deck, so the bar stays
+	# one row here whatever the measurement says — but the column is wide enough
+	# (about 355 units) that all four fit comfortably anyway.
 	var controls_h := 34.0
 	var controls_y: float = d.y - margin - controls_h
-	_layout_compact_controls(Rect2(margin, controls_y, col_w, controls_h), false)
+	_layout_compact_controls(Rect2(margin, controls_y, col_w, controls_h), false, true, 1)
 
 	_place_stage(Rect2(margin, y, col_w, maxf(controls_y - gap - y, 50.0)), 0.95)
 
@@ -660,34 +673,119 @@ func _place_board(x: float, y: float) -> void:
 ## menu. Potions move down here rather than keeping the desktop's separate panel
 ## because a phone cannot spare a whole row for three buttons that are used
 ## once a fight.
-func _layout_compact_controls(area: Rect2, tall: bool) -> void:
-	_place_node(console_bar, area)
-	# The three potions go in as their whole PANEL, not as three loose buttons.
-	# They live inside PotionPanel/VBox/Row, and a container lays its children
-	# out itself — placing them individually sets offsets the HBoxContainer
-	# overwrites on the next sort, which is why they piled up in one corner.
-	# Moving the panel and letting its own row do the spacing works with the
-	# scene rather than against it.
+## The bottom action bar for compact layouts.
+##
+## `with_potions` decides whether the two potion chips ride along here or have
+## been placed elsewhere by the caller. `rows` is 1 or 2 — see
+## _compact_action_rows() for who decides and why.
+func _layout_compact_controls(area: Rect2, tall: bool, with_potions: bool = true,
+		rows: int = 1) -> void:
+	console_bar.visible = false
+	_prepare_compact_potions()
+	_prepare_compact_actions(tall)
+
 	# ConsoleBar sits later in the scene tree than PotionPanel, so it paints over
-	# it -- invisible at 640x480 where the two never overlap, fatal here where
-	# the panel is being moved onto the bar. Lifting the panel above it is safe
-	# on every layout, since on WIDE they are 400 units apart.
+	# it -- invisible at 640x480 where the two never overlap, and fatal wherever
+	# the panel is moved onto the bar. Lifting the panel above it is safe on
+	# every layout, since on WIDE they are 400 units apart.
 	if potion_panel.get_index() < console_bar.get_index():
 		move_child(potion_panel, console_bar.get_index())
-	# The wooden ConsoleBar is a 400x26 strip meant to sit UNDER three shallow
-	# inset wells. Stretched to a phone's 296x52 it doubles in height, the grain
-	# smears, and the buttons on it stop reading as buttons at all. Compact
-	# layouts drop it and give the three actions their own wooden chrome.
-	console_bar.visible = false
+
+	var pad := 4.0
+	var gap := 5.0
+	var inner := Rect2(area.position + Vector2(pad, pad),
+		area.size - Vector2(pad, pad) * 2.0)
+
+	if rows >= 2:
+		# Two decks. The turn actions — the two ways to spend a turn — go
+		# together on the lower one, side by side and largest, where a thumb
+		# rests. Everything that is not a turn action shares the deck above.
+		var row_gap := 5.0
+		var lower: float = maxf(inner.size.y * 0.52, TOUCH_TARGET)
+		var upper: float = maxf(inner.size.y - lower - row_gap, 30.0)
+		var top_row := Rect2(inner.position, Vector2(inner.size.x, upper))
+		var bottom_row := Rect2(inner.position + Vector2(0.0, upper + row_gap),
+			Vector2(inner.size.x, lower))
+		if with_potions:
+			_place_row([potion_panel, menu_button], [0.42, 0.58], top_row, gap)
+		else:
+			_place_row([menu_button], [1.0], top_row, gap)
+		_place_row([shuffle_button, attack_button], [0.48, 0.52], bottom_row, gap)
+		return
+
+	var slots: Array[Control] = []
+	var shares: Array[float] = []
+	if with_potions:
+		# The potions take the smallest share of the slack: they are two fixed
+		# chips, and any extra width goes to them as dead wood rather than as a
+		# bigger target.
+		slots = [potion_panel, shuffle_button, attack_button, menu_button]
+		shares = [0.16, 0.26, 0.32, 0.26]
+	else:
+		slots = [shuffle_button, attack_button, menu_button]
+		shares = [0.36, 0.36, 0.28]
+	_place_row(slots, shares, inner, gap)
+
+## Lays `items` across `rect`, giving each one at least the width it actually
+## needs and sharing whatever is left over by `shares`.
+##
+## Distributing by share ALONE is what broke this bar before: a button whose
+## label needed more than its share silently grew past it, because a Control's
+## size is clamped up to its combined minimum the moment it is assigned. Every
+## caller must therefore have set text, font and chip sizes before getting here,
+## or the minimums measured are the wrong ones.
+func _place_row(items: Array, shares: Array, rect: Rect2, gap: float) -> void:
+	if items.is_empty():
+		return
+	var mins: Array[float] = []
+	var needed := 0.0
+	for item in items:
+		var m: float = (item as Control).get_combined_minimum_size().x
+		mins.append(m)
+		needed += m
+	var inner: float = rect.size.x - gap * float(items.size() - 1)
+	var spare: float = maxf(inner - needed, 0.0)
+	var x: float = rect.position.x
+	for i in items.size():
+		var width: float = mins[i] + spare * float(shares[i])
+		_place_node(items[i] as Control, Rect2(x, rect.position.y, width, rect.size.y))
+		x += width + gap
+
+## Would the four controls sit comfortably on one line at `width`, or does this
+## screen need two?
+##
+## "Fits" is not the same as "reads well": a row packed to its exact minimum has
+## every label touching its own border and looks like an accident. The slack
+## factor is what separates a row that merely fits from one that looks placed.
+const ONE_ROW_SLACK := 1.12
+
+func _compact_action_rows(width: float, tall: bool, with_potions: bool) -> int:
+	_prepare_compact_potions()
+	_prepare_compact_actions(tall)
+	var slots: Array[Control] = [shuffle_button, attack_button, menu_button]
+	if with_potions:
+		slots.push_front(potion_panel)
+	var needed := 0.0
+	for slot in slots:
+		needed += slot.get_combined_minimum_size().x
+	var inner: float = width - 8.0 - 5.0 * float(slots.size() - 1)
+	return 1 if inner >= needed * ONE_ROW_SLACK else 2
+
+## Text, font and clipping for the three action buttons. Everything here feeds
+## their minimum width, so it must run before anything measures or places them.
+func _prepare_compact_actions(tall: bool) -> void:
+	shuffle_button.text = "New Question"
+	var font_size: int = 12 if tall else 10
+	for button in [shuffle_button, attack_button, menu_button]:
+		button.custom_minimum_size = Vector2.ZERO
+		button.clip_text = false
+		button.add_theme_font_size_override("font_size", font_size)
 	_style_console(shuffle_button, Color(0.92, 0.88, 0.80))
 	_style_console(attack_button, Color(1.0, 0.86, 0.62))
 	_style_console(menu_button, Color(0.86, 0.84, 0.86))
 
-	# Shrink the potions BEFORE the panel around them is placed. A Control's
-	# size is clamped up to its combined minimum at the moment it is assigned,
-	# so placing the panel first and slimming its contents afterwards leaves it
-	# stuck at the old minimum -- 3x60 + 2x4 + 14 = 202 units of it, straight
-	# across New Q and Attack.
+## The two potion chips, slimmed to ride in a compact row.
+func _prepare_compact_potions() -> void:
 	potion_title.visible = false
 	purify_potion_button.visible = false
 	potion_row.add_theme_constant_override("separation", 3)
@@ -697,60 +795,10 @@ func _layout_compact_controls(area: Rect2, tall: bool) -> void:
 		potion.custom_minimum_size = Vector2(22.0, 0.0)
 		potion.expand_icon = true
 		potion.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		# Fill the bar's height too, or three 16-unit-tall chips sit centred in a
-		# 46-unit bar and are the smallest touch targets on the screen.
+		# Fill the row's height too, or two 16-unit-tall chips sit centred in a
+		# 44-unit bar and are the smallest touch targets on the screen.
 		potion.size_flags_vertical = Control.SIZE_EXPAND_FILL
 		potion.add_theme_font_size_override("font_size", 8)
-
-	# Everything that affects a button's MINIMUM width happens before anything
-	# is placed. A Control's size is clamped up to its minimum at the moment it
-	# is assigned, so setting the label afterwards leaves a button quietly wider
-	# than the slot it was given -- which is what pushed this row out of true.
-	shuffle_button.text = "Shuffle"
-	var font_size: int = 12 if tall else 10
-	for button in [shuffle_button, attack_button, menu_button]:
-		button.custom_minimum_size = Vector2.ZERO
-		button.clip_text = false
-		button.add_theme_font_size_override("font_size", font_size)
-
-	var slots: Array[Control] = [potion_panel, shuffle_button, attack_button, menu_button]
-	var pad := 4.0
-	var gap := 5.0
-	var h: float = area.size.y - pad * 2.0
-	var inner: float = area.size.x - pad * 2.0 - gap * float(slots.size() - 1)
-
-	# Measure what each slot genuinely needs, rather than assuming a share of
-	# the bar is enough for it.
-	var mins: Array[float] = []
-	var needed := 0.0
-	for slot in slots:
-		var m: float = slot.get_combined_minimum_size().x
-		mins.append(m)
-		needed += m
-
-	if needed > inner:
-		# Not enough room even at minimum. Let the three labels ellipsise rather
-		# than let them shoulder each other out of the bar; clip_text drops the
-		# text from a Button's minimum entirely.
-		for button in [shuffle_button, attack_button, menu_button]:
-			button.clip_text = true
-		mins.clear()
-		needed = 0.0
-		for slot in slots:
-			var m: float = slot.get_combined_minimum_size().x
-			mins.append(m)
-			needed += m
-
-	# Whatever is left over after every slot has its minimum is shared out.
-	# Attack is the primary action and takes the largest share; the potions,
-	# being two fixed-size chips, take the smallest.
-	var share := [0.16, 0.26, 0.32, 0.26]
-	var spare: float = maxf(inner - needed, 0.0)
-	var x: float = area.position.x + pad
-	for i in slots.size():
-		var width: float = mins[i] + spare * share[i]
-		_place_node(slots[i], Rect2(x, area.position.y + pad, width, h))
-		x += width + gap
 
 ## Dresses a console button as a small wooden button in its own right, for
 ## layouts where the bar it used to be inset into is gone.

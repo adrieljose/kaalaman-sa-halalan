@@ -13,12 +13,6 @@ config_version=5
 config/name="Kaalaman sa Halalan"
 run/main_scene="res://scenes/main_menu.tscn"
 config/features=PackedStringArray("4.7", "Forward Plus")
-; Without these Godot shows its own logo while the web build streams in, which
-; on a 38MB wasm is the first thing a player sees for several seconds. The
-; game's own title art on the panel-wood colour reads as the game starting
-; rather than as an engine booting. (fullsize/use_filter were folded into
-; stretch_mode when the editor last rewrote this file; 0 is "keep size", which
-; is what fullsize=false meant.)
 boot_splash/bg_color=Color(0.09, 0.06, 0.04, 1)
 boot_splash/stretch_mode=0
 boot_splash/image="res://assets/images/ui/title_logo.png"
