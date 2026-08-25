@@ -377,6 +377,7 @@ func _apply_layout(profile: LayoutProfile) -> void:
 		_build_move_list()
 		_fit_move_overlay(profile)
 	_refresh_move_strip()
+	TouchFeedback.apply_to_tree(self)
 
 ## Shrinks the compact roster overlay to the moves it actually holds. It has to
 ## happen after _build_move_list(), because until the entries exist the panel

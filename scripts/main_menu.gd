@@ -186,6 +186,10 @@ var _music_started: bool = false
 var _reviewer_panel: PanelContainer
 var _reviewer_entries: VBoxContainer
 var _reviewer_count: Label
+## The CHAPTER / LEVEL / TOPIC captions down the left of the filter strips.
+## Tracked so a narrow layout can drop them: 52 units of caption is a fifth of a
+## phone's width, and the tab labels beside them already say what they filter.
+var _reviewer_headings: Array[Label] = []
 var _reviewer_chapter_tabs: Dictionary = {}
 var _reviewer_difficulty_tabs: Dictionary = {}
 var _reviewer_category_tabs: Dictionary = {}
@@ -271,6 +275,10 @@ func _apply_layout(profile: LayoutProfile) -> void:
 	_grow_menu_stack($Menu)
 	_layout_map(profile)
 	_layout_panels(profile)
+	# Last, so anything the passes above created is included. Every button in
+	# this scene assigned one stylebox to all four states, so until now none of
+	# them acknowledged a press at all — see TouchFeedback.
+	TouchFeedback.apply_to_tree(self)
 
 ## Every overlay was positioned by a hardcoded rect measured against the 640x480
 ## canvas — 150..490 for the difficulty picker, 16..624 for the reviewer, and so
@@ -282,8 +290,11 @@ func _layout_panels(profile: LayoutProfile) -> void:
 	_centre_panel(difficulty_panel, Vector2(340.0, 252.0))
 	_centre_panel(credits_panel, Vector2(420.0, 250.0))
 	_centre_panel(options_panel, Vector2(288.0, 168.0))
+	# 300 units of status label alone is wider than a small phone.
+	if _certificate_status_label != null:
+		_certificate_status_label.custom_minimum_size.x = minf(
+			300.0, profile.design_size.x * 0.88)
 	_centre_panel(_certificate_panel, Vector2(340.0, 226.0))
-	_centre_panel(_reviewer_panel, Vector2(608.0, 456.0))
 
 	# The pickers' buttons were sized for a cursor. A finger needs a target it
 	# can hit without aiming, so on touch they grow to 40 design units — about
@@ -293,13 +304,7 @@ func _layout_panels(profile: LayoutProfile) -> void:
 				male_button, female_button, character_back_button, credits_close_button]:
 			button.custom_minimum_size.y = 40.0
 
-	# The reviewer's entries wrap to an explicit width, so it has to be told the
-	# panel's new one and then rebuilt — the labels already on screen keep
-	# whatever width they were created with.
-	var previous := _reviewer_entry_width
-	_reviewer_entry_width = maxf(_reviewer_panel.size.x - 52.0, 160.0)
-	if not is_equal_approx(previous, _reviewer_entry_width):
-		_refresh_reviewer()
+	_layout_reviewer(profile)
 
 	# Both of these re-fit their own height around their centre once the content
 	# is measured, and that centre has just moved.
@@ -310,17 +315,59 @@ func _layout_panels(profile: LayoutProfile) -> void:
 	# otherwise leave it scaling from a corner.
 	options_panel.pivot_offset = options_panel.size * 0.5
 
+## The reviewer needs its own pass, in a specific order, because its width is
+## circular: the panel is as wide as its entries, and the entries wrap to the
+## panel's width.
+##
+## Reading the width off the panel — as this first did — reads the width the
+## panel had already been forced to by the 556-unit entries still inside it, so
+## it never converged and hung a third of the way off a phone screen. Deciding
+## the width from the SCREEN, rebuilding the entries at it, and only then sizing
+## the panel breaks the loop.
+func _layout_reviewer(profile: LayoutProfile) -> void:
+	var d := profile.design_size
+	var margin: float = maxf(d.x * 0.03, 10.0)
+	# The CHAPTER / LEVEL / TOPIC captions are dropped on compact — 52 units of
+	# caption is a sixth of a phone's width, and the tabs beside them already
+	# say what they filter.
+	for heading in _reviewer_headings:
+		heading.visible = profile.is_wide()
+	var chrome: float = 52.0 if profile.is_wide() else 24.0
+	var target: float = minf(608.0, d.x - margin * 2.0)
+
+	var previous := _reviewer_entry_width
+	_reviewer_entry_width = maxf(target - chrome, 150.0)
+	if not is_equal_approx(previous, _reviewer_entry_width):
+		_refresh_reviewer()
+		# Rebuilt labels do not report their new minimum until the next layout
+		# pass, and _centre_panel clamps to whatever the minimum is when it runs.
+		await get_tree().process_frame
+		if not is_instance_valid(_reviewer_panel):
+			return
+	# Never shrink-to-content: a ScrollContainer reports almost no minimum
+	# height, so fitting the reviewer to its content collapses the question list
+	# it exists to show.
+	_centre_panel(_reviewer_panel, Vector2(target, minf(456.0, d.y - margin * 2.0)), false)
+	# This pass can finish a frame after the one in _apply_layout, so anything
+	# _refresh_reviewer() just rebuilt would otherwise wait a whole layout change
+	# for its pressed state.
+	TouchFeedback.apply_to_tree(_reviewer_panel)
+
 ## Centres `panel`, capped at `preferred` but never wider or taller than the
 ## screen can hold. On a phone the cap rarely binds, which is the intent: a
 ## picker that fills the glass is easier to hit than a faithfully-scaled one.
-func _centre_panel(panel: Control, preferred: Vector2) -> void:
+## `shrink_to_content` off means "fill the space you were given" — for panels
+## whose content is a scrolling list, where shrinking to the minimum leaves the
+## list nowhere to appear.
+func _centre_panel(panel: Control, preferred: Vector2,
+		shrink_to_content: bool = true) -> void:
 	if panel == null:
 		return
 	var d := Layout.profile.design_size
 	var margin: float = maxf(d.x * 0.03, 10.0)
 	var w: float = minf(preferred.x, d.x - margin * 2.0)
 	var h: float = minf(preferred.y, d.y - margin * 2.0)
-	if not Layout.profile.is_wide():
+	if shrink_to_content and not Layout.profile.is_wide():
 		# Shrink to the content when there is less of it than the authored rect
 		# allowed for, so a picker does not sit on a tall slab of empty wood.
 		# WIDE keeps the authored height untouched — those rects were composed
@@ -1038,12 +1085,14 @@ func _add_tab_row(column: VBoxContainer, heading: String) -> HBoxContainer:
 	column.add_child(row)
 
 	var label := Label.new()
+	label.name = "RowHeading"
 	label.text = heading
 	label.custom_minimum_size = Vector2(52, 0)
 	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	label.add_theme_font_size_override("font_size", 9)
 	label.add_theme_color_override("font_color", Color(0.6, 0.55, 0.44))
 	row.add_child(label)
+	_reviewer_headings.append(label)
 
 	return row
 
@@ -1060,6 +1109,12 @@ func _make_tab(text: String) -> Button:
 	tab.custom_minimum_size = Vector2(0, 19)
 	tab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	tab.add_theme_font_size_override("font_size", 9)
+	# A Button reports its label's width as its minimum, so five chapter tabs
+	# insisted on ~450 units between them and shouldered the whole reviewer
+	# panel off the side of a 320-unit phone. clip_text drops the text from that
+	# minimum, letting the row fit and ellipsising whatever does not.
+	tab.clip_text = true
+	tab.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	return tab
 
 ## Repaints a strip so exactly one tab reads as chosen. Style is applied per

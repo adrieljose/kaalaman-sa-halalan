@@ -103,6 +103,10 @@ func pop_open() -> void:
 		.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	tween.tween_property(self, "modulate:a", 1.0, 0.12)
 
+## Minimum gap between preview blips while the sound slider is being dragged.
+const SFX_PREVIEW_INTERVAL_MS := 90
+var _last_sfx_preview_ms: int = 0
+
 func _on_music_changed(value: float) -> void:
 	Audio.set_music_volume_percent(value)
 	_music_value.text = "%d%%" % int(round(value))
@@ -112,9 +116,16 @@ func _on_sfx_changed(value: float) -> void:
 	Audio.set_sfx_volume_percent(value)
 	_sfx_value.text = "%d%%" % int(round(value))
 	_flash(_sfx_value)
-	# Answers audibly as well as visually, so the slider proves itself.
+	# Answers audibly as well as visually, so the slider proves itself — but at
+	# step=1 a drag fires this on every one of a hundred values. With a mouse
+	# that is a fast scrub; with a thumb across a 32-unit track it is a burst of
+	# overlapping clicks. Rate-limited so it still confirms the change without
+	# machine-gunning.
 	if value > 0.0:
-		Audio.play_sfx("tile_tap")
+		var now := Time.get_ticks_msec()
+		if now - _last_sfx_preview_ms >= SFX_PREVIEW_INTERVAL_MS:
+			_last_sfx_preview_ms = now
+			Audio.play_sfx("tile_tap")
 
 ## Confirms a change on the readout itself: a brief lift, then back. Music has
 ## no audible answer while it is being dragged, and a number that changes
@@ -184,7 +195,11 @@ func _make_row(icon_path: String, label_text: String,
 func _style_slider(slider: HSlider) -> void:
 	slider.max_value = 100.0
 	slider.step = 1.0
-	slider.custom_minimum_size = Vector2(0, 18)
+	# 18 was a comfortable mouse target and a poor thumb one: the whole
+	# interactive strip was under 22 CSS px on a phone. 32 clears the usual
+	# 44px guidance once the phone's content scale is applied, and costs a
+	# desktop user nothing but a slightly chunkier bar.
+	slider.custom_minimum_size = Vector2(0, 32)
 
 	var track := StyleBoxTexture.new()
 	track.texture = load("%s/bar_track.png" % UI_DIR)
@@ -224,7 +239,7 @@ func _style_slider(slider: HSlider) -> void:
 static func make_back_button(handler: Callable, label: String = "Back") -> Button:
 	var close := Button.new()
 	close.text = label
-	close.custom_minimum_size = Vector2(0, 24)
+	close.custom_minimum_size = Vector2(0, 36)
 	close.add_theme_font_size_override("font_size", 12)
 	close.add_theme_color_override("font_color", Color(1, 0.96, 0.85))
 
