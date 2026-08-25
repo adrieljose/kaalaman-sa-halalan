@@ -24,11 +24,43 @@ signal mud_detonated
 
 const COLS := 6
 const ROWS := 6
-## 6 tiles + 5 gaps = 231px square, which is what the Board node in
-## word_battle.tscn is sized to. Changing either of these means resizing that
-## node (and BoardFrame around it) to match, or tiles will spill past the frame.
-const TILE_SIZE := 36.0
-const TILE_GAP := 3.0
+## 6 tiles + 5 gaps, which is what the Board node in word_battle.tscn is sized
+## to. The battle scene's layout pass owns both of these now and resizes the
+## node (and BoardFrame around it) to match -- see set_tile_size().
+##
+## A variable rather than a constant because a 36-unit tile is a comfortable
+## mouse target and a poor finger one: on a phone the layout hands this a
+## larger value so the same six columns come out at a size a thumb can hit.
+## _cell_position() and _position_to_cell() both read it, so placement and
+## hit-testing cannot drift apart.
+var tile_size := 36.0
+var tile_gap := 3.0
+
+## The square the six columns currently occupy, for the caller sizing the frame.
+func board_side() -> float:
+	return tile_size * COLS + tile_gap * (COLS - 1)
+
+## Resizes the grid in place, keeping every tile's letter and type. Called from
+## the battle scene's layout pass, including on a live device rotation, so it
+## has to work on a board that is already mid-game rather than only at startup.
+func set_tile_size(new_size: float, new_gap: float = -1.0) -> void:
+	if new_gap >= 0.0:
+		tile_gap = new_gap
+	if is_equal_approx(new_size, tile_size):
+		return
+	tile_size = new_size
+	for col in COLS:
+		for row in ROWS:
+			var tile: LetterTile = grid[col][row] if not grid.is_empty() else null
+			if tile == null:
+				continue
+			tile.custom_minimum_size = Vector2(tile_size, tile_size)
+			tile.size = Vector2(tile_size, tile_size)
+			# Selected tiles are lifted out to the tray and their cell is drawn
+			# empty, but the node stays parked on the grid -- so it is moved
+			# with the rest rather than left at the old pitch.
+			tile.position = _cell_position(col, row)
+	size = Vector2(board_side(), board_side())
 const LETTER_POOL := "AAAAAAAAABBCCDDDDEEEEEEEEEEEEFFGGGHHIIIIIIIIIJKLLLLMMNNNNNNOOOOOOOOPPQRRRRRRSSSSTTTTTTUUUUVVWWXYYZ"
 
 ## Scrabble-standard letter values — rarer letters hit harder. This is the
@@ -93,11 +125,15 @@ func _random_letter() -> String:
 	return LETTER_POOL[randi() % LETTER_POOL.length()]
 
 func _cell_position(col: int, row: int) -> Vector2:
-	return Vector2(col * (TILE_SIZE + TILE_GAP), row * (TILE_SIZE + TILE_GAP))
+	return Vector2(col * (tile_size + tile_gap), row * (tile_size + tile_gap))
 
 func _spawn_tile(col: int, row: int) -> void:
 	var tile: LetterTile = tile_scene.instantiate()
 	tile.position = _cell_position(col, row)
+	# The scene carries the authored 36; a refill mid-game on a phone has to
+	# match whatever pitch the board is currently laid out at.
+	tile.custom_minimum_size = Vector2(tile_size, tile_size)
+	tile.size = Vector2(tile_size, tile_size)
 	add_child(tile)
 	tile.letter = _random_letter()
 	grid[col][row] = tile
@@ -258,7 +294,7 @@ func _is_valid_cell(cell: Vector2i) -> bool:
 	return cell.x >= 0 and cell.x < COLS and cell.y >= 0 and cell.y < ROWS
 
 func _position_to_cell(pos: Vector2) -> Vector2i:
-	return Vector2i(int(pos.x / (TILE_SIZE + TILE_GAP)), int(pos.y / (TILE_SIZE + TILE_GAP)))
+	return Vector2i(int(pos.x / (tile_size + tile_gap)), int(pos.y / (tile_size + tile_gap)))
 
 func _on_board_gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:

@@ -45,10 +45,15 @@ const DIFFICULTY_BLURB := {
 	"medium": "Real election terms",
 	"hard": "Long civics words",
 }
-## Row heights for the reviewer's tab strips, and how wide an entry may run
-## before it wraps. The wrap width has to be set explicitly: a RichTextLabel
-## left to guess reports its height as if every word were on its own line.
-const REVIEWER_ENTRY_WIDTH := 556.0
+## How wide a reviewer entry may run before it wraps. The wrap width has to be
+## set explicitly: a RichTextLabel left to guess reports its height as if every
+## word were on its own line.
+##
+## A variable rather than a constant because the reviewer is near-fullscreen on
+## a phone and a fixed 556 would run straight off a 320-unit canvas. Recomputed
+## from the panel's real width in _layout_panels(), which then rebuilds the list
+## so existing entries pick the new width up.
+var _reviewer_entry_width := 556.0
 
 ## Which chapter unlocks the certificate. Chapter 1 only, matching
 ## UNLOCKED_CHAPTERS — there is only one chapter to complete anyway, but this
@@ -86,12 +91,58 @@ const CERTIFICATE_NAME_WIDTH_FRACTION := 0.55
 const CERTIFICATE_NAME_FONT_FRACTION := 0.03
 const CERTIFICATE_NAME_MAX_LENGTH := 40
 
-## Bottom of the PLAY/REVIEWER/.../QUIT stack, held fixed as buttons are added
-## — matches the scene's original offset_bottom for the 4-button menu.
-const MENU_STACK_BOTTOM := 434.0
-## The stack must never grow above this, or it starts overlapping the
-## "I am aware." subtitle banner (which ends at y=138 in main_menu.tscn).
-const MENU_STACK_SAFE_TOP := 144.0
+## Where the plaza floor sits in menu_updated.png, as a fraction of the image's
+## height. Measured against the authored composition: the characters' rects end
+## at y=457 of a 480-unit canvas, and the background is a 4:3 image drawn 1:1
+## over it, so the paved ground the pair stand on is 95% of the way down.
+##
+## This number is why the phone layout puts the menu ABOVE the characters rather
+## than below them. Only the bottom 5% of the illustration is ground; on a tall
+## screen a bottom-anchored menu covers the plaza entirely, and the characters
+## get pushed up into the sky to stand on the town hall roof. Moving the buttons
+## into the empty sky instead leaves the pair on real paving at every size.
+const GROUND_FRACTION := 0.95
+
+## The composition the title screen was authored at. In WIDE arrangements the
+## whole screen is laid out at exactly these coordinates and centred inside
+## whatever design space we actually got, which is what keeps a 4:3 window
+## pixel-identical to the pre-responsive build while a 16:9 one simply gains
+## background either side.
+const WIDE_COMPOSITION := Vector2(640.0, 480.0)
+
+## Where the PLAY/REVIEWER/.../QUIT stack may live, as left/top/right/bottom in
+## design space. Top is a floor the stack must not grow above; bottom is fixed
+## and the stack grows upward from it.
+##
+## Was a pair of constants matching the scene's authored 4-button menu; it is a
+## variable now because the answer differs per arrangement — the same six
+## buttons are a narrow column beside the characters on a monitor and a
+## full-width stack beneath them on a phone.
+var _menu_bounds := Rect2(372.0, 144.0, 240.0, 290.0)
+## Preferred button height before the fitting in _grow_menu_stack() shrinks it.
+## Phones get a taller one so the target clears a fingertip.
+var _menu_button_height := 50.0
+## Menu label size. Compact arrangements need a smaller one or CERTIFICATE runs
+## off the end of its scroll.
+var _menu_font_size := 21
+
+## Everything the title screen composes. Kept as one list because the map, the
+## character picker and the rest all need them hidden together, and hand-written
+## hide lists at each call site is exactly how the original drifted.
+@onready var _title_pieces: Array[Control] = [
+	$TitleLogo, $PlayerCharacter, $PlayerCharacterFemale, $Menu,
+]
+
+## The chapter map's artwork and its pins, reparented into one group at
+## _ready() so they can be fitted to the screen as a unit. The pins are placed
+## against landmarks in the illustration, so anything that moves the picture
+## without moving them by the same amount puts Barangay in the sea.
+var _map_group: Control
+## The compact stand-in for the illustration — see _build_map_list().
+var _map_list: VBoxContainer
+## Dimmed backdrop behind the list, showing the map artwork itself so the
+## compact chapter picker still reads as the map rather than as a bare menu.
+var _map_scrim: TextureRect
 
 @onready var play_button: Button = $Menu/PlayButton
 @onready var options_button: Button = $Menu/OptionsButton
@@ -195,6 +246,363 @@ func _ready() -> void:
 	# selection is made on its own screen a click later anyway.
 	title_character.configure_clips(GameState.PLAYER_CHARACTERS["male"])
 	title_character_female.configure_clips(GameState.PLAYER_CHARACTERS["female"])
+	_group_map()
+	# Last, and after every builder above: the layout pass positions panels that
+	# do not exist until those builders have run. bind() also runs it once
+	# immediately, so the first frame is already in the right arrangement.
+	Layout.bind(self, "_apply_layout")
+
+# --- responsive layout ----------------------------------------------------
+#
+# The title screen implements the three arrangements from LayoutProfile. WIDE
+# reproduces the authored composition exactly; PORTRAIT stacks it; and
+# LANDSCAPE_COMPACT keeps the side-by-side shape but on a canvas less than half
+# as tall, which mostly means the logo and the characters give up height so the
+# menu keeps a tappable one.
+
+func _apply_layout(profile: LayoutProfile) -> void:
+	match profile.arrangement:
+		LayoutProfile.Arrangement.PORTRAIT:
+			_layout_stacked(profile)
+		LayoutProfile.Arrangement.LANDSCAPE_COMPACT:
+			_layout_side_by_side(profile)
+		_:
+			_layout_wide(profile)
+	_grow_menu_stack($Menu)
+	_layout_map(profile)
+	_layout_panels(profile)
+
+## Every overlay was positioned by a hardcoded rect measured against the 640x480
+## canvas — 150..490 for the difficulty picker, 16..624 for the reviewer, and so
+## on. On a 320-unit phone those run clean off the side of the screen, so they
+## are all re-centred against the real design space here, and allowed to go
+## near-fullscreen when that is all the room there is.
+func _layout_panels(profile: LayoutProfile) -> void:
+	_centre_panel(character_panel, Vector2(340.0, 252.0))
+	_centre_panel(difficulty_panel, Vector2(340.0, 252.0))
+	_centre_panel(credits_panel, Vector2(420.0, 250.0))
+	_centre_panel(options_panel, Vector2(288.0, 168.0))
+	_centre_panel(_certificate_panel, Vector2(340.0, 226.0))
+	_centre_panel(_reviewer_panel, Vector2(608.0, 456.0))
+
+	# The pickers' buttons were sized for a cursor. A finger needs a target it
+	# can hit without aiming, so on touch they grow to 40 design units — about
+	# 49 CSS px once the phone's content scale is applied.
+	if profile.is_touch:
+		for button in [easy_button, medium_button, hard_button, difficulty_back_button,
+				male_button, female_button, character_back_button, credits_close_button]:
+			button.custom_minimum_size.y = 40.0
+
+	# The reviewer's entries wrap to an explicit width, so it has to be told the
+	# panel's new one and then rebuilt — the labels already on screen keep
+	# whatever width they were created with.
+	var previous := _reviewer_entry_width
+	_reviewer_entry_width = maxf(_reviewer_panel.size.x - 52.0, 160.0)
+	if not is_equal_approx(previous, _reviewer_entry_width):
+		_refresh_reviewer()
+
+	# Both of these re-fit their own height around their centre once the content
+	# is measured, and that centre has just moved.
+	_fit_difficulty_panel()
+	_fit_certificate_panel()
+
+	# SettingsPanel captures its pop pivot at build time, so a resize would
+	# otherwise leave it scaling from a corner.
+	options_panel.pivot_offset = options_panel.size * 0.5
+
+## Centres `panel`, capped at `preferred` but never wider or taller than the
+## screen can hold. On a phone the cap rarely binds, which is the intent: a
+## picker that fills the glass is easier to hit than a faithfully-scaled one.
+func _centre_panel(panel: Control, preferred: Vector2) -> void:
+	if panel == null:
+		return
+	var d := Layout.profile.design_size
+	var margin: float = maxf(d.x * 0.03, 10.0)
+	var w: float = minf(preferred.x, d.x - margin * 2.0)
+	var h: float = minf(preferred.y, d.y - margin * 2.0)
+	if not Layout.profile.is_wide():
+		# Shrink to the content when there is less of it than the authored rect
+		# allowed for, so a picker does not sit on a tall slab of empty wood.
+		# WIDE keeps the authored height untouched — those rects were composed
+		# against this background and are not ours to second-guess.
+		panel.size.x = w
+		var needed: float = panel.get_combined_minimum_size().y
+		if needed > 0.0:
+			h = clampf(needed, 0.0, h)
+	_place(panel, Rect2((d.x - w) * 0.5, (d.y - h) * 0.5, w, h))
+	panel.size = Vector2(w, h)
+
+## The original 640x480 composition, centred in whatever we were given.
+##
+## Every number here is the scene's own authored offset plus an inset, and the
+## characters keep their hand-placed rects rather than going through
+## _stand_characters(): those two rects were nudged against this exact
+## background crop, and re-deriving them would move desktop for no gain. At
+## exactly 640x480 the inset is zero and nothing has moved at all.
+func _layout_wide(profile: LayoutProfile) -> void:
+	var d := profile.design_size
+	var inset: float = maxf((d.x - WIDE_COMPOSITION.x) * 0.5, 0.0)
+	var top: float = maxf((d.y - WIDE_COMPOSITION.y) * 0.5, 0.0)
+	_place_background(d, top + WIDE_COMPOSITION.y * GROUND_FRACTION)
+	_place($TitleLogo, Rect2(inset + 60.0, top + 6.0, 519.0, 136.0))
+	_place(title_character, Rect2(inset + 154.0, top + 237.0, 120.0, 220.0))
+	_place(title_character_female, Rect2(inset + 267.0, top + 236.0, 120.0, 220.0))
+	_menu_bounds = Rect2(inset + 372.0, top + 144.0, 240.0, 290.0)
+	_menu_button_height = 50.0
+	_menu_font_size = 21
+
+## Logo band across the top, menu column down the right, characters standing on
+## the plaza in the space left over. Used for a phone held sideways, where the
+## canvas is only ~270 units tall — so the logo and the characters give up
+## height and the menu keeps a tappable one.
+func _layout_side_by_side(profile: LayoutProfile) -> void:
+	var d := profile.design_size
+	var margin := 10.0
+	var menu_w := 190.0
+	var menu_left: float = d.x - margin - menu_w
+	var floor_y: float = d.y - margin
+	_place_background(d, floor_y)
+	_place($TitleLogo, Rect2(margin, margin, menu_left - margin * 2.0, 62.0))
+	_menu_bounds = Rect2(menu_left, margin, menu_w, d.y - margin * 2.0)
+	_menu_button_height = 40.0
+	_menu_font_size = 17
+	var char_h := 150.0
+	_stand_characters(menu_left * 0.5, floor_y, char_h, char_h * 0.52)
+
+## Logo at the top, menu in the sky, characters on the plaza at the bottom.
+##
+## The unusual part is the menu sitting ABOVE the characters rather than below.
+## That is forced by the artwork — see GROUND_FRACTION — and it turns out to be
+## the better composition anyway: the buttons land on empty sky where they read
+## cleanly, and the pair keep the paving under their feet.
+func _layout_stacked(profile: LayoutProfile) -> void:
+	var d := profile.design_size
+	var margin: float = maxf(d.x * 0.04, 10.0)
+	var logo_h: float = minf(d.y * 0.155, 120.0)
+	_place($TitleLogo, Rect2(margin, margin, d.x - margin * 2.0, logo_h))
+
+	var ground := _place_background(d, d.y - margin)
+	var char_h: float = clampf(d.y * 0.24, 110.0, 230.0)
+	_stand_characters(d.x * 0.5, ground, char_h, char_h * 0.52)
+
+	# 44 design units is the tap-target floor; on a phone the content scale puts
+	# that at roughly 54 CSS px, past the 44 CSS px minimum. _grow_menu_stack
+	# shrinks below it only if the band genuinely cannot hold six buttons.
+	_menu_button_height = 44.0
+	_menu_font_size = 20
+	var band_top: float = margin + logo_h + 6.0
+	var band_bottom: float = ground - char_h - 10.0
+	_menu_bounds = Rect2(margin, band_top, d.x - margin * 2.0,
+		maxf(band_bottom - band_top, 120.0))
+
+## Sizes and offsets the background so the plaza lands on `target_floor`, and
+## reports where the ground actually ended up.
+##
+## The node was anchored full-rect with KEEP_ASPECT_COVERED, which centres its
+## crop — fine at 4:3, but on a tall phone it decides for itself which slice of
+## the illustration to show, and the answer was "not the ground". Placing the
+## rect by hand means we choose the crop, and the return value lets the caller
+## stand the characters on whatever we were actually able to give them.
+func _place_background(d: Vector2, target_floor: float) -> float:
+	var bg: TextureRect = $Background
+	var tex := bg.texture
+	if tex == null:
+		return target_floor
+	var ts := tex.get_size()
+	if ts.x <= 0.0 or ts.y <= 0.0:
+		return target_floor
+	# Cover: never leave a bare edge, whatever the aspect.
+	var s: float = maxf(d.x / ts.x, d.y / ts.y)
+	var drawn := ts * s
+	# Slide vertically to put the ground where it was asked for, but never past
+	# the point where the image stops covering the screen.
+	var wanted: float = target_floor - drawn.y * GROUND_FRACTION
+	var y: float = clampf(wanted, minf(d.y - drawn.y, 0.0), 0.0)
+	bg.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	bg.stretch_mode = TextureRect.STRETCH_SCALE
+	# The node was authored anchored full-rect, which would make the offsets
+	# below relative to the far edges instead of the origin.
+	bg.anchor_left = 0.0
+	bg.anchor_top = 0.0
+	bg.anchor_right = 0.0
+	bg.anchor_bottom = 0.0
+	_place(bg, Rect2((d.x - drawn.x) * 0.5, y, drawn.x, drawn.y))
+	return y + drawn.y * GROUND_FRACTION
+
+## Stands Juan and Maria side by side with their FEET on `floor_y`, whatever
+## their sprites' transparent padding happens to be.
+##
+## The scene had their two rects hand-nudged a pixel apart to make the ground
+## line look right at one size, which stops being true the moment the size
+## changes. AnimatedCharacter.body_rect() reports where the opaque pixels
+## actually are inside the node, so aligning against that puts both pairs of
+## feet on the same line by construction, at every arrangement.
+func _stand_characters(centre_x: float, floor_y: float, height: float, width: float) -> void:
+	var overlap: float = width * 0.06
+	var pair := [
+		{"node": title_character, "x": centre_x - width + overlap},
+		{"node": title_character_female, "x": centre_x - overlap},
+	]
+	for entry in pair:
+		var who: AnimatedCharacter = entry["node"]
+		who.offset_left = entry["x"]
+		who.offset_right = entry["x"] + width
+		# Size must be settled before body_rect() is asked, because it measures
+		# against the node's current rect to reproduce KEEP_ASPECT_CENTERED.
+		who.offset_top = floor_y - height
+		who.offset_bottom = floor_y
+		who.size = Vector2(width, height)
+		var body := who.body_rect()
+		var foot_gap: float = height - body.end.y
+		who.offset_top += foot_gap
+		who.offset_bottom += foot_gap
+
+func _place(node: Control, rect: Rect2) -> void:
+	node.offset_left = rect.position.x
+	node.offset_top = rect.position.y
+	node.offset_right = rect.end.x
+	node.offset_bottom = rect.end.y
+
+## Moves the map illustration and its pins into one Control so they can be
+## scaled together. Done in code rather than in main_menu.tscn because the
+## editor rewrites that scene whenever it has it open, and this is a subtree
+## that would be silently lost.
+func _group_map() -> void:
+	var artwork := map_panel.get_node_or_null("MapBackground") as TextureRect
+	_map_scrim = TextureRect.new()
+	_map_scrim.name = "MapScrim"
+	_map_scrim.texture = artwork.texture if artwork != null else null
+	_map_scrim.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_map_scrim.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	# Dark enough that the buttons on top carry the contrast, bright enough that
+	# the islands are still recognisably there.
+	_map_scrim.modulate = Color(0.34, 0.34, 0.36)
+	_map_scrim.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_map_scrim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	map_panel.add_child(_map_scrim)
+	map_panel.move_child(_map_scrim, 0)
+
+	_map_group = Control.new()
+	_map_group.name = "MapGroup"
+	_map_group.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_map_group.size = WIDE_COMPOSITION
+	map_panel.add_child(_map_group)
+	map_panel.move_child(_map_group, 1)
+
+	# Everything that is pinned to the artwork travels with it. The back button
+	# and the "available soon" toast belong to the screen, not the picture, so
+	# they stay where they are and get placed against the real design space.
+	for child in map_panel.get_children():
+		var name_text: String = String(child.name)
+		var travels := name_text == "MapBackground" or name_text == "TitleScrim" \
+			or name_text.begins_with("Chapter")
+		if travels:
+			map_panel.remove_child(child)
+			_map_group.add_child(child)
+	_build_map_list()
+
+## The portrait/landscape stand-in for the illustrated map.
+##
+## The illustration is a 640-wide picture whose five pins are placed against
+## landmarks in it, so it can only ever be shown whole — and whole, on a
+## 320-unit phone, means half scale, which puts its chapter captions at about
+## six pixels. Rather than ship a map nobody can read, compact screens get the
+## same five chapters as a list of full-width buttons, with the artwork kept
+## behind them as a backdrop so the screen still feels like the map.
+func _build_map_list() -> void:
+	_map_list = VBoxContainer.new()
+	_map_list.name = "MapList"
+	_map_list.add_theme_constant_override("separation", 8)
+	map_panel.add_child(_map_list)
+
+	var title := Label.new()
+	title.text = "CHOOSE YOUR CHAPTER"
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.add_theme_font_override("font", load("res://assets/fonts/TitanOne-Regular.ttf"))
+	title.add_theme_font_size_override("font_size", 18)
+	title.add_theme_color_override("font_color", Color(1.0, 0.88, 0.6))
+	_map_list.add_child(title)
+
+	for i in range(1, TOTAL_CHAPTERS + 1):
+		var locked := i > UNLOCKED_CHAPTERS
+		var button := Button.new()
+		button.name = "ListChapter%d" % i
+		# The short tab names, not the long map captions: the scroll stylebox
+		# spends ~60 units on its decorative ends, and "City Hall Shadows
+		# (LOCKED)" runs straight through them on a 320-unit canvas.
+		button.text = "%d  %s" % [i, CHAPTER_TABS[i]]
+		if locked:
+			button.text += "   LOCKED"
+		button.clip_text = true
+		button.add_theme_font_override("font", load("res://assets/fonts/TitanOne-Regular.ttf"))
+		button.add_theme_color_override("font_color", Color(0.2, 0.11, 0.05))
+		# Borrow PLAY's boxes so the list is the same wooden scroll as the menu
+		# it was reached from, rather than a bare default button.
+		for state in ["normal", "pressed", "hover", "focus"]:
+			var style := play_button.get_theme_stylebox(state)
+			if style != null:
+				button.add_theme_stylebox_override(state, style)
+		button.self_modulate = Color(0.62, 0.62, 0.6) if locked else Color(0.72, 1.0, 0.72)
+		button.pressed.connect(_on_chapter_pressed.bind(i))
+		_map_list.add_child(button)
+
+func _layout_map(profile: LayoutProfile) -> void:
+	if _map_group == null:
+		return
+	var d := profile.design_size
+	var margin: float = maxf(d.x * 0.03, 10.0)
+
+	# Only a WIDE canvas can show the illustration at a size where its captions
+	# are legible; everywhere else the list stands in for it.
+	var illustrated := profile.is_wide()
+	_map_group.visible = illustrated
+	_map_list.visible = not illustrated
+	_map_scrim.visible = not illustrated
+
+	if illustrated:
+		# Fit, never fill: cropping is not an option when five of the children
+		# are tap targets sitting near the picture's edges.
+		var fit: float = minf(d.x / WIDE_COMPOSITION.x, d.y / WIDE_COMPOSITION.y)
+		_map_group.scale = Vector2(fit, fit)
+		_map_group.position = (d - WIDE_COMPOSITION * fit) * 0.5
+	else:
+		# The list has to share the screen with the Back button, which is placed
+		# below. Sizing the rows to the space that is actually left over — rather
+		# than to a fixed height — is what keeps a rotated phone, where there are
+		# only ~200 units to work with, from stacking the two on top of each
+		# other.
+		var back_h: float = 44.0 if profile.is_touch else 28.0
+		var title_h: float = 26.0 if profile.is_portrait() else 20.0
+		# The scroll stylebox is about 30 units tall before its art starts
+		# overlapping the row above, so on a short canvas the rows are packed
+		# closer together rather than made shorter than the graphic allows.
+		var separation: int = 8 if profile.is_portrait() else 3
+		_map_list.add_theme_constant_override("separation", separation)
+		var available: float = d.y - margin * 2.0 - back_h - 8.0
+		var button_h: float = clampf(
+			(available - title_h - separation * TOTAL_CHAPTERS) / float(TOTAL_CHAPTERS),
+			30.0, 46.0)
+		for child in _map_list.get_children():
+			if child is Button:
+				(child as Button).custom_minimum_size.y = button_h
+				# The scroll stylebox spends ~120 units on decorative ends, so
+				# the usable text run is much narrower than the button.
+				(child as Button).add_theme_font_size_override("font_size",
+					16 if d.x >= 400.0 else 12)
+		var list_h: float = title_h + (button_h + separation) * TOTAL_CHAPTERS
+		_place(_map_list, Rect2(margin, margin + maxf((available - list_h) * 0.5, 0.0),
+			d.x - margin * 2.0, list_h))
+
+	var back_size := Vector2(108.0, 28.0) if profile.is_wide() else Vector2(120.0, 44.0)
+	_place(map_back_button, Rect2(margin, d.y - margin - back_size.y, back_size.x, back_size.y))
+	var toast_w: float = minf(300.0, d.x - margin * 2.0)
+	_place(soon_toast, Rect2((d.x - toast_w) * 0.5, d.y * 0.42, toast_w, 88.0))
+
+## The title composition and the map cannot share the screen once the map is
+## fitted rather than stretched — it no longer covers the logo and characters.
+func _set_title_visible(visible_now: bool) -> void:
+	for piece in _title_pieces:
+		piece.visible = visible_now
 
 ## Wired by index rather than one handler per pin, so adding chapter 6 means
 ## adding a node and bumping TOTAL_CHAPTERS — no new signal code.
@@ -236,6 +644,7 @@ func _on_play_pressed() -> void:
 	character_panel.hide()
 	_reviewer_panel.hide()
 	_certificate_panel.hide()
+	_set_title_visible(false)
 	map_panel.show()
 
 func _on_chapter_pressed(chapter: int) -> void:
@@ -304,6 +713,7 @@ func _on_map_back_pressed() -> void:
 	difficulty_panel.hide()
 	character_panel.hide()
 	map_panel.hide()
+	_set_title_visible(true)
 
 func _on_options_pressed() -> void:
 	Audio.play_sfx("button_click")
@@ -600,17 +1010,22 @@ func _insert_menu_button(button_name: String, text: String, color: Color, after:
 ## whole stack legible rather than letting it overrun its ceiling.
 func _grow_menu_stack(menu: VBoxContainer) -> void:
 	var count := menu.get_child_count()
+	if count <= 0:
+		return
 	var separation := menu.get_theme_constant("separation")
-	var available: float = MENU_STACK_BOTTOM - MENU_STACK_SAFE_TOP
-	var default_height: float = maxf(play_button.custom_minimum_size.y, 1.0)
+	var available: float = _menu_bounds.size.y
 	var fitted_height: float = (available - separation * (count - 1)) / float(count)
-	var button_height: float = clampf(fitted_height, 30.0, default_height)
+	var button_height: float = clampf(fitted_height, 30.0, _menu_button_height)
 	for child in menu.get_children():
 		if child is Button:
-			(child as Button).custom_minimum_size.y = button_height
+			var button := child as Button
+			button.custom_minimum_size.y = button_height
+			button.add_theme_font_size_override("font_size", _menu_font_size)
 	var needed := button_height * count + separation * (count - 1)
-	menu.offset_top = MENU_STACK_BOTTOM - needed
-	menu.offset_bottom = MENU_STACK_BOTTOM
+	menu.offset_left = _menu_bounds.position.x
+	menu.offset_right = _menu_bounds.end.x
+	menu.offset_top = _menu_bounds.end.y - needed
+	menu.offset_bottom = _menu_bounds.end.y
 
 ## One labelled strip of filter tabs, returned empty for the caller to fill.
 ##
@@ -724,7 +1139,7 @@ func _make_tier_heading(tier: String, count: int) -> RichTextLabel:
 	heading.bbcode_enabled = true
 	heading.fit_content = true
 	heading.scroll_active = false
-	heading.custom_minimum_size = Vector2(REVIEWER_ENTRY_WIDTH, 0)
+	heading.custom_minimum_size = Vector2(_reviewer_entry_width, 0)
 	heading.add_theme_font_size_override("normal_font_size", 10)
 	heading.add_theme_font_size_override("bold_font_size", 13)
 	heading.text = "[color=#%s][b]%s[/b][/color]  [color=#6b6252]%d[/color]" % [
@@ -766,7 +1181,7 @@ func _make_entry_label(entry: Dictionary) -> RichTextLabel:
 	label.bbcode_enabled = true
 	label.fit_content = true
 	label.scroll_active = false
-	label.custom_minimum_size = Vector2(REVIEWER_ENTRY_WIDTH, 0)
+	label.custom_minimum_size = Vector2(_reviewer_entry_width, 0)
 	# Sized deliberately rather than left to the theme: the headword is bold and
 	# would otherwise inherit a much larger default, making each entry tall
 	# enough that only a handful fit on screen at once.

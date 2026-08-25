@@ -144,17 +144,27 @@ const HUD_PILLAR_W := 12.0
 ## own max HP. See HeartRow.fixed_heart_count for why proportional beats a
 ## fixed 20-points-per-heart here.
 const HUD_HEART_COUNT := 5
-## Section bounds across the 640px bar: portrait, info, pillar, centre,
-## pillar, info, portrait.
+## Section bounds across the bar: portrait, info, pillar, centre, pillar, info,
+## portrait. These were constants measured against a fixed 640-wide bar; they
+## are computed per layout now (see _hud_metrics()), because the bar spans
+## whatever width the device actually has. The left-hand numbers below are the
+## authored ones and are still used verbatim — only the right-hand sections
+## move, mirrored in from the real right edge.
 const HUD_LEFT_PORTRAIT_X := 6.0
 const HUD_LEFT_INFO_X := 48.0
 const HUD_PILLAR_A_X := 204.0
-const HUD_CENTRE_X := 220.0
-const HUD_CENTRE_R := 420.0
-const HUD_PILLAR_B_X := 424.0
-const HUD_RIGHT_INFO_X := 440.0
-const HUD_RIGHT_INFO_R := 592.0
-const HUD_RIGHT_PORTRAIT_X := 596.0
+## Distances measured IN from the right edge, so a 640-wide bar reproduces the
+## authored 424/440/592/596 exactly and a wider one keeps the enemy's block
+## against its own edge instead of stranding it mid-screen.
+const HUD_PILLAR_B_INSET := 216.0
+const HUD_RIGHT_INFO_INSET := 200.0
+const HUD_RIGHT_INFO_R_INSET := 48.0
+const HUD_RIGHT_PORTRAIT_INSET := 44.0
+
+## The live HUD geometry, rebuilt by _hud_metrics() on every layout change and
+## read by the section builders. Keyed by the same names as the constants above
+## so the builders read close to how they did when those were fixed.
+var _hud: Dictionary = {}
 const HUD_BAR_TEX := preload("res://assets/images/ui/hud_bar.png")
 const HUD_RIBBON_TEX := preload("res://assets/images/ui/hud_ribbon.png")
 const HUD_SLOT_TEX := preload("res://assets/images/ui/hud_slot.png")
@@ -177,6 +187,11 @@ const HUD_DIFFICULTY_COLORS := {
 @onready var potion_panel: PanelContainer = $PotionPanel
 @onready var question_panel: PanelContainer = $QuestionPanel
 @onready var side_panel: PanelContainer = $SidePanel
+## Neither of these had a handle before, because nothing ever moved them.
+@onready var board_frame: PanelContainer = $BoardFrame
+@onready var console_bar: TextureRect = $ConsoleBar
+@onready var potion_title: Label = $PotionPanel/VBox/PotionTitle
+@onready var potion_row: HBoxContainer = $PotionPanel/VBox/Row
 @onready var board: BoardController = $Board
 @onready var enemy_name_label: Label = $TopBar/EnemyPanel/EnemyNameLabel
 @onready var enemy_heart_row: HeartRow = $TopBar/EnemyPanel/EnemyHeartRow
@@ -269,6 +284,11 @@ var _player_home_x: float = 0.0
 var _question_time: float = GameState.DEFAULT_QUESTION_TIME
 ## Held so the countdown can retint the bar without re-querying the theme.
 var _timer_fill_style: StyleBoxTexture
+## The compact roster strip, and whether its overlay is currently open. Both
+## only mean anything on PORTRAIT / LANDSCAPE_COMPACT; on WIDE the full roster
+## is permanently on screen and the strip is hidden.
+var _move_strip: Button
+var _moves_open: bool = false
 ## When the current word was started, in milliseconds. Set on the tap that
 ## takes the selection from empty to one letter, so the clock measures the time
 ## spent building THIS word rather than time spent staring at the board first.
@@ -287,7 +307,8 @@ func _ready() -> void:
 	shuffle_button.add_theme_font_size_override("font_size", 12)
 	_screen_home = position
 	_apply_panel_chrome()
-	_build_hud()
+	# The HUD is no longer built here: it needs the layout metrics, so
+	# _apply_layout() builds it as part of the first layout pass below.
 	board.word_accepted.connect(_on_word_accepted)
 	board.tile_lifted.connect(_on_tile_lifted)
 	board.tile_returned.connect(_on_tile_returned)
@@ -309,9 +330,444 @@ func _ready() -> void:
 	encounter_banner.hide()
 	transition_veil.color.a = 0.0
 	transition_veil.hide()
-	_player_home_x = player_character.position.x
+	_build_move_strip()
+	# Before _start_encounter, so the first question is presented into a layout
+	# that is already the right shape. bind() runs the pass immediately and then
+	# keeps us subscribed, which is what makes rotating the device mid-fight work.
+	Layout.bind(self, "_apply_layout")
 	_start_encounter(true)
 	Audio.play_music("battle")
+
+# --- responsive layout ----------------------------------------------------
+#
+# The battle scene was authored entirely in absolute offsets against a 640x480
+# canvas. Rather than re-author it, the layout below re-places the same nodes
+# per arrangement. WIDE reproduces the authored composition exactly (see
+# _layout_battle_wide), so a 4:3 window is unchanged.
+
+## Where the play area's bottom controls sit, and how tall a tap target has to
+## be to count as one. 44 CSS px is the usual minimum; on a phone the content
+## scale turns 44 design units into roughly 54, with margin to spare.
+const TOUCH_TARGET := 44.0
+## Below this design height the portrait layout stops trying to give the stage
+## a generous share and starts protecting the board instead.
+const PORTRAIT_STAGE_MIN := 92.0
+## Where the floor the fighters stand on sits in the battle backdrop, as a
+## fraction of the image height. Taken from the authored composition: the
+## player's rect ends at y=438 of 480 with the backdrop drawn 1:1 over it.
+const BATTLE_GROUND_FRACTION := 0.9125
+
+func _apply_layout(profile: LayoutProfile) -> void:
+	_hud = _hud_metrics(profile)
+	_build_hud()
+	match profile.arrangement:
+		LayoutProfile.Arrangement.PORTRAIT:
+			_layout_battle_portrait(profile)
+		LayoutProfile.Arrangement.LANDSCAPE_COMPACT:
+			_layout_battle_landscape(profile)
+		_:
+			_layout_battle_wide(profile)
+	_layout_overlays(profile)
+	# The walk between encounters returns the player to this x, so it has to be
+	# re-read after anything moves them.
+	_player_home_x = player_character.position.x
+	# Rebuilt against the new panel width: the roster's labels wrap to an
+	# explicit width and keep whatever one they were created with.
+	if _enemy != null:
+		_build_move_list()
+		_fit_move_overlay(profile)
+	_refresh_move_strip()
+
+## Shrinks the compact roster overlay to the moves it actually holds. It has to
+## happen after _build_move_list(), because until the entries exist the panel
+## has no content to measure and would keep whatever height the layout guessed.
+func _fit_move_overlay(profile: LayoutProfile) -> void:
+	if profile.is_wide():
+		return
+	# A container recomputes its minimum on the next layout pass, not the moment
+	# a child is added — asking now returns the size it was before the roster
+	# went in. Same reason _warn_if_roster_overflows() waits a frame.
+	await get_tree().process_frame
+	if not is_instance_valid(side_panel):
+		return
+	var d := profile.design_size
+	var needed: float = side_panel.get_combined_minimum_size().y
+	var h: float = clampf(needed, 80.0, d.y * 0.55)
+	side_panel.offset_bottom = side_panel.offset_top + h
+	side_panel.size.y = h
+
+## HUD section geometry for the current arrangement.
+##
+## The WIDE branch reproduces the authored 640-wide bar exactly — every value
+## below evaluates to the constant it replaced when width is 640 — while
+## anchoring the enemy's block to the real right edge so a wider bar keeps it
+## against its own end instead of stranding it mid-screen.
+func _hud_metrics(profile: LayoutProfile) -> Dictionary:
+	var w := profile.design_size.x
+	if profile.is_portrait():
+		# A 320-unit bar cannot range seven sections across one line, so the
+		# portrait bar is two decks: chapter and progress on top, the two
+		# fighters facing each other below. The head portraits are dropped
+		# rather than shrunk — both characters are on the stage a few units
+		# further down, so the bar is not the only place you can see them.
+		var half: float = w * 0.5
+		return {
+			"width": w, "height": 62.0,
+			"show_pillars": false, "show_portraits": false,
+			"show_chapter_ribbon": false,
+			"left_portrait_x": 0.0, "right_portrait_x": 0.0,
+			"left_info_x": 5.0,
+			"right_info_x": half + 4.0, "right_info_r": w - 5.0,
+			"info_w": half - 9.0, "ribbon_w": half - 9.0,
+			"player_ribbon_top": 26.0, "enemy_ribbon_top": 26.0,
+			"hearts_top": 43.0, "enemy_hearts_top": 43.0,
+			"centre_x": 5.0, "centre_r": w - 96.0,
+			"chapter_top": 3.0,
+			"encounter_x": w - 92.0, "encounter_r": w - 5.0,
+			"encounter_top": 6.0,
+		}
+	return {
+		"width": w, "height": HUD_HEIGHT,
+		"show_pillars": true, "show_portraits": true,
+		"show_chapter_ribbon": true,
+		"left_portrait_x": HUD_LEFT_PORTRAIT_X,
+		"right_portrait_x": w - HUD_RIGHT_PORTRAIT_INSET,
+		"left_info_x": HUD_LEFT_INFO_X,
+		"right_info_x": w - HUD_RIGHT_INFO_INSET,
+		"right_info_r": w - HUD_RIGHT_INFO_R_INSET,
+		"info_w": 150.0, "ribbon_w": 94.0,
+		"player_ribbon_top": 9.0, "enemy_ribbon_top": 4.0,
+		"hearts_top": 27.0, "enemy_hearts_top": 32.0,
+		"pillar_a_x": HUD_PILLAR_A_X, "pillar_b_x": w - HUD_PILLAR_B_INSET,
+		"centre_x": HUD_PILLAR_A_X + 16.0,
+		"centre_r": w - HUD_PILLAR_B_INSET - 4.0,
+		"chapter_top": 24.0,
+		"encounter_x": w - HUD_RIGHT_INFO_INSET,
+		"encounter_r": w - HUD_RIGHT_INFO_R_INSET,
+		"encounter_top": 20.0,
+	}
+
+## The authored composition, centred. Every offset is the scene's own plus an
+## inset that is zero at 640 wide, so a 4:3 window is untouched and a wider one
+## simply reveals more background either side of the same arrangement.
+func _layout_battle_wide(profile: LayoutProfile) -> void:
+	var inset: float = maxf((profile.design_size.x - 640.0) * 0.5, 0.0)
+	board.set_tile_size(36.0, 3.0)
+	_show_compact_chrome(false)
+	shuffle_button.text = "New Question"
+	shuffle_button.add_theme_font_size_override("font_size", 12)
+	potion_row.add_theme_constant_override("separation", 4)
+	for potion in [health_potion_button, power_potion_button, purify_potion_button]:
+		potion.custom_minimum_size = Vector2(60.0, 32.0)
+		potion.expand_icon = false
+		potion.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		potion.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		potion.add_theme_font_size_override("font_size", 10)
+	_place_node(potion_panel, Rect2(inset + 10.0, 55.0, 208.0, 83.0))
+	_place_node(question_panel, Rect2(inset + 220.0, 54.0, 259.0, 84.0))
+	_place_node(side_panel, Rect2(inset + 480.0, 55.0, 150.0, 81.0))
+	_place_node(player_character, Rect2(inset + 37.0, 258.0, 130.0, 180.0))
+	_place_node(enemy_character, Rect2(inset + 478.0, 265.0, 130.0, 180.0))
+	_place_node(word_tray, Rect2(inset, 143.0, 640.0, 32.0))
+	_place_node(word_preview_label, Rect2(inset - 5.0, 416.0, 640.0, 36.0))
+	_place_board(inset + 205.0, 187.0)
+	_place_node(console_bar, Rect2(inset + 120.0, 454.0, 400.0, 26.0))
+	_place_node(shuffle_button, Rect2(inset + 135.0, 457.0, 110.0, 20.0))
+	_place_node(attack_button, Rect2(inset + 260.0, 457.0, 110.0, 20.0))
+	_place_node(menu_button, Rect2(inset + 385.0, 457.0, 110.0, 20.0))
+
+## Everything stacked down a narrow, tall canvas.
+##
+## Laid out from both ends inward — HUD, move strip and question from the top;
+## controls, board and word tray from the bottom — with the character stage
+## taking whatever is left in the middle. That ordering is deliberate: the
+## board and the controls are what the player touches, so they claim their space
+## first and the stage absorbs the variation between a 692-unit phone and a
+## 568-unit one.
+func _layout_battle_portrait(profile: LayoutProfile) -> void:
+	var d := profile.design_size
+	var margin: float = maxf(d.x * 0.04, 10.0)
+	var w: float = d.x - margin * 2.0
+	var gap := 5.0
+	_show_compact_chrome(true)
+
+	# --- from the top
+	var y: float = _hud["height"] + gap
+	_place_node(_move_strip, Rect2(margin, y, w, 24.0))
+	y += 24.0 + gap
+	var question_h: float = clampf(d.y * 0.10, 58.0, 78.0)
+	_place_node(question_panel, Rect2(margin, y, w, question_h))
+	var content_top: float = y + question_h + gap
+
+	# --- from the bottom
+	var controls_h: float = TOUCH_TARGET + 8.0
+	var controls_y: float = d.y - margin * 0.7 - controls_h
+	_layout_compact_controls(Rect2(margin, controls_y, w, controls_h), true)
+
+	var tray_h := 30.0
+	var available: float = controls_y - gap - content_top - tray_h - gap * 2.0
+	var board_side: float = _fit_board(minf(w, available - PORTRAIT_STAGE_MIN))
+	var board_y: float = controls_y - gap - board_side
+	var tray_y: float = board_y - gap - tray_h
+	_place_board((d.x - board_side) * 0.5, board_y)
+	_place_node(word_tray, Rect2(0.0, tray_y, d.x, tray_h))
+
+	# --- the middle
+	var stage := Rect2(0.0, content_top, d.x, maxf(tray_y - gap - content_top, 60.0))
+	_place_stage(stage, 0.9)
+	# The preview reads out the word being spelled; on a stacked layout it sits
+	# under the tray it describes rather than under the board.
+	_place_node(word_preview_label, Rect2(margin, tray_y - 2.0, w, tray_h))
+	word_preview_label.visible = false
+
+## Two columns: the board owns the right, everything else stacks down the left.
+## A rotated phone gives about 270 units of height, which is not enough to stack
+## a question, a stage, a board and a control row on top of each other.
+func _layout_battle_landscape(profile: LayoutProfile) -> void:
+	var d := profile.design_size
+	var margin := 8.0
+	var gap := 4.0
+	_show_compact_chrome(true)
+
+	var top: float = _hud["height"] + gap
+	var strip_h := 20.0
+
+	# Right column: the board, with the move strip tucked under it. The strip
+	# goes here rather than over the left column because every unit of height
+	# on that side is already spoken for, and the stage is the thing that
+	# suffers if it loses any more.
+	var board_side: float = _fit_board(minf(
+		d.y - top - margin - strip_h - gap, d.x * 0.36))
+	var board_x: float = d.x - margin - board_side
+	_place_board(board_x, top)
+	_place_node(_move_strip, Rect2(board_x, top + board_side + gap,
+		board_side, strip_h))
+
+	# Left column, top down: question, then the word being spelled, then the
+	# fighters, with the controls pinned to the bottom.
+	var col_w: float = board_x - margin * 2.0
+	var y: float = top
+	_place_node(question_panel, Rect2(margin, y, col_w, 46.0))
+	y += 46.0 + gap
+	var tray_h := 22.0
+	_place_node(word_tray, Rect2(margin, y, col_w, tray_h))
+	_place_node(word_preview_label, Rect2(margin, y, col_w, tray_h))
+	word_preview_label.visible = false
+	y += tray_h + gap
+
+	var controls_h := 34.0
+	var controls_y: float = d.y - margin - controls_h
+	_layout_compact_controls(Rect2(margin, controls_y, col_w, controls_h), false)
+
+	_place_stage(Rect2(margin, y, col_w, maxf(controls_y - gap - y, 50.0)), 0.95)
+
+## Stands the two fighters in `area`, facing each other, sized to a share of its
+## height and pushed out to its edges.
+##
+## The gap between them is what melee attacks travel across, and every distance
+## in the combat code is derived from these two nodes' live rects — so sizing
+## them correctly here is the whole of what requirement 8 needs. Nothing in the
+## attack choreography has a hardcoded reach.
+func _place_stage(area: Rect2, height_share: float) -> void:
+	var h: float = clampf(area.size.y * height_share, 84.0, 180.0)
+	var w: float = h * 0.72
+	var floor_y: float = area.end.y
+	_place_node(player_character, Rect2(area.position.x + 4.0, floor_y - h, w, h))
+	_place_node(enemy_character, Rect2(area.end.x - 4.0 - w, floor_y - h, w, h))
+	# The backdrop follows the fighters rather than the other way round, so
+	# whatever height the stage ended up with, they are standing on its floor.
+	_place_battle_background(Layout.profile.design_size, floor_y)
+
+## Places the backdrop so its painted floor lands under the fighters.
+##
+## The node was anchored full-rect with KEEP_ASPECT_COVERED, which is correct at
+## 4:3 and wrong everywhere else: on a phone the stage is a band in the middle of
+## the screen, and a centred cover-crop puts the floor a long way below it, so
+## the pair stand in mid-air against a window.
+##
+## Scaling to cover the band from the top of the screen down to the stage floor
+## — rather than the whole screen — puts the floor exactly where it is needed.
+## At 640x480 this evaluates to the same 720x480 crop the anchored version
+## produced, so the desktop backdrop is untouched.
+func _place_battle_background(d: Vector2, stage_floor: float) -> void:
+	if background.texture == null:
+		return
+	var ts := background.texture.get_size()
+	if ts.x <= 0.0 or ts.y <= 0.0:
+		return
+	var s: float = maxf(d.x / ts.x, stage_floor / BATTLE_GROUND_FRACTION / ts.y)
+	var drawn := ts * s
+	background.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	background.stretch_mode = TextureRect.STRETCH_SCALE
+	background.anchor_left = 0.0
+	background.anchor_top = 0.0
+	background.anchor_right = 0.0
+	background.anchor_bottom = 0.0
+	_place_node(background, Rect2((d.x - drawn.x) * 0.5,
+		stage_floor - drawn.y * BATTLE_GROUND_FRACTION, drawn.x, drawn.y))
+
+## Largest tile pitch that fits `budget`, snapped so the six columns come out to
+## a whole number of units. Clamped at both ends: never so small a finger cannot
+## land on one, never so large the art looks blown up.
+func _fit_board(budget: float) -> float:
+	var gap := 3.0
+	var tile: float = floorf((maxf(budget, 120.0) - gap * 5.0) / 6.0)
+	tile = clampf(tile, 26.0, 48.0)
+	board.set_tile_size(tile, gap)
+	return board.board_side()
+
+func _place_board(x: float, y: float) -> void:
+	var side: float = board.board_side()
+	_place_node(board, Rect2(x, y, side, side))
+	_place_node(board_frame, Rect2(x - 6.0, y - 6.0, side + 12.0, side + 12.0))
+
+## The bottom bar for compact layouts: three potions, then reroll, attack and
+## menu. Potions move down here rather than keeping the desktop's separate panel
+## because a phone cannot spare a whole row for three buttons that are used
+## once a fight.
+func _layout_compact_controls(area: Rect2, tall: bool) -> void:
+	_place_node(console_bar, area)
+	# The three potions go in as their whole PANEL, not as three loose buttons.
+	# They live inside PotionPanel/VBox/Row, and a container lays its children
+	# out itself — placing them individually sets offsets the HBoxContainer
+	# overwrites on the next sort, which is why they piled up in one corner.
+	# Moving the panel and letting its own row do the spacing works with the
+	# scene rather than against it.
+	# ConsoleBar sits later in the scene tree than PotionPanel, so it paints over
+	# it -- invisible at 640x480 where the two never overlap, fatal here where
+	# the panel is being moved onto the bar. Lifting the panel above it is safe
+	# on every layout, since on WIDE they are 400 units apart.
+	if potion_panel.get_index() < console_bar.get_index():
+		move_child(potion_panel, console_bar.get_index())
+	# Shrink the potions BEFORE the panel around them is placed. A Control's
+	# size is clamped up to its combined minimum at the moment it is assigned,
+	# so placing the panel first and slimming its contents afterwards leaves it
+	# stuck at the old minimum -- 3x60 + 2x4 + 14 = 202 units of it, straight
+	# across New Q and Attack.
+	potion_title.visible = false
+	potion_row.add_theme_constant_override("separation", 2)
+	for potion in [health_potion_button, power_potion_button, purify_potion_button]:
+		# Clearing the minimum is not enough on its own: the bottle icon carries
+		# its own, which is what expand_icon lifts.
+		potion.custom_minimum_size = Vector2(22.0, 0.0)
+		potion.expand_icon = true
+		potion.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		# Fill the bar's height too, or three 16-unit-tall chips sit centred in a
+		# 46-unit bar and are the smallest touch targets on the screen.
+		potion.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		potion.add_theme_font_size_override("font_size", 8)
+
+	var slots: Array[Control] = [potion_panel, shuffle_button, attack_button, menu_button]
+	# Attack is the primary action and gets the widest slot of the three
+	# buttons. Weights, not pixels, so the same split works at 296 units and at
+	# 560.
+	var weights := [0.36, 0.19, 0.26, 0.19]
+	var pad := 3.0
+	var inner: float = area.size.x - pad * 2.0
+	var x: float = area.position.x + pad
+	var h: float = area.size.y - pad * 2.0
+	for i in slots.size():
+		var slot: float = inner * weights[i]
+		_place_node(slots[i], Rect2(x + 1.0, area.position.y + pad, slot - 2.0, h))
+		if slots[i] is Button:
+			(slots[i] as Button).custom_minimum_size = Vector2.ZERO
+			(slots[i] as Button).add_theme_font_size_override("font_size", 12 if tall else 10)
+		x += slot
+
+	# "New Question" does not fit a fifth of a phone's width at any legible size.
+	shuffle_button.text = "New Q"
+
+## Panels that only exist on one arrangement or the other.
+func _show_compact_chrome(compact: bool) -> void:
+	_move_strip.visible = compact
+	# potion_panel is NOT hidden on compact -- it moves into the bottom bar,
+	# carrying its three buttons with it. Only its heading goes.
+	potion_title.visible = not compact
+	# On compact layouts the roster is opened from the strip instead of living
+	# on screen permanently; on WIDE it is always up.
+	side_panel.visible = not compact
+	_moves_open = false
+
+func _layout_overlays(profile: LayoutProfile) -> void:
+	var d := profile.design_size
+	var margin: float = maxf(d.x * 0.04, 10.0)
+	_centre_battle_panel(encounter_banner, Vector2(340.0, 70.0), d, margin)
+	_centre_battle_panel(result_overlay, Vector2(300.0, 120.0), d, margin)
+	_centre_battle_panel(pause_main_panel, PAUSE_PANEL_RECT.size, d, margin)
+	_centre_battle_panel(pause_options_panel, PAUSE_PANEL_RECT.size, d, margin)
+	pause_options_panel.pivot_offset = pause_options_panel.size * 0.5
+	# The compact roster overlay, when the player opens it from the strip.
+	if not profile.is_wide():
+		var panel_w: float = minf(320.0, d.x - margin * 2.0)
+		_place_node(side_panel, Rect2((d.x - panel_w) * 0.5, _hud["height"] + 34.0,
+			panel_w, minf(220.0, d.y * 0.5)))
+	if profile.is_touch:
+		for button in [try_again_button, resume_button, pause_options_button, title_button]:
+			button.custom_minimum_size.y = TOUCH_TARGET
+
+func _centre_battle_panel(panel: Control, preferred: Vector2, d: Vector2,
+		margin: float) -> void:
+	if panel == null:
+		return
+	var w: float = minf(preferred.x, d.x - margin * 2.0)
+	var h: float = minf(preferred.y, d.y - margin * 2.0)
+	_place_node(panel, Rect2((d.x - w) * 0.5, (d.y - h) * 0.5, w, h))
+
+func _place_node(node: Control, rect: Rect2) -> void:
+	if node == null:
+		return
+	node.offset_left = rect.position.x
+	node.offset_top = rect.position.y
+	node.offset_right = rect.end.x
+	node.offset_bottom = rect.end.y
+	node.size = rect.size
+
+## The compact stand-in for the MOVES roster: one tappable strip naming the move
+## that is about to land, which opens the full descriptions when pressed.
+##
+## Requirement was to keep telegraphing the incoming move without spending a
+## permanent panel on it — so the strip carries the one fact that matters every
+## turn, and the detail stays one tap away.
+func _build_move_strip() -> void:
+	# Behind everything, including the backdrop art. On compact layouts the
+	# artwork is scaled to the stage band rather than the whole screen, so the
+	# strips above and below it need something to sit on other than the void.
+	var floorfill := ColorRect.new()
+	floorfill.name = "Backdrop"
+	floorfill.color = Color(0.10, 0.07, 0.05)
+	floorfill.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	floorfill.set_anchors_preset(Control.PRESET_FULL_RECT)
+	add_child(floorfill)
+	move_child(floorfill, 0)
+
+	_move_strip = Button.new()
+	_move_strip.name = "MoveStrip"
+	_move_strip.add_theme_font_size_override("font_size", 11)
+	_move_strip.add_theme_color_override("font_color", MOVE_ACTIVE_NAME_COLOR)
+	_move_strip.clip_text = true
+	_move_strip.pressed.connect(_on_move_strip_pressed)
+	_move_strip.hide()
+	add_child(_move_strip)
+
+func _on_move_strip_pressed() -> void:
+	Audio.play_sfx("button_click")
+	_moves_open = not _moves_open
+	side_panel.visible = _moves_open
+	# Same z-order trap as the potion panel: as an overlay it has to be drawn
+	# after the board it now covers, not before it.
+	if _moves_open:
+		move_child(side_panel, get_child_count() - 1)
+
+func _refresh_move_strip() -> void:
+	# _enemy is still null during the first layout pass, which runs before the
+	# opening encounter is staged.
+	if _move_strip == null or not _move_strip.visible or _enemy == null:
+		return
+	var move := _current_move()
+	if move == null:
+		_move_strip.text = "MOVES"
+		return
+	_move_strip.text = "NEXT:  %s      ▸" % move.move_name.to_upper()
 
 func _on_attack_pressed() -> void:
 	Audio.play_sfx("button_click")
@@ -532,11 +988,12 @@ func _build_hud() -> void:
 	chapter_banner.hide()
 	header_bar.hide()
 	chapter_badge.hide()
+	_teardown_hud()
 
 	var bar := Panel.new()
 	bar.name = "HudBar"
-	bar.offset_right = 640.0
-	bar.offset_bottom = HUD_HEIGHT
+	bar.offset_right = _hud["width"]
+	bar.offset_bottom = _hud["height"]
 	bar.add_theme_stylebox_override("panel", _nine_slice(HUD_BAR_TEX, HUD_BAR_SLICE, 0.0))
 	add_child(bar)
 	move_child(bar, top_bar.get_index())
@@ -546,39 +1003,66 @@ func _build_hud() -> void:
 	_build_hud_enemy_section()
 
 	# The dividers go on last so they sit over the section edges rather than
-	# being clipped by them.
-	for i in [0, 1]:
-		var x: float = HUD_PILLAR_A_X if i == 0 else HUD_PILLAR_B_X
-		var pillar := TextureRect.new()
-		pillar.name = "HudPillar%d" % i
-		pillar.texture = HUD_PILLAR_TEX
-		pillar.offset_left = x
-		pillar.offset_right = x + HUD_PILLAR_W
-		pillar.offset_top = HUD_INNER_TOP
-		pillar.offset_bottom = HUD_INNER_BOTTOM
-		pillar.stretch_mode = TextureRect.STRETCH_SCALE
-		top_bar.add_child(pillar)
+	# being clipped by them. A portrait bar stacks its sections instead of
+	# ranging them across one line, so there is nothing for them to divide.
+	if _hud["show_pillars"]:
+		for i in [0, 1]:
+			var x: float = _hud["pillar_a_x"] if i == 0 else _hud["pillar_b_x"]
+			var pillar := TextureRect.new()
+			pillar.name = "HudPillar%d" % i
+			pillar.texture = HUD_PILLAR_TEX
+			pillar.offset_left = x
+			pillar.offset_right = x + HUD_PILLAR_W
+			pillar.offset_top = HUD_INNER_TOP
+			pillar.offset_bottom = _hud["height"] - HUD_BAR_SLICE
+			pillar.stretch_mode = TextureRect.STRETCH_SCALE
+			top_bar.add_child(pillar)
 
-	# Freed rather than left hidden: these were the scene's old stacked layout,
-	# and every label and heart row inside them has been pulled out above.
-	player_panel.queue_free()
-	enemy_panel.queue_free()
+## Returns the HUD to a blank slate so _build_hud() can run again.
+##
+## It could not, before: the original freed PlayerPanel and EnemyPanel outright
+## once it had harvested their labels and heart rows, which is fine exactly once
+## and fatal the second time. Nothing ever asked for a second time, because
+## nothing ever re-laid-out — until a phone could be rotated mid-battle.
+##
+## The order matters. The scene's own nodes are rescued from whatever code-made
+## container currently holds them FIRST; only then is that container freed, or
+## they would go down with it. free() rather than queue_free() because the
+## rebuild happens in this same frame and would otherwise collide with the
+## still-living nodes it is replacing by name.
+func _teardown_hud() -> void:
+	for salvaged in [chapter_label, encounter_label, player_name_label,
+			enemy_name_label, player_heart_row, enemy_heart_row]:
+		if is_instance_valid(salvaged) and salvaged.get_parent() != null:
+			salvaged.get_parent().remove_child(salvaged)
+	var bar := get_node_or_null("HudBar")
+	if bar != null:
+		bar.free()
+	for child in top_bar.get_children():
+		child.free()
 
 func _build_hud_player_section() -> void:
-	_hud_player_portrait = _add_portrait("PlayerPortrait", HUD_LEFT_PORTRAIT_X)
-	_add_ribbon("PlayerRibbon", player_name_label, HUD_LEFT_INFO_X, HUD_LEFT_INFO_X + 94.0, 9.0)
+	if _hud["show_portraits"]:
+		_hud_player_portrait = _add_portrait("PlayerPortrait", _hud["left_portrait_x"])
+	else:
+		_hud_player_portrait = null
+	var left: float = _hud["left_info_x"]
+	_add_ribbon("PlayerRibbon", player_name_label, left, left + _hud["ribbon_w"],
+		_hud["player_ribbon_top"])
 	player_name_label.text = "YOU"
 	_add_heart_slot(
-		"PlayerHeartSlot", player_heart_row, HUD_LEFT_INFO_X,
-		HUD_LEFT_INFO_X + 150.0, 27.0, false)
+		"PlayerHeartSlot", player_heart_row, left, left + _hud["info_w"],
+		_hud["hearts_top"], false)
 
 func _build_hud_centre_section() -> void:
 	# The chapter number gets the ribbon and the chapter's name sits below it
 	# in the open: number as the label, name as the thing you actually read.
 	_hud_chapter_ribbon_label = Label.new()
 	_hud_chapter_ribbon_label.name = "ChapterRibbonLabel"
-	var centre := (HUD_CENTRE_X + HUD_CENTRE_R) * 0.5
-	_add_ribbon("ChapterRibbon", _hud_chapter_ribbon_label, centre - 62.0, centre + 62.0, 6.0)
+	var centre: float = (_hud["centre_x"] + _hud["centre_r"]) * 0.5
+	if _hud["show_chapter_ribbon"]:
+		_add_ribbon("ChapterRibbon", _hud_chapter_ribbon_label,
+			centre - 62.0, centre + 62.0, 6.0)
 
 	# The chapter name is the one piece of HUD text that is a heading rather
 	# than a stat, so it gets a light parchment ground and dark ink — the
@@ -586,10 +1070,10 @@ func _build_hud_centre_section() -> void:
 	# what it looked like before the plate went in, just read as muddy.
 	var plate := PanelContainer.new()
 	plate.name = "ChapterPlate"
-	plate.offset_left = HUD_CENTRE_X + 4.0
-	plate.offset_right = HUD_CENTRE_R - 4.0
-	plate.offset_top = 24.0
-	plate.offset_bottom = 46.0
+	plate.offset_left = _hud["centre_x"] + 4.0
+	plate.offset_right = _hud["centre_r"] - 4.0
+	plate.offset_top = _hud["chapter_top"]
+	plate.offset_bottom = _hud["chapter_top"] + 22.0
 	plate.add_theme_stylebox_override("panel", _nine_slice(HUD_PARCHMENT_TEX, 6.0, 2.0))
 	top_bar.add_child(plate)
 
@@ -612,22 +1096,28 @@ func _build_hud_centre_section() -> void:
 	chapter_label.clip_text = true
 
 func _build_hud_enemy_section() -> void:
-	_hud_enemy_portrait = _add_portrait("EnemyPortrait", HUD_RIGHT_PORTRAIT_X)
-	_add_ribbon("EnemyRibbon", enemy_name_label, HUD_RIGHT_INFO_X, HUD_RIGHT_INFO_R, 4.0)
+	if _hud["show_portraits"]:
+		_hud_enemy_portrait = _add_portrait("EnemyPortrait", _hud["right_portrait_x"])
+	else:
+		_hud_enemy_portrait = null
+	var right_x: float = _hud["right_info_x"]
+	var right_r: float = _hud["right_info_r"]
+	_add_ribbon("EnemyRibbon", enemy_name_label, right_x, right_r, _hud["enemy_ribbon_top"])
 
 	# Encounter count and difficulty share a line but stay visibly separate —
 	# the old header ran them together as one grey "Encounter · 1/5 · EASY".
 	var row := HBoxContainer.new()
 	row.name = "EncounterRow"
-	row.offset_left = HUD_RIGHT_INFO_X
-	row.offset_right = HUD_RIGHT_INFO_R
-	row.offset_top = 20.0
-	row.offset_bottom = 31.0
+	row.offset_left = _hud["encounter_x"]
+	row.offset_right = _hud["encounter_r"]
+	row.offset_top = _hud["encounter_top"]
+	row.offset_bottom = _hud["encounter_top"] + 11.0
 	row.alignment = BoxContainer.ALIGNMENT_CENTER
 	row.add_theme_constant_override("separation", 6)
 	top_bar.add_child(row)
 
-	encounter_label.get_parent().remove_child(encounter_label)
+	if encounter_label.get_parent() != null:
+		encounter_label.get_parent().remove_child(encounter_label)
 	encounter_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	encounter_label.add_theme_font_size_override("font_size", 9)
 	encounter_label.add_theme_color_override("font_color", HUD_CREAM)
@@ -643,8 +1133,8 @@ func _build_hud_enemy_section() -> void:
 	row.add_child(_difficulty_chip)
 
 	_add_heart_slot(
-		"EnemyHeartSlot", enemy_heart_row, HUD_RIGHT_INFO_R - 150.0,
-		HUD_RIGHT_INFO_R, 32.0, true)
+		"EnemyHeartSlot", enemy_heart_row, right_r - _hud["info_w"],
+		right_r, _hud["enemy_hearts_top"], true)
 
 ## A gold-framed head crop. Returns the inner TextureRect so the caller can
 ## swap which character it shows.
@@ -723,7 +1213,8 @@ func _add_heart_slot(
 	hp.horizontal_alignment = (
 		HORIZONTAL_ALIGNMENT_LEFT if mirrored else HORIZONTAL_ALIGNMENT_RIGHT)
 
-	heart_row.get_parent().remove_child(heart_row)
+	if heart_row.get_parent() != null:
+		heart_row.get_parent().remove_child(heart_row)
 	heart_row.fixed_heart_count = HUD_HEART_COUNT
 	heart_row.max_row_width = HUD_HEART_COUNT * (HUD_HEART + 3.0)
 	heart_row.size_flags_vertical = Control.SIZE_SHRINK_CENTER
@@ -1109,6 +1600,7 @@ func _move_plate_style(active: bool) -> StyleBoxFlat:
 ## that just landed.
 func _highlight_current_move() -> void:
 	_stop_move_pulse()
+	_refresh_move_strip()
 	if _move_entries.is_empty():
 		return
 	var active_index := _move_index % _move_entries.size()
@@ -1156,6 +1648,12 @@ func _stop_move_pulse() -> void:
 func _warn_if_roster_overflows() -> void:
 	await get_tree().process_frame
 	if not is_instance_valid(side_panel):
+		return
+	# Only meaningful on WIDE, where the roster is permanently on screen with
+	# the enemy standing underneath it. On compact layouts it is a hidden
+	# overlay that is *supposed* to cover the stage when opened, so measuring it
+	# against the sprite line reports a collision that is the whole design.
+	if not Layout.profile.is_wide():
 		return
 	var bottom := side_panel.position.y + side_panel.size.y
 	if bottom > SIDE_PANEL_BOTTOM_LIMIT:
@@ -1599,6 +2097,13 @@ func _spawn_bolts(from: Control, to: Control, tint: Color, count: int,
 ## signature moves draw goes through here so nothing can outlive its attack.
 func _fx_node(node: Control, life: float) -> Control:
 	node.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	# Keep the effect on screen. Several effects are placed relative to a
+	# fighter but sized in absolute units -- a 150-unit damage label, a
+	# 150-unit shockwave ring -- which is comfortably inside a 640-unit canvas
+	# and hangs off the edge of a 320-unit one.
+	var limit: Vector2 = Layout.profile.design_size
+	if node.size.x > 0.0 and node.size.x < limit.x:
+		node.position.x = clampf(node.position.x, 0.0, limit.x - node.size.x)
 	add_child(node)
 	var killer := create_tween()
 	killer.tween_interval(life)
@@ -1619,8 +2124,10 @@ func _fx_style(color: Color, radius: int, shadow: float = 0.0) -> StyleBoxFlat:
 func _fx_flash(color: Color, peak: float, hold: float = 0.03, fade: float = 0.22) -> void:
 	var wash := ColorRect.new()
 	wash.color = Color(color.r, color.g, color.b, 0.0)
-	wash.offset_right = 640.0
-	wash.offset_bottom = 480.0
+	# "Full screen" is whatever the screen currently is, not the 640x480 this
+	# was written against.
+	wash.offset_right = Layout.profile.design_size.x
+	wash.offset_bottom = Layout.profile.design_size.y
 	_fx_node(wash, hold + fade + 0.05)
 	var tween := create_tween()
 	tween.tween_property(wash, "color:a", peak, 0.04)
@@ -2284,6 +2791,12 @@ const MELEE_GAP := 22.0
 ## Where a dash-through carries on to, past the player and off the left edge.
 const MELEE_THROUGH_X := -150.0
 
+## The line the fighters stand on, in the current layout. Effects that erupt
+## from or land on the ground were written against the authored y=438 floor and
+## have to follow the stage wherever it moved to.
+func _stage_floor() -> float:
+	return player_character.position.y + player_character.size.y
+
 ## How far the player must travel from its rest pose to bring its own visible
 ## edge MELEE_GAP from the rival's. The mirror of _melee_target_x, and measured
 ## the same way for the same reason: node bounds leave 374px of transparent air
@@ -2467,7 +2980,8 @@ func _sig_padrino_favor(move_id: String, tint: Color) -> void:
 
 	# Comes in from beyond the right edge: the favour, not the man.
 	var offscreen := Control.new()
-	offscreen.position = Vector2(700.0, player_character.position.y + 40.0)
+	offscreen.position = Vector2(Layout.profile.design_size.x + 60.0,
+		player_character.position.y + 40.0)
 	offscreen.size = Vector2(2, 2)
 	_fx_node(offscreen, 1.0)
 	_spawn_bolt(offscreen, player_character, tint, 17.0, 0.34, 0.0, 0.0, false)
@@ -2776,11 +3290,12 @@ func _sig_under_the_table(move_id: String, tint: Color) -> void:
 	spike.add_theme_stylebox_override("panel", _fx_style(tint, 2, 10.0))
 	spike.size = Vector2(16, 8)
 	spike.position = Vector2(
-		player_character.position.x + player_character.size.x * 0.5 - 8.0, 446.0)
+		player_character.position.x + player_character.size.x * 0.5 - 8.0,
+		_stage_floor() + 8.0)
 	_fx_node(spike, 0.5)
 	var rise := create_tween()
 	rise.tween_property(spike, "size", Vector2(16, 92), 0.14)
-	rise.parallel().tween_property(spike, "position:y", 354.0, 0.14)
+	rise.parallel().tween_property(spike, "position:y", _stage_floor() - 84.0, 0.14)
 	rise.tween_property(spike, "modulate:a", 0.0, 0.2)
 
 	_fx_impact(move_id, 9.0, tint, 0.24)
@@ -2867,12 +3382,13 @@ func _sig_tarpaulin_wall(move_id: String, tint: Color) -> void:
 	tarp.add_theme_stylebox_override("panel", _fx_style(
 		Color(tint.r, tint.g, tint.b, 0.88), 3, 14.0))
 	tarp.size = Vector2(430, 250)
-	tarp.position = Vector2(680.0, 120.0)
+	tarp.position = Vector2(Layout.profile.design_size.x + 40.0,
+		player_character.position.y - 40.0)
 	tarp.pivot_offset = tarp.size * 0.5
 	tarp.rotation = 0.12
 	_fx_node(tarp, 1.0)
 	var sweep := create_tween()
-	sweep.tween_property(tarp, "position:x", 105.0, 0.26) \
+	sweep.tween_property(tarp, "position:x", player_character.position.x - 20.0, 0.26) \
 		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	sweep.parallel().tween_property(tarp, "rotation", 0.0, 0.26)
 	await _body_play(enemy_character, [
@@ -2882,7 +3398,7 @@ func _sig_tarpaulin_wall(move_id: String, tint: Color) -> void:
 	_fx_impact(move_id, 13.0, tint, 0.3)
 	var drop := create_tween()
 	drop.tween_interval(0.16)
-	drop.tween_property(tarp, "position:y", 470.0, 0.3) \
+	drop.tween_property(tarp, "position:y", _stage_floor() + 30.0, 0.3) \
 		.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
 	drop.parallel().tween_property(tarp, "modulate:a", 0.0, 0.3)
 	await _body_end(enemy_character)
