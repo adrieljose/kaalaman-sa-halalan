@@ -345,6 +345,22 @@ func _ready() -> void:
 # per arrangement. WIDE reproduces the authored composition exactly (see
 # _layout_battle_wide), so a 4:3 window is unchanged.
 
+## Scales an effect's particle/projectile count to what this device should be
+## asked to draw.
+##
+## Every effect still plays and still looks like itself — this thins density,
+## it never removes a move. The heaviest single frames in the game are the
+## signature moves: _sig_word_salad alone allocates ~14 Control nodes and ~32
+## tweens, each with its own StyleBoxFlat, and every one of them is a real node
+## in the tree rather than a particle system.
+##
+## Never returns less than one, so a move whose whole identity is "it throws a
+## thing" still throws the thing.
+func _fx_count(n: int) -> int:
+	if n <= 1:
+		return n
+	return maxi(1, int(round(float(n) * Layout.profile.fx_budget)))
+
 ## Where the play area's bottom controls sit, and how tall a tap target has to
 ## be to count as one. 44 CSS px is the usual minimum; on a phone the content
 ## scale turns 44 design units into roughly 54, with margin to spare.
@@ -2007,8 +2023,13 @@ func _shake_screen(strength: float) -> void:
 		_shake_tween.kill()
 	position = _screen_home
 	_shake_tween = create_tween()
-	for i in 5:
-		var falloff := strength * (1.0 - float(i) / 5.0)
+	# This tweens the ROOT Control, so every step retransforms the entire scene
+	# — the single most expensive effect in the game per unit of drama. Phones
+	# get fewer, shorter steps; the kick still reads, it just costs less.
+	var steps: int = _fx_count(5)
+	var reach: float = strength * lerpf(0.7, 1.0, Layout.profile.fx_budget)
+	for i in steps:
+		var falloff := reach * (1.0 - float(i) / float(steps))
 		_shake_tween.tween_property(self, "position",
 			_screen_home + Vector2(randf_range(-falloff, falloff), randf_range(-falloff, falloff)),
 			0.035)
@@ -2062,6 +2083,7 @@ func _launch_bolts(from: Control, to: Control, tint: Color, count: int,
 		bolt_size: float, rate: float) -> float:
 	var travel := TRAVEL_TIME * rate
 	var stagger := travel * 0.22
+	count = _fx_count(count)
 	for i in count:
 		_spawn_bolt(from, to, tint, bolt_size, travel, stagger * float(i),
 			0.0 if count == 1 else randf_range(-14.0, 14.0))
@@ -2213,7 +2235,7 @@ func _fx_slab(from: Control, to: Control, color: Color, slab: Vector2, travel: f
 
 ## Debris left sitting on whoever was hit — mud, paste, scribble.
 func _fx_splatter(who: Control, color: Color, count: int, spread: float, life: float) -> void:
-	for i in count:
+	for i in _fx_count(count):
 		var bit := Panel.new()
 		var s := randf_range(4.0, 9.0)
 		bit.add_theme_stylebox_override("panel", _fx_style(color, int(s * 0.5)))
@@ -2997,7 +3019,7 @@ func _sig_padrino_favor(move_id: String, tint: Color) -> void:
 func _sig_dynasty_power(move_id: String, tint: Color) -> void:
 	_body_begin(enemy_character, BODY_FEET)
 	_body_bring_forward(enemy_character)
-	for i in 3:
+	for i in _fx_count(3):
 		_fx_ring(enemy_character, tint, 46.0 + 22.0 * float(i), 0.36, 0.13 * float(i))
 	_fx_charge(enemy_character, tint, 0.55)
 	await _body_play_walking(enemy_character, _melee_advance("charge", 0.62), 16.0)
@@ -3031,7 +3053,7 @@ func _sig_smear_campaign(move_id: String, tint: Color) -> void:
 	await _body_play(enemy_character, [
 		_beat(-18, 0, 24, 1.04, 0.98, 0.12, Tween.TRANS_QUAD, Tween.EASE_IN),     # whips across
 	])
-	for i in 9:
+	for i in _fx_count(9):
 		_spawn_bolt(enemy_character, player_character, tint, randf_range(7.0, 15.0),
 			TRAVEL_TIME * 0.95, 0.035 * float(i), randf_range(-40.0, 40.0), true)
 	await _body_play(enemy_character, [
@@ -3126,7 +3148,7 @@ func _sig_spray_and_run(move_id: String, tint: Color) -> void:
 	# The tag happens in passing, not from a stop.
 	_fx_impact(move_id, 4.0, tint, 0.16)
 	_fx_word("TAGGED", player_character, tint, 18.0)
-	for i in 6:
+	for i in _fx_count(6):
 		_spawn_bolt(player_character, player_character, tint, randf_range(5.0, 9.0),
 			0.22, 0.02 * float(i), randf_range(-20.0, 20.0), true)
 	_fx_splatter(player_character, tint, 4, 20.0, 0.5)
@@ -3153,7 +3175,7 @@ func _sig_spray_and_run(move_id: String, tint: Color) -> void:
 ## travel, no strike — the body language of somebody running out the clock.
 func _sig_filibuster(move_id: String, tint: Color) -> void:
 	_body_begin(enemy_character, BODY_FEET)
-	for i in 3:
+	for i in _fx_count(3):
 		_fx_word(["MR. SPEAKER…", "AS I WAS SAYING…", "POINT OF ORDER…"][i],
 			enemy_character, tint, 22.0, 0.26 * float(i), 10)
 	_fx_charge(enemy_character, tint, 0.9)
@@ -3187,7 +3209,7 @@ func _sig_sabaw_splash(move_id: String, tint: Color) -> void:
 	])
 	_fx_impact(move_id, 8.0, tint, 0.26)
 	_fx_ring(player_character, tint, 92.0, 0.34)
-	for i in 8:
+	for i in _fx_count(8):
 		_spawn_bolt(player_character, player_character, tint, randf_range(5.0, 11.0),
 			0.3, 0.02 * float(i), randf_range(-50.0, 50.0), true)
 	_fx_splatter(player_character, tint, 6, 24.0, 0.55)
@@ -3200,7 +3222,7 @@ func _sig_sabaw_splash(move_id: String, tint: Color) -> void:
 func _sig_word_salad(move_id: String, tint: Color) -> void:
 	_body_begin(enemy_character, BODY_CHEST)
 	var letters := ["A", "E", "R", "S", "T", "O", "N", "I"]
-	for i in 4:
+	for i in _fx_count(4):
 		_fx_word(letters[randi() % letters.size()], enemy_character,
 			Color(randf_range(0.6, 1.0), randf_range(0.6, 1.0), randf_range(0.6, 1.0)),
 			16.0, 0.07 * float(i), 12)
@@ -3211,7 +3233,7 @@ func _sig_word_salad(move_id: String, tint: Color) -> void:
 		_beat(-7, -5, 15, 1.04, 0.98, 0.10, Tween.TRANS_QUAD, Tween.EASE_OUT),
 		_beat(5, 2, -10, 0.98, 1.01, 0.10, Tween.TRANS_QUAD, Tween.EASE_OUT),
 	])
-	for i in 10:
+	for i in _fx_count(10):
 		_fx_slab(enemy_character, player_character,
 			Color(randf_range(0.55, 1.0), randf_range(0.55, 1.0), randf_range(0.55, 1.0), 0.95),
 			Vector2(randf_range(7.0, 13.0), randf_range(7.0, 13.0)), TRAVEL_TIME * 1.05,
@@ -3231,7 +3253,7 @@ func _sig_word_salad(move_id: String, tint: Color) -> void:
 func _sig_ghost_payroll(move_id: String, tint: Color) -> void:
 	_body_begin(enemy_character, BODY_FEET)
 	var pale := Color(tint.r, tint.g, tint.b, 0.45)
-	for i in 3:
+	for i in _fx_count(3):
 		_fx_word("†", enemy_character, pale, 30.0, 0.16 * float(i), 14)
 	_fx_charge(enemy_character, tint, 0.6)
 	await _body_play(enemy_character, [
@@ -3239,7 +3261,7 @@ func _sig_ghost_payroll(move_id: String, tint: Color) -> void:
 		_beat(18, 2, -14, 0.86, 1.0, 0.22),                                   # hunched over the book
 		_beat(16, 0, -10, 0.9, 1.0, 0.18),                                    # a glance back
 	])
-	for i in 3:
+	for i in _fx_count(3):
 		_fx_slab(enemy_character, player_character, pale, Vector2(14, 20),
 			TRAVEL_TIME * 1.7, 0.14 * float(i), randf_range(-12.0, 12.0), 0.0, 6)
 	await get_tree().create_timer(TRAVEL_TIME * 1.7 + 0.2).timeout
@@ -3252,14 +3274,14 @@ func _sig_ghost_payroll(move_id: String, tint: Color) -> void:
 ## away — the only move whose strongest motion is retreating.
 func _sig_tong_collection(move_id: String, tint: Color) -> void:
 	_body_begin(enemy_character, BODY_CHEST)
-	for i in 3:
+	for i in _fx_count(3):
 		_fx_ring(enemy_character, tint, 26.0, 0.24, 0.09 * float(i))
 	_fx_charge(enemy_character, tint, 0.34)
 	await _body_play(enemy_character, [
 		_beat(-14, 2, 11, 1.02, 0.99, 0.26, Tween.TRANS_QUAD, Tween.EASE_OUT),    # leans in, palm out
 		_beat(-16, 3, 13, 1.03, 0.98, 0.1),                                       # waits for it
 	])
-	for i in 5:
+	for i in _fx_count(5):
 		_fx_slab(enemy_character, player_character, tint, Vector2(11, 11),
 			TRAVEL_TIME * 1.1, 0.05 * float(i), 34.0 + randf_range(-10.0, 10.0),
 			randf_range(4.0, 8.0), 6)
@@ -3427,7 +3449,7 @@ func _play_move_animation(style: String, tint: Color) -> void:
 			if enemy_character.play_attack():
 				await enemy_character.one_shot_finished
 			var travel := TRAVEL_TIME * 0.9
-			for i in 7:
+			for i in _fx_count(7):
 				_spawn_bolt(enemy_character, player_character, tint, randf_range(8.0, 13.0),
 					travel, 0.04 * float(i), randf_range(-34.0, 34.0), true)
 			await get_tree().create_timer(travel + 0.28).timeout
