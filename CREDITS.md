@@ -1,4 +1,4 @@
-# Credits — Halalan Wyrm
+# Credits — Kaalaman sa Halalan
 
 ## Audio
 
