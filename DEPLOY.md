@@ -46,16 +46,28 @@ npx vercel deploy build\web --prod --yes
 ```
 
 The first time ever, this will ask you to log in and link the project — follow
-its prompts. `--prod` means "this is the real live site." It prints a URL at
-the end, like `https://web-xxxxxxxxx-jaysuz1s-projects.vercel.app` — **that is
-your new live link.** Vercel mints a fresh URL on every deploy; anyone with an
-older link is still seeing the old build.
+its prompts. `--prod` means "this is the real live site."
+
+It prints **two** URLs at the end, and the difference matters:
+
+```
+  Production      https://web-xxxxxxxxx-jaysuz1s-projects.vercel.app
+▲ Aliased         https://web-wheat-six-45.vercel.app
+```
+
+- The **Production** line is a snapshot of *this one deploy*. Vercel mints a
+  fresh one every time, and it keeps serving the old build forever.
+- The **Aliased** line — `https://web-wheat-six-45.vercel.app` — is the
+  permanent public link. Vercel repoints it at the newest production deploy on
+  every push.
+
+**Give people the aliased one.** It never changes, so nobody ends up bookmarked
+to a stale build.
 
 **Step 4 — check it's actually live.**
 
 ```powershell
-$url = "https://PASTE-YOUR-NEW-URL-HERE.vercel.app"
-(Invoke-WebRequest -Uri $url -Method Head -UseBasicParsing).StatusCode
+(Invoke-WebRequest -Uri "https://web-wheat-six-45.vercel.app" -Method Head -UseBasicParsing).StatusCode
 ```
 
 You want `200`. If you get `302`, Vercel's "Deployment Protection" got
