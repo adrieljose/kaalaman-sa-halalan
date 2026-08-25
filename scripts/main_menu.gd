@@ -288,7 +288,10 @@ func _apply_layout(profile: LayoutProfile) -> void:
 func _layout_panels(profile: LayoutProfile) -> void:
 	_centre_panel(character_panel, Vector2(340.0, 252.0))
 	_centre_panel(difficulty_panel, Vector2(340.0, 252.0))
-	_centre_panel(credits_panel, Vector2(420.0, 250.0))
+	# Never shrink-to-content: the credits body is a RichTextLabel, which reports
+	# almost no minimum height, so fitting the panel to its "content" collapsed
+	# it to a title and a Close button with the actual credits clipped away.
+	_centre_panel(credits_panel, Vector2(420.0, 250.0), false)
 	_centre_panel(options_panel, Vector2(288.0, 168.0))
 	# 300 units of status label alone is wider than a small phone.
 	if _certificate_status_label != null:
@@ -392,6 +395,8 @@ func _layout_wide(profile: LayoutProfile) -> void:
 	var top: float = maxf((d.y - WIDE_COMPOSITION.y) * 0.5, 0.0)
 	_place_background(d, top + WIDE_COMPOSITION.y * GROUND_FRACTION)
 	_place($TitleLogo, Rect2(inset + 60.0, top + 6.0, 519.0, 136.0))
+	title_character.visible = true
+	title_character_female.visible = true
 	_place(title_character, Rect2(inset + 154.0, top + 237.0, 120.0, 220.0))
 	_place(title_character_female, Rect2(inset + 267.0, top + 236.0, 120.0, 220.0))
 	_menu_bounds = Rect2(inset + 372.0, top + 144.0, 240.0, 290.0)
@@ -413,6 +418,8 @@ func _layout_side_by_side(profile: LayoutProfile) -> void:
 	_menu_bounds = Rect2(menu_left, margin, menu_w, d.y - margin * 2.0)
 	_menu_button_height = 40.0
 	_menu_font_size = 17
+	title_character.visible = true
+	title_character_female.visible = true
 	var char_h := 150.0
 	_stand_characters(menu_left * 0.5, floor_y, char_h, char_h * 0.52)
 
@@ -428,19 +435,29 @@ func _layout_stacked(profile: LayoutProfile) -> void:
 	var logo_h: float = minf(d.y * 0.155, 120.0)
 	_place($TitleLogo, Rect2(margin, margin, d.x - margin * 2.0, logo_h))
 
+	# Juan and Maria stay on the plaza, but only where there is room to see
+	# them. On a phone the menu is the screen's whole job, and two characters
+	# sharing it made the buttons compete with the artwork for the same strip;
+	# the pair still greet the player on desktop and tablet-landscape.
 	var ground := _place_background(d, d.y - margin)
-	var char_h: float = clampf(d.y * 0.24, 110.0, 230.0)
-	_stand_characters(d.x * 0.5, ground, char_h, char_h * 0.52)
+	title_character.visible = false
+	title_character_female.visible = false
 
 	# 44 design units is the tap-target floor; on a phone the content scale puts
 	# that at roughly 54 CSS px, past the 44 CSS px minimum. _grow_menu_stack
 	# shrinks below it only if the band genuinely cannot hold six buttons.
 	_menu_button_height = 44.0
 	_menu_font_size = 20
+	# With the plaza to itself, the stack centres in the space under the logo
+	# instead of hugging a character's head.
 	var band_top: float = margin + logo_h + 6.0
-	var band_bottom: float = ground - char_h - 10.0
-	_menu_bounds = Rect2(margin, band_top, d.x - margin * 2.0,
-		maxf(band_bottom - band_top, 120.0))
+	var band_bottom: float = d.y - margin
+	var count: float = float(maxi($Menu.get_child_count(), 1))
+	var separation: float = $Menu.get_theme_constant("separation")
+	var wanted: float = _menu_button_height * count + separation * (count - 1.0)
+	var slack: float = maxf((band_bottom - band_top - wanted) * 0.5, 0.0)
+	var available: float = maxf(band_bottom - band_top - slack * 2.0, 120.0)
+	_menu_bounds = Rect2(margin, band_top + slack, d.x - margin * 2.0, available)
 
 ## Sizes and offsets the background so the plaza lands on `target_floor`, and
 ## reports where the ground actually ended up.
@@ -642,14 +659,37 @@ func _layout_map(profile: LayoutProfile) -> void:
 
 	var back_size := Vector2(108.0, 28.0) if profile.is_wide() else Vector2(120.0, 44.0)
 	_place(map_back_button, Rect2(margin, d.y - margin - back_size.y, back_size.x, back_size.y))
+	# Width and stacking only — the height is settled in _show_soon_toast(),
+	# once the body label has a width to wrap at. Raised to the top of the map
+	# because, as a child added before the chapter list, it was being painted
+	# over by the very buttons it is answering.
 	var toast_w: float = minf(300.0, d.x - margin * 2.0)
-	_place(soon_toast, Rect2((d.x - toast_w) * 0.5, d.y * 0.42, toast_w, 88.0))
+	soon_toast.offset_left = (d.x - toast_w) * 0.5
+	soon_toast.offset_right = soon_toast.offset_left + toast_w
+	soon_toast.size.x = toast_w
+	map_panel.move_child(soon_toast, map_panel.get_child_count() - 1)
 
 ## The title composition and the map cannot share the screen once the map is
 ## fitted rather than stretched — it no longer covers the logo and characters.
 func _set_title_visible(visible_now: bool) -> void:
 	for piece in _title_pieces:
 		piece.visible = visible_now
+
+## Heights the toast to its own text and centres it.
+##
+## Has to happen while the toast is VISIBLE and has already been given its
+## width. Asking a hidden panel for its minimum height measures an autowrap
+## label that has no width to wrap at, so every word reports as its own line and
+## a two-line notice claims a third of the screen.
+func _fit_soon_toast() -> void:
+	await get_tree().process_frame
+	if not is_instance_valid(soon_toast) or not soon_toast.visible:
+		return
+	var d := Layout.profile.design_size
+	var height: float = clampf(soon_toast.get_combined_minimum_size().y, 60.0, d.y * 0.4)
+	soon_toast.offset_top = (d.y - height) * 0.5
+	soon_toast.offset_bottom = soon_toast.offset_top + height
+	soon_toast.size.y = height
 
 ## Wired by index rather than one handler per pin, so adding chapter 6 means
 ## adding a node and bumping TOTAL_CHAPTERS — no new signal code.
@@ -709,6 +749,7 @@ func _show_soon_toast() -> void:
 		_toast_tween.kill()
 	soon_toast.modulate.a = 1.0
 	soon_toast.show()
+	await _fit_soon_toast()
 	_toast_tween = create_tween()
 	_toast_tween.tween_interval(TOAST_HOLD)
 	_toast_tween.tween_property(soon_toast, "modulate:a", 0.0, TOAST_FADE)
@@ -851,9 +892,7 @@ func _fit_difficulty_panel() -> void:
 	var needed: float = column.get_combined_minimum_size().y + 16.0
 	if needed <= difficulty_panel.size.y:
 		return
-	var centre: float = difficulty_panel.offset_top + difficulty_panel.size.y * 0.5
-	difficulty_panel.offset_top = centre - needed * 0.5
-	difficulty_panel.offset_bottom = difficulty_panel.offset_top + needed
+	_regrow_panel(difficulty_panel, needed)
 
 ## A couple of representative answers from one pool, for the difficulty hint.
 ##
@@ -1371,9 +1410,24 @@ func _build_certificate() -> void:
 func _fit_certificate_panel() -> void:
 	var margin := 28.0  # 14px top + 14px bottom, matching the MarginContainer above
 	var needed: float = _certificate_column.get_combined_minimum_size().y + margin
-	var centre: float = _certificate_panel.offset_top + _certificate_panel.size.y * 0.5
-	_certificate_panel.offset_top = centre - needed * 0.5
-	_certificate_panel.offset_bottom = _certificate_panel.offset_top + needed
+	_regrow_panel(_certificate_panel, needed)
+
+## Re-heights a panel around its own centre, then slides it back on screen if
+## that pushed it off an edge.
+##
+## Both fitters grew panels around their centre with no regard for the screen,
+## which was invisible at 640x480 — the panels were small and the canvas was
+## roomy — and shows up on a phone, where a certificate carrying a name field
+## and a claim button is taller than the space above and below its centre.
+func _regrow_panel(panel: Control, needed: float) -> void:
+	var d := Layout.profile.design_size
+	var margin: float = maxf(d.x * 0.03, 10.0)
+	var height: float = minf(needed, d.y - margin * 2.0)
+	var centre: float = panel.offset_top + panel.size.y * 0.5
+	var top: float = clampf(centre - height * 0.5, margin, maxf(d.y - margin - height, margin))
+	panel.offset_top = top
+	panel.offset_bottom = top + height
+	panel.size.y = height
 
 ## The single place that decides whether a certificate can be claimed.
 ##

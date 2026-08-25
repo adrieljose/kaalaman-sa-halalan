@@ -288,6 +288,8 @@ var _timer_fill_style: StyleBoxTexture
 ## only mean anything on PORTRAIT / LANDSCAPE_COMPACT; on WIDE the full roster
 ## is permanently on screen and the strip is hidden.
 var _move_strip: Button
+## The console buttons' authored styleboxes, by node. See _style_console().
+var _console_button_boxes: Dictionary = {}
 var _moves_open: bool = false
 ## When the current word was started, in milliseconds. Set on the tap that
 ## takes the selection from empty to one letter, so the clock measures the time
@@ -303,9 +305,16 @@ func _ready() -> void:
 	player_character.configure_clips(GameState.character_clips())
 	_question_time = GameState.question_seconds()
 	# Renamed from "Shuffle": it rerolls the question now, not the letters.
+	console_bar.visible = true
+	for button in [shuffle_button, attack_button, menu_button]:
+		_restore_console(button)
 	shuffle_button.text = "New Question"
 	shuffle_button.add_theme_font_size_override("font_size", 12)
 	_screen_home = position
+	# Captured before anything re-styles them, so the WIDE layout can hand the
+	# authored sunken "well" boxes back verbatim.
+	for button in [shuffle_button, attack_button, menu_button]:
+		_console_button_boxes[button] = button.get_theme_stylebox("normal")
 	_apply_panel_chrome()
 	# The HUD is no longer built here: it needs the layout metrics, so
 	# _apply_layout() builds it as part of the first layout pass below.
@@ -474,7 +483,8 @@ func _layout_battle_wide(profile: LayoutProfile) -> void:
 	shuffle_button.text = "New Question"
 	shuffle_button.add_theme_font_size_override("font_size", 12)
 	potion_row.add_theme_constant_override("separation", 4)
-	for potion in [health_potion_button, power_potion_button, purify_potion_button]:
+	purify_potion_button.visible = false
+	for potion in [health_potion_button, power_potion_button]:
 		potion.custom_minimum_size = Vector2(60.0, 32.0)
 		potion.expand_icon = false
 		potion.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
@@ -656,14 +666,24 @@ func _layout_compact_controls(area: Rect2, tall: bool) -> void:
 	# on every layout, since on WIDE they are 400 units apart.
 	if potion_panel.get_index() < console_bar.get_index():
 		move_child(potion_panel, console_bar.get_index())
+	# The wooden ConsoleBar is a 400x26 strip meant to sit UNDER three shallow
+	# inset wells. Stretched to a phone's 296x52 it doubles in height, the grain
+	# smears, and the buttons on it stop reading as buttons at all. Compact
+	# layouts drop it and give the three actions their own wooden chrome.
+	console_bar.visible = false
+	_style_console(shuffle_button, Color(0.92, 0.88, 0.80))
+	_style_console(attack_button, Color(1.0, 0.86, 0.62))
+	_style_console(menu_button, Color(0.86, 0.84, 0.86))
+
 	# Shrink the potions BEFORE the panel around them is placed. A Control's
 	# size is clamped up to its combined minimum at the moment it is assigned,
 	# so placing the panel first and slimming its contents afterwards leaves it
 	# stuck at the old minimum -- 3x60 + 2x4 + 14 = 202 units of it, straight
 	# across New Q and Attack.
 	potion_title.visible = false
-	potion_row.add_theme_constant_override("separation", 2)
-	for potion in [health_potion_button, power_potion_button, purify_potion_button]:
+	purify_potion_button.visible = false
+	potion_row.add_theme_constant_override("separation", 3)
+	for potion in [health_potion_button, power_potion_button]:
 		# Clearing the minimum is not enough on its own: the bottle icon carries
 		# its own, which is what expand_icon lifts.
 		potion.custom_minimum_size = Vector2(22.0, 0.0)
@@ -677,15 +697,16 @@ func _layout_compact_controls(area: Rect2, tall: bool) -> void:
 	var slots: Array[Control] = [potion_panel, shuffle_button, attack_button, menu_button]
 	# Attack is the primary action and gets the widest slot of the three
 	# buttons. Weights, not pixels, so the same split works at 296 units and at
-	# 560.
-	var weights := [0.36, 0.19, 0.26, 0.19]
-	var pad := 3.0
+	# 560. The potions need less room than they did now that there are two of
+	# them rather than three.
+	var weights := [0.25, 0.22, 0.31, 0.22]
+	var pad := 4.0
 	var inner: float = area.size.x - pad * 2.0
 	var x: float = area.position.x + pad
 	var h: float = area.size.y - pad * 2.0
 	for i in slots.size():
 		var slot: float = inner * weights[i]
-		_place_node(slots[i], Rect2(x + 1.0, area.position.y + pad, slot - 2.0, h))
+		_place_node(slots[i], Rect2(x + 3.0, area.position.y + pad, slot - 6.0, h))
 		if slots[i] is Button:
 			(slots[i] as Button).custom_minimum_size = Vector2.ZERO
 			(slots[i] as Button).add_theme_font_size_override("font_size", 12 if tall else 10)
@@ -693,6 +714,28 @@ func _layout_compact_controls(area: Rect2, tall: bool) -> void:
 
 	# "New Question" does not fit a fifth of a phone's width at any legible size.
 	shuffle_button.text = "New Q"
+
+## Dresses a console button as a small wooden button in its own right, for
+## layouts where the bar it used to be inset into is gone.
+##
+## The meta is cleared so TouchFeedback, which runs at the end of the layout
+## pass, re-derives pressed and hover from this new box rather than keeping the
+## states it worked out from the old one.
+func _style_console(button: Button, tint: Color) -> void:
+	var box := _nine_slice(PANEL_TEXTURE, PANEL_SLICE, 4.0)
+	if box is StyleBoxTexture:
+		(box as StyleBoxTexture).modulate_color = tint
+	for state in ["normal", "focus"]:
+		button.add_theme_stylebox_override(state, box)
+	button.remove_meta("touch_feedback")
+
+func _restore_console(button: Button) -> void:
+	var box: StyleBox = _console_button_boxes.get(button)
+	if box == null:
+		return
+	for state in ["normal", "focus"]:
+		button.add_theme_stylebox_override(state, box)
+	button.remove_meta("touch_feedback")
 
 ## Panels that only exist on one arrangement or the other.
 func _show_compact_chrome(compact: bool) -> void:

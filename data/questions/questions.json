@@ -3,33 +3,33 @@
     "chapter": 1,
     "difficulty": "easy",
     "category": "voting",
-    "prompt": "The choice a citizen casts in an election is a ___.",
+    "prompt": "The choice a barangay resident marks for a local candidate is a ___.",
     "answer": "VOTE",
-    "fact": "Article V of the 1987 Constitution gives every Filipino citizen aged 18 or older the right to vote."
+    "fact": "In the BSKE, voters choose the Punong Barangay, seven Barangay Kagawad, and the SK officials they are eligible to vote for."
   },
   {
     "chapter": 1,
     "difficulty": "easy",
     "category": "voting",
-    "prompt": "A Filipino registered to cast a ballot is a ___.",
+    "prompt": "A registered barangay resident who can cast a ballot is a ___.",
     "answer": "VOTER",
-    "fact": "To register you must be a Filipino citizen, at least 18 on election day, and a resident of your area for six months."
+    "fact": "Regular barangay voters must be Filipino citizens who are at least 18 on election day and meet the residence requirements."
   },
   {
     "chapter": 1,
     "difficulty": "easy",
     "category": "voting",
-    "prompt": "The sheet a voter marks their choices on is the ___.",
+    "prompt": "The paper used to choose barangay and SK officials is the ___.",
     "answer": "BALLOT",
-    "fact": "The paper ballot is fed into a counting machine, but the paper itself is kept as the official record."
+    "fact": "A voter marks the ballot carefully so each chosen barangay or SK candidate can be counted."
   },
   {
     "chapter": 1,
     "difficulty": "easy",
     "category": "voting",
-    "prompt": "The agency that administers Philippine elections is the ___.",
+    "prompt": "The agency that conducts barangay and SK elections is ___.",
     "answer": "COMELEC",
-    "fact": "COMELEC also registers political parties and decides election disputes."
+    "fact": "COMELEC manages voter registration, polling rules, and the official BSKE calendar."
   },
   {
     "chapter": 1,
@@ -51,95 +51,97 @@
     "chapter": 1,
     "difficulty": "easy",
     "category": "voting",
-    "prompt": "The stain put on a voter's finger to stop double voting is indelible ___.",
+    "prompt": "After voting in the BSKE, indelible ___ is placed on a voter's finger.",
     "answer": "INK",
-    "fact": "Indelible ink marks the finger for days, so one person cannot vote a second time."
+    "fact": "Indelible ink helps election workers prevent anyone from voting twice."
   },
   {
     "chapter": 1,
     "difficulty": "easy",
     "category": "voting",
-    "prompt": "A Filipino must be 18 years of ___ to vote.",
-    "answer": "AGE",
-    "fact": "The 1987 Constitution lowered the voting age from 21 to 18."
+    "prompt": "The minimum age to run for an elected SK position is ___.",
+    "answer": "EIGHTEEN",
+    "display": "18",
+    "fact": "An elected SK candidate must be 18 to 24 years old on election day."
   },
   {
     "chapter": 1,
     "difficulty": "easy",
     "category": "voting",
-    "prompt": "The voting area a citizen is assigned to is their ___.",
+    "prompt": "The voting area assigned to a barangay resident is their ___.",
     "answer": "PRECINCT",
-    "fact": "COMELEC assigns your precinct from your registered address, so moving house means transferring your registration."
+    "fact": "COMELEC assigns a voter's precinct using the address in their registration record."
   },
   {
     "chapter": 1,
     "difficulty": "easy",
     "category": "voting",
-    "prompt": "A Filipino's vote is meant to stay ___.",
+    "prompt": "A barangay voter's choice must remain ___.",
     "answer": "SECRET",
-    "fact": "The Constitution requires a secret ballot, which is exactly what makes a bought vote impossible to enforce."
+    "fact": "The secret ballot protects every BSKE voter from pressure or intimidation."
   },
   {
     "chapter": 1,
     "difficulty": "easy",
     "category": "voting",
-    "prompt": "After the polls close, officials ___ the votes.",
+    "prompt": "After the BSKE polls close, the electoral board ___ the votes.",
     "answer": "COUNT",
-    "fact": "Counting happens at the precinct in public view, where accredited watchers may observe."
+    "fact": "Counting happens at the precinct where accredited watchers may observe the process."
   },
   {
     "chapter": 1,
     "difficulty": "easy",
     "category": "voting",
-    "prompt": "The place where citizens go to vote is often called the ___.",
+    "prompt": "Barangay residents go to the ___ to cast their ballots.",
     "answer": "POLLS",
-    "fact": "Polling places are usually public schools, staffed by teachers serving on the electoral board."
+    "fact": "BSKE polling places are commonly located in public schools."
   },
   {
     "chapter": 1,
     "difficulty": "easy",
     "category": "voting",
-    "prompt": "A vote-counting ___ reads the marked ballots.",
-    "answer": "MACHINE",
-    "fact": "The machine prints a receipt so a voter can confirm it read their ballot correctly."
+    "prompt": "The highest age allowed for an elected SK candidate is ___.",
+    "answer": "TWENTYFOUR",
+    "display": "24",
+    "fact": "An elected SK candidate must not be older than 24 on election day."
   },
   {
     "chapter": 1,
     "difficulty": "easy",
     "category": "voting",
-    "prompt": "Registered voters appear on the official voters' ___.",
-    "answer": "LIST",
-    "fact": "You can check that your name is on the list before election day through COMELEC's precinct finder."
+    "prompt": "The youth assembly in every barangay is the Katipunan ng ___.",
+    "answer": "KABATAAN",
+    "fact": "The Katipunan ng Kabataan includes registered barangay residents who are 15 to 30 years old."
   },
   {
     "chapter": 1,
     "difficulty": "easy",
     "category": "voting",
-    "prompt": "Only a Filipino ___ may register to vote.",
-    "answer": "CITIZEN",
-    "fact": "Citizenship, age and residence are the only requirements; the Constitution forbids any literacy or property test."
+    "prompt": "An SK candidate must have lived in the barangay for at least one ___.",
+    "answer": "YEAR",
+    "fact": "The one-year barangay residence requirement is measured immediately before election day."
   },
   {
     "chapter": 1,
     "difficulty": "easy",
     "category": "voting",
-    "prompt": "The polling place staff on election day are usually a ___ from the school.",
-    "answer": "TEACHER",
-    "fact": "Public school teachers make up the electoral board, and serving on it is a legal duty."
+    "prompt": "The Punong Barangay is commonly called the barangay ___.",
+    "answer": "CAPTAIN",
+    "fact": "Punong Barangay is the official title of the elected head of the barangay."
   },
   {
     "chapter": 1,
     "difficulty": "easy",
     "category": "why",
-    "prompt": "The Filipino word for a vote is ___.",
+    "prompt": "The Filipino word for a choice cast in a barangay election is ___.",
     "answer": "BOTO",
-    "fact": "The reminder 'ang boto mo ay mahalaga' captures why turnout matters: uncast votes still change the result."
+    "fact": "The reminder 'ang boto mo ay mahalaga' emphasizes that every barangay vote matters."
   },
   {
     "chapter": 1,
     "difficulty": "easy",
     "category": "why",
-    "prompt": "Citizens vote to choose a ___.",
+    "prompt": "Barangay residents vote to choose a local ___.",
     "answer": "LEADER",
     "fact": "In a barangay election you choose a Punong Barangay and seven Kagawad on the same ballot."
   },
@@ -147,55 +149,55 @@
     "chapter": 1,
     "difficulty": "easy",
     "category": "why",
-    "prompt": "In a democracy, power comes from the ___.",
-    "answer": "PEOPLE",
-    "fact": "The Constitution states that sovereignty resides in the people and all government authority comes from them."
+    "prompt": "A Sangguniang Barangay has ___ elected Barangay Kagawad.",
+    "answer": "SEVEN",
+    "fact": "The Punong Barangay leads the council, while seven Barangay Kagawad help pass local ordinances."
   },
   {
     "chapter": 1,
     "difficulty": "easy",
     "category": "why",
-    "prompt": "Voting is both a duty and a ___.",
-    "answer": "RIGHT",
-    "fact": "Suffrage is a right the Constitution protects, though voting is not compulsory in the Philippines."
+    "prompt": "SK voters aged 15 to 17 vote for SK positions ___.",
+    "answer": "ONLY",
+    "fact": "Voters aged 15 to 17 participate only in the SK part of the BSKE."
   },
   {
     "chapter": 1,
     "difficulty": "easy",
     "category": "why",
-    "prompt": "An honest election must be ___ and fair.",
-    "answer": "FREE",
-    "fact": "COMELEC's mandate is to hold free, orderly, honest, peaceful and credible elections."
+    "prompt": "Voters aged 18 to 30 may vote in ___ regular barangay and SK elections.",
+    "answer": "BOTH",
+    "fact": "Eligible voters aged 18 to 30 may vote for both regular barangay and SK positions."
   },
   {
     "chapter": 1,
     "difficulty": "easy",
     "category": "why",
-    "prompt": "Voting gives a citizen a ___ in government.",
-    "answer": "VOICE",
-    "fact": "Between elections citizens can still be heard at the barangay assembly, which meets at least twice a year."
+    "prompt": "Voters aged 31 and above vote for ___ barangay positions.",
+    "answer": "REGULAR",
+    "fact": "Voters aged 31 and above no longer vote in the SK election but may vote for regular barangay positions."
   },
   {
     "chapter": 1,
     "difficulty": "easy",
     "category": "why",
-    "prompt": "Every citizen's vote counts as ___.",
-    "answer": "EQUAL",
-    "fact": "One person, one vote: a wealthy voter's ballot counts exactly the same as a poor voter's."
+    "prompt": "The SK receives ten ___ of the barangay general fund.",
+    "answer": "PERCENT",
+    "fact": "Ten percent of the barangay general fund is set aside for youth development and empowerment through the SK."
   },
   {
     "chapter": 1,
     "difficulty": "easy",
     "category": "why",
-    "prompt": "An elected official is chosen to ___ the public.",
-    "answer": "SERVE",
-    "fact": "Article XI of the Constitution declares that public office is a public trust."
+    "prompt": "The barangay justice system is called Katarungang ___.",
+    "answer": "PAMBARANGAY",
+    "fact": "Katarungang Pambarangay helps settle certain community disputes at the barangay level."
   },
   {
     "chapter": 1,
     "difficulty": "easy",
     "category": "why",
-    "prompt": "Public office is a public ___.",
+    "prompt": "Barangay office is a public ___.",
     "answer": "TRUST",
     "fact": "Officials must act with integrity and remain accountable to the people at all times."
   },
@@ -203,39 +205,39 @@
     "chapter": 1,
     "difficulty": "easy",
     "category": "why",
-    "prompt": "The SK gives the ___ a voice in the barangay.",
+    "prompt": "The SK gives the barangay's ___ a voice in local government.",
     "answer": "YOUTH",
-    "fact": "Sangguniang Kabataan officials are elected by and from Filipinos aged 15 to 30."
+    "fact": "The SK represents young residents and develops programs for their needs."
   },
   {
     "chapter": 1,
     "difficulty": "easy",
     "category": "why",
-    "prompt": "The youth council in every barangay is the Sangguniang ___.",
-    "answer": "KABATAAN",
-    "fact": "The SK chairperson also sits on the Sangguniang Barangay as its eighth member."
+    "prompt": "The SK chairperson also sits on the barangay ___.",
+    "answer": "COUNCIL",
+    "fact": "The SK chairperson serves as an ex officio member of the Sangguniang Barangay."
   },
   {
     "chapter": 1,
     "difficulty": "easy",
     "category": "why",
-    "prompt": "Young voters help decide the country's ___.",
-    "answer": "FUTURE",
-    "fact": "Young Filipinos form one of the largest voting blocs, so turnout among them can decide close races."
+    "prompt": "Money reserved for SK youth programs is the SK ___.",
+    "answer": "FUND",
+    "fact": "The SK fund supports programs such as education, sports, the environment, health, and livelihood."
   },
   {
     "chapter": 1,
     "difficulty": "easy",
     "category": "why",
-    "prompt": "Government should act for the ___ good.",
-    "answer": "COMMON",
-    "fact": "A barangay project is meant to serve the whole community, not only the officials' supporters."
+    "prompt": "Residents discuss community issues at the barangay ___.",
+    "answer": "ASSEMBLY",
+    "fact": "The barangay assembly meets at least twice a year to discuss local activities, finances, and community concerns."
   },
   {
     "chapter": 1,
     "difficulty": "easy",
     "category": "candidate",
-    "prompt": "A person running for public office is a ___.",
+    "prompt": "A person running for barangay or SK office is a ___.",
     "answer": "CANDIDATE",
     "fact": "Someone becomes an official candidate only after filing a Certificate of Candidacy with COMELEC."
   },
@@ -243,7 +245,7 @@
     "chapter": 1,
     "difficulty": "easy",
     "category": "candidate",
-    "prompt": "The form filed to run for office is the ___.",
+    "prompt": "A barangay or SK candidate files a ___ to run for office.",
     "answer": "COC",
     "fact": "The Certificate of Candidacy names the office sought and declares that the filer is eligible for it."
   },
@@ -251,7 +253,7 @@
     "chapter": 1,
     "difficulty": "easy",
     "category": "candidate",
-    "prompt": "A candidate should explain their ___ for the community.",
+    "prompt": "A barangay candidate should explain their ___ for the community.",
     "answer": "PLAN",
     "fact": "Always ask how a plan will be paid for: a barangay's funds come largely from its share of national taxes."
   },
@@ -259,7 +261,7 @@
     "chapter": 1,
     "difficulty": "easy",
     "category": "candidate",
-    "prompt": "A public campaign gathering is a ___.",
+    "prompt": "A public gathering for a barangay campaign is a ___.",
     "answer": "RALLY",
     "fact": "Campaigning outside the official campaign period set by COMELEC is prohibited."
   },
@@ -275,7 +277,7 @@
     "chapter": 1,
     "difficulty": "easy",
     "category": "candidate",
-    "prompt": "Printed campaign material displayed in public is a ___.",
+    "prompt": "Printed BSKE campaign material displayed in public is a ___.",
     "answer": "POSTER",
     "fact": "COMELEC limits poster size and allows them only in designated common poster areas."
   },
@@ -283,7 +285,7 @@
     "chapter": 1,
     "difficulty": "easy",
     "category": "candidate",
-    "prompt": "A candidate's past performance is their track ___.",
+    "prompt": "A barangay candidate's past performance is their track ___.",
     "answer": "RECORD",
     "fact": "Attendance at council sessions and finished projects are checkable evidence, unlike promises."
   },
@@ -307,7 +309,7 @@
     "chapter": 1,
     "difficulty": "easy",
     "category": "candidate",
-    "prompt": "A winner takes an ___ of office before serving.",
+    "prompt": "A winning barangay official takes an ___ of office before serving.",
     "answer": "OATH",
     "fact": "The oath binds the official to defend the Constitution and discharge their duties faithfully."
   },
@@ -315,7 +317,7 @@
     "chapter": 1,
     "difficulty": "easy",
     "category": "candidate",
-    "prompt": "A group of candidates with shared aims is a political ___.",
+    "prompt": "Barangay and SK candidates run without a political ___.",
     "answer": "PARTY",
     "fact": "Barangay and SK elections are non-partisan, so candidates there run without party backing."
   },
@@ -323,7 +325,7 @@
     "chapter": 1,
     "difficulty": "easy",
     "category": "candidate",
-    "prompt": "Voters should look for an ___ candidate.",
+    "prompt": "Voters should look for an ___ barangay candidate.",
     "answer": "HONEST",
     "fact": "Officials file a yearly statement of assets, liabilities and net worth that the public may inspect."
   },
@@ -331,7 +333,7 @@
     "chapter": 1,
     "difficulty": "easy",
     "category": "fraud",
-    "prompt": "Paying someone for their vote is vote ___.",
+    "prompt": "Paying a barangay resident for their vote is vote ___.",
     "answer": "BUYING",
     "fact": "Vote buying is an election offense, and the law can hold both the giver and the receiver liable."
   },
@@ -339,7 +341,7 @@
     "chapter": 1,
     "difficulty": "easy",
     "category": "fraud",
-    "prompt": "Using a ___ to force someone's vote is illegal.",
+    "prompt": "Using a ___ to control someone's BSKE vote is illegal.",
     "answer": "THREAT",
     "fact": "Intimidating a voter is an election offense; report it to COMELEC or to a poll watcher."
   },
@@ -347,7 +349,7 @@
     "chapter": 1,
     "difficulty": "easy",
     "category": "fraud",
-    "prompt": "A ___ news post can mislead voters.",
+    "prompt": "A ___ social media post about a barangay candidate can mislead voters.",
     "answer": "FAKE",
     "fact": "Check a surprising election claim against COMELEC's official channels before sharing it."
   },
@@ -355,7 +357,7 @@
     "chapter": 1,
     "difficulty": "easy",
     "category": "fraud",
-    "prompt": "An unverified claim passed between people is a ___.",
+    "prompt": "An unverified story about a barangay candidate is a ___.",
     "answer": "RUMOR",
     "fact": "A claim repeated many times does not become true; trace it back to its original source."
   },
@@ -363,7 +365,7 @@
     "chapter": 1,
     "difficulty": "easy",
     "category": "fraud",
-    "prompt": "A serious accusation needs ___.",
+    "prompt": "An accusation against a barangay candidate needs ___.",
     "answer": "PROOF",
     "fact": "Ask who published a claim, when they published it, and what evidence they actually showed."
   },
@@ -388,7 +390,7 @@
     "chapter": 1,
     "difficulty": "easy",
     "category": "fraud",
-    "prompt": "A voter who witnesses cheating should ___ it.",
+    "prompt": "A voter who witnesses cheating in the BSKE should ___ it.",
     "answer": "REPORT",
     "fact": "COMELEC runs reporting hotlines and an anti-vote-buying campaign for exactly this purpose."
   },
@@ -396,7 +398,7 @@
     "chapter": 1,
     "difficulty": "easy",
     "category": "fraud",
-    "prompt": "Before believing a claim, check its ___.",
+    "prompt": "Before believing a claim about a barangay candidate, check its ___.",
     "answer": "SOURCE",
     "fact": "An official result comes from COMELEC, not from a social media post or a group chat forward."
   },

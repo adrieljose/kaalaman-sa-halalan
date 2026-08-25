@@ -256,7 +256,12 @@ func reset_potions() -> void:
 	potions = {
 		PotionType.HEALTH: STARTING_POTION_COUNT,
 		PotionType.POWER: STARTING_POTION_COUNT,
-		PotionType.PURIFY: STARTING_POTION_COUNT,
+		# Shelved, not deleted. Purify's only job was clearing the Mudslinging
+		# Tile, and it was the one potion whose purpose was not readable from
+		# its button. Starting at zero hides it without unpicking the mechanic:
+		# the tile can still be cleared by spelling through it, and restoring
+		# the potion is this one line.
+		PotionType.PURIFY: 0,
 	}
 
 func potion_count(type: PotionType) -> int:
