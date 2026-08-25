@@ -304,11 +304,12 @@ func _ready() -> void:
 	QuestionBank.set_context(GameState.chapter_number(), GameState.difficulty)
 	player_character.configure_clips(GameState.character_clips())
 	_question_time = GameState.question_seconds()
-	# Renamed from "Shuffle": it rerolls the question now, not the letters.
-	console_bar.visible = true
-	for button in [shuffle_button, attack_button, menu_button]:
-		_restore_console(button)
-	shuffle_button.text = "New Question"
+	# The button rerolls the question AND reseeds the board, and costs the turn
+	# either way — "Shuffle" covers all of that in one word that fits a phone,
+	# where the old "New Question" had to be abbreviated to an unreadable
+	# "New Q". The layout passes set this too; it is here so the button reads
+	# correctly on the very first frame.
+	shuffle_button.text = "Shuffle"
 	shuffle_button.add_theme_font_size_override("font_size", 12)
 	_screen_home = position
 	# Captured before anything re-styles them, so the WIDE layout can hand the
@@ -480,8 +481,15 @@ func _layout_battle_wide(profile: LayoutProfile) -> void:
 	var inset: float = maxf((profile.design_size.x - 640.0) * 0.5, 0.0)
 	board.set_tile_size(36.0, 3.0)
 	_show_compact_chrome(false)
-	shuffle_button.text = "New Question"
-	shuffle_button.add_theme_font_size_override("font_size", 12)
+	# The wooden bar and its three inset wells come back — a compact layout
+	# swapped both out, and rotating a tablet back to landscape has to undo it.
+	console_bar.visible = true
+	for button in [shuffle_button, attack_button, menu_button]:
+		_restore_console(button)
+		button.clip_text = false
+		button.custom_minimum_size = Vector2.ZERO
+		button.add_theme_font_size_override("font_size", 12)
+	shuffle_button.text = "Shuffle"
 	potion_row.add_theme_constant_override("separation", 4)
 	purify_potion_button.visible = false
 	for potion in [health_potion_button, power_potion_button]:
@@ -694,26 +702,55 @@ func _layout_compact_controls(area: Rect2, tall: bool) -> void:
 		potion.size_flags_vertical = Control.SIZE_EXPAND_FILL
 		potion.add_theme_font_size_override("font_size", 8)
 
-	var slots: Array[Control] = [potion_panel, shuffle_button, attack_button, menu_button]
-	# Attack is the primary action and gets the widest slot of the three
-	# buttons. Weights, not pixels, so the same split works at 296 units and at
-	# 560. The potions need less room than they did now that there are two of
-	# them rather than three.
-	var weights := [0.25, 0.22, 0.31, 0.22]
-	var pad := 4.0
-	var inner: float = area.size.x - pad * 2.0
-	var x: float = area.position.x + pad
-	var h: float = area.size.y - pad * 2.0
-	for i in slots.size():
-		var slot: float = inner * weights[i]
-		_place_node(slots[i], Rect2(x + 3.0, area.position.y + pad, slot - 6.0, h))
-		if slots[i] is Button:
-			(slots[i] as Button).custom_minimum_size = Vector2.ZERO
-			(slots[i] as Button).add_theme_font_size_override("font_size", 12 if tall else 10)
-		x += slot
+	# Everything that affects a button's MINIMUM width happens before anything
+	# is placed. A Control's size is clamped up to its minimum at the moment it
+	# is assigned, so setting the label afterwards leaves a button quietly wider
+	# than the slot it was given -- which is what pushed this row out of true.
+	shuffle_button.text = "Shuffle"
+	var font_size: int = 12 if tall else 10
+	for button in [shuffle_button, attack_button, menu_button]:
+		button.custom_minimum_size = Vector2.ZERO
+		button.clip_text = false
+		button.add_theme_font_size_override("font_size", font_size)
 
-	# "New Question" does not fit a fifth of a phone's width at any legible size.
-	shuffle_button.text = "New Q"
+	var slots: Array[Control] = [potion_panel, shuffle_button, attack_button, menu_button]
+	var pad := 4.0
+	var gap := 5.0
+	var h: float = area.size.y - pad * 2.0
+	var inner: float = area.size.x - pad * 2.0 - gap * float(slots.size() - 1)
+
+	# Measure what each slot genuinely needs, rather than assuming a share of
+	# the bar is enough for it.
+	var mins: Array[float] = []
+	var needed := 0.0
+	for slot in slots:
+		var m: float = slot.get_combined_minimum_size().x
+		mins.append(m)
+		needed += m
+
+	if needed > inner:
+		# Not enough room even at minimum. Let the three labels ellipsise rather
+		# than let them shoulder each other out of the bar; clip_text drops the
+		# text from a Button's minimum entirely.
+		for button in [shuffle_button, attack_button, menu_button]:
+			button.clip_text = true
+		mins.clear()
+		needed = 0.0
+		for slot in slots:
+			var m: float = slot.get_combined_minimum_size().x
+			mins.append(m)
+			needed += m
+
+	# Whatever is left over after every slot has its minimum is shared out.
+	# Attack is the primary action and takes the largest share; the potions,
+	# being two fixed-size chips, take the smallest.
+	var share := [0.16, 0.26, 0.32, 0.26]
+	var spare: float = maxf(inner - needed, 0.0)
+	var x: float = area.position.x + pad
+	for i in slots.size():
+		var width: float = mins[i] + spare * share[i]
+		_place_node(slots[i], Rect2(x, area.position.y + pad, width, h))
+		x += width + gap
 
 ## Dresses a console button as a small wooden button in its own right, for
 ## layouts where the bar it used to be inset into is gone.
