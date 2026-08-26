@@ -1,5 +1,8 @@
 # Credits — Kaalaman sa Halalan
 
+**Game Developer** — Adriel Jose Villas
+**Election Officer IV** — Atty. Keinth L. Horario
+
 ## Audio
 
 All audio in this project is royalty-free. Every item below is **CC0 / public
