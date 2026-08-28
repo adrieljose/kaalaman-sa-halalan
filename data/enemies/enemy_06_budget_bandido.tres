@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/images/portraits/enemy_budget_bandido.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/images/backgrounds/cityhall_budget.png" id="3"]
+[ext_resource type="Resource" path="res://data/moves/budget_bag_bash.tres" id="10"]
+[ext_resource type="Resource" path="res://data/moves/coin_burst.tres" id="11"]
+[ext_resource type="Resource" path="res://data/moves/deficit_drop.tres" id="12"]
+
+[resource]
+script = ExtResource("1")
+enemy_name = "Budget Bandido"
+title = "The Fund Raider"
+max_hp = 245
+portrait = ExtResource("2")
+background = ExtResource("3")
+lore = "A masked man carrying a sack marked CITY FUNDS, in daylight, past three guards, none of whom felt it was their department."
+is_boss = false
+moves = [ExtResource("10"), ExtResource("11"), ExtResource("12")]
+idle_dir = "res://assets/images/characters/budget_bandido_idle"
+idle_count = 4
+attack_dir = "res://assets/images/characters/budget_bandido_budget_bag_bash"
+attack_count = 6
+hit_dir = "res://assets/images/characters/budget_bandido_hit"
+hit_count = 4

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="EnemyMove" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_move.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/images/moves/backdoor_dash.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+move_id = "backdoor_dash"
+move_name = "Backdoor Dash"
+description = "Out one door, in behind you."
+icon = ExtResource("2")
+direct_damage = 14
+animation_style = "lunge"
+effect_color = Color(0.62, 0.55, 0.42, 0.95)
+attack_dir = "res://assets/images/characters/fixer_fredo_backdoor_dash"
+attack_count = 6

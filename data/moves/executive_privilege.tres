@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="EnemyMove" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_move.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/images/moves/executive_privilege.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+move_id = "executive_privilege"
+move_name = "Executive Privilege"
+description = "Lights out. He is entitled to it."
+icon = ExtResource("2")
+direct_damage = 34
+animation_style = "slam"
+effect_color = Color(0.98, 0.88, 0.52, 0.95)
+min_phase = 2
+attack_dir = "res://assets/images/characters/don_eraptado_executive_privilege"
+attack_count = 6

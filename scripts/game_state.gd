@@ -2,7 +2,19 @@ extends Node
 ## Tracks run-scoped progress: potion stock, and how far through the current
 ## chapter the player has walked.
 
-const CHAPTER_PATH := "res://data/chapters/chapter_01.tres"
+## Chapters are addressed by number rather than by one hardcoded path, so
+## adding chapter 3 is a matter of dropping chapter_03.tres in beside the
+## others — no code change here, and none in the battle scene either.
+const CHAPTER_PATH_FORMAT := "res://data/chapters/chapter_%02d.tres"
+const FIRST_CHAPTER := 1
+
+static func chapter_path(chapter_no: int) -> String:
+	return CHAPTER_PATH_FORMAT % chapter_no
+
+## Whether a chapter's data actually exists on disk. The chapter map asks this
+## so a chapter is offered only when there is something behind the button.
+static func chapter_exists(chapter_no: int) -> bool:
+	return ResourceLoader.exists(chapter_path(chapter_no))
 
 var player_max_hp: int = 100
 
@@ -103,10 +115,21 @@ const PROGRESS_SAVE_PATH := "user://progress.save"
 
 func _ready() -> void:
 	reset_potions()
-	chapter = load(CHAPTER_PATH) as ChapterData
-	if chapter == null:
-		push_warning("GameState: could not load chapter at %s" % CHAPTER_PATH)
+	load_chapter(FIRST_CHAPTER)
 	_load_progress()
+
+## Swaps in a chapter and rewinds to its first encounter. Returns false and
+## leaves the current chapter untouched if the requested one has no data, so a
+## bad chapter number can never strand the player in an empty battle scene.
+func load_chapter(chapter_no: int) -> bool:
+	var path := chapter_path(chapter_no)
+	var loaded := load(path) as ChapterData if ResourceLoader.exists(path) else null
+	if loaded == null:
+		push_warning("GameState: could not load chapter at %s" % path)
+		return false
+	chapter = loaded
+	encounter_index = 0
+	return true
 
 ## Records ONE difficulty tier as beaten for THIS SESSION, and — if that
 ## completes the full Easy -> Medium -> Hard climb — marks the certificate

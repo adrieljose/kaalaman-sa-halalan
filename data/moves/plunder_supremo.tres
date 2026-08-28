@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="EnemyMove" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_move.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/images/moves/plunder_supremo.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+move_id = "plunder_supremo"
+move_name = "Plunder Supremo"
+description = "He never stands. The sacks fire."
+icon = ExtResource("2")
+direct_damage = 22
+animation_style = "volley"
+effect_color = Color(0.96, 0.84, 0.4, 0.95)
+attack_dir = "res://assets/images/characters/don_eraptado_plunder_supremo"
+attack_count = 6

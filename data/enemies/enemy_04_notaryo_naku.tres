@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/images/portraits/enemy_notaryo_naku.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/images/backgrounds/cityhall_archive.png" id="3"]
+[ext_resource type="Resource" path="res://data/moves/notary_stampede.tres" id="10"]
+[ext_resource type="Resource" path="res://data/moves/signature_slash.tres" id="11"]
+[ext_resource type="Resource" path="res://data/moves/seal_of_approval.tres" id="12"]
+
+[resource]
+script = ExtResource("1")
+enemy_name = "Notaryo Naku"
+title = "The Seal Schemer"
+max_hp = 215
+portrait = ExtResource("2")
+background = ExtResource("3")
+lore = "He notarises with the flourish of a man signing a treaty. What he is signing is a photocopy of a photocopy."
+is_boss = false
+moves = [ExtResource("10"), ExtResource("11"), ExtResource("12")]
+idle_dir = "res://assets/images/characters/notaryo_naku_idle"
+idle_count = 4
+attack_dir = "res://assets/images/characters/notaryo_naku_notary_stampede"
+attack_count = 6
+hit_dir = "res://assets/images/characters/notaryo_naku_hit"
+hit_count = 4

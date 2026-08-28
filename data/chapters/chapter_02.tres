@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="ChapterData" load_steps=11 format=3]
+
+[ext_resource type="Script" path="res://scripts/chapter_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/enemies/enemy_01_fixer_fredo.tres" id="2"]
+[ext_resource type="Resource" path="res://data/enemies/enemy_02_clerk_kurakot.tres" id="3"]
+[ext_resource type="Resource" path="res://data/enemies/enemy_03_permit_peke.tres" id="4"]
+[ext_resource type="Resource" path="res://data/enemies/enemy_04_notaryo_naku.tres" id="5"]
+[ext_resource type="Resource" path="res://data/enemies/enemy_05_cashier_kaltas.tres" id="6"]
+[ext_resource type="Resource" path="res://data/enemies/enemy_06_budget_bandido.tres" id="7"]
+[ext_resource type="Resource" path="res://data/enemies/enemy_07_bidding_bandit.tres" id="8"]
+[ext_resource type="Resource" path="res://data/enemies/enemy_08_ordinance_ogre.tres" id="9"]
+[ext_resource type="Resource" path="res://data/enemies/enemy_09_don_eraptado.tres" id="10"]
+
+[resource]
+script = ExtResource("1")
+chapter_number = 2
+chapter_name = "City Hall Shadows"
+encounters = [ExtResource("2"), ExtResource("3"), ExtResource("4"), ExtResource("5"), ExtResource("6"), ExtResource("7"), ExtResource("8"), ExtResource("9"), ExtResource("10")]

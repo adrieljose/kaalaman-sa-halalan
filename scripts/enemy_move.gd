@@ -49,6 +49,15 @@ extends Resource
 @export_enum("lunge", "volley", "slam", "spray", "curse") var animation_style: String = "lunge"
 @export var effect_color: Color = Color(0.75, 0.35, 0.85, 0.95)
 
+## The earliest boss phase this move may be used in. 1 for everything an
+## ordinary rival owns, so this field costs the existing roster nothing.
+##
+## A boss raises its phase as its health falls (see EnemyData.phase_thresholds),
+## and its move rotation is filtered against this — which is how a skill can be
+## held back as a phase-2 exclusive without hard-coding its name anywhere in
+## the battle controller.
+@export var min_phase: int = 1
+
 ## Per-skill attack frames. Empty means "use the rival's default attack clip".
 ##
 ## One clip per character was enough while every skill shared the same swing;

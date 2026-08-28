@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="EnemyMove" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_move.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/images/moves/seal_of_approval.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+move_id = "seal_of_approval"
+move_name = "Seal of Approval"
+description = "A seal glows under your feet. Move."
+icon = ExtResource("2")
+direct_damage = 20
+animation_style = "curse"
+effect_color = Color(0.94, 0.78, 0.34, 0.95)
+attack_dir = "res://assets/images/characters/notaryo_naku_seal_of_approval"
+attack_count = 6

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="EnemyMove" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_move.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/images/moves/fake_seal_shot.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+move_id = "fake_seal_shot"
+move_name = "Fake Seal Shot"
+description = "Seals peel off the page and curve in."
+icon = ExtResource("2")
+direct_damage = 15
+animation_style = "spray"
+effect_color = Color(0.92, 0.3, 0.28, 0.95)
+attack_dir = "res://assets/images/characters/permit_peke_fake_seal_shot"
+attack_count = 6

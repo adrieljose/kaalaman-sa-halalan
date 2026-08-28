@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="EnemyMove" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_move.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/images/moves/envelope_express.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+move_id = "envelope_express"
+move_name = "Envelope Express"
+description = "Envelopes flicked like cards. They burst."
+icon = ExtResource("2")
+direct_damage = 12
+animation_style = "volley"
+effect_color = Color(0.88, 0.82, 0.62, 0.95)
+attack_dir = "res://assets/images/characters/fixer_fredo_envelope_express"
+attack_count = 6

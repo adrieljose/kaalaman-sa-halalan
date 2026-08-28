@@ -19,6 +19,24 @@ extends Resource
 ## whichever move is next; its damage lands when the Mudslinging Tile detonates.
 @export var moves: Array[EnemyMove] = []
 
+## Health fractions at which a boss escalates a phase, high to low. [0.5] means
+## "enter phase 2 when health drops to half". Empty — the ordinary case — means
+## the rival has exactly one phase and never transforms, so every Chapter 1
+## rival is unaffected by this existing entirely.
+##
+## Each crossing raises the phase by one, which unlocks any move whose
+## min_phase now qualifies and swaps in phase_backgrounds if one is supplied.
+@export var phase_thresholds: Array[float] = []
+
+## Backdrop per phase beyond the first, in the same order as phase_thresholds.
+## Left empty the arena simply stays as it was; supplying one lets the room
+## itself react to the fight, which is what the boss arena does.
+@export var phase_backgrounds: Array[Texture2D] = []
+
+## Shown when a phase begins, in the same order as phase_thresholds. Empty
+## falls back to a generic announcement.
+@export var phase_banners: Array[String] = []
+
 ## Sprite clips, mirroring AnimatedCharacter's own fields so swapping enemies
 ## mid-chapter is a straight copy across rather than a naming convention the
 ## two files have to agree on. Frame counts are stored because the loader walks

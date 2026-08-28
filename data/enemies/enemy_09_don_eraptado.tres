@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/images/portraits/enemy_don_eraptado.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/images/backgrounds/cityhall_mayor_office.png" id="3"]
+[ext_resource type="Resource" path="res://data/moves/kaban_ng_bayan.tres" id="10"]
+[ext_resource type="Resource" path="res://data/moves/plunder_supremo.tres" id="11"]
+[ext_resource type="Resource" path="res://data/moves/jueteng_jackpot.tres" id="12"]
+[ext_resource type="Resource" path="res://data/moves/executive_privilege.tres" id="13"]
+[ext_resource type="Texture2D" path="res://assets/images/backgrounds/cityhall_mayor_office_phase2.png" id="90"]
+
+[resource]
+script = ExtResource("1")
+enemy_name = "Don Eraptado"
+title = "The Plunder Supremo"
+max_hp = 480
+portrait = ExtResource("2")
+background = ExtResource("3")
+lore = "He does not rise when you enter. The vault behind him is open, and he has decided that this, too, is a formality he can approve."
+is_boss = true
+moves = [ExtResource("10"), ExtResource("11"), ExtResource("12"), ExtResource("13")]
+phase_thresholds = Array[float]([0.5])
+phase_backgrounds = Array[Texture2D]([ExtResource("90")])
+phase_banners = PackedStringArray("THE MASK COMES OFF")
+idle_dir = "res://assets/images/characters/don_eraptado_idle"
+idle_count = 4
+attack_dir = "res://assets/images/characters/don_eraptado_kaban_ng_bayan"
+attack_count = 6
+hit_dir = "res://assets/images/characters/don_eraptado_hit"
+hit_count = 4

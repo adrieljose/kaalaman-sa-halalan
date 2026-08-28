@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/images/portraits/enemy_fixer_fredo.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/images/backgrounds/cityhall_plaza.png" id="3"]
+[ext_resource type="Resource" path="res://data/moves/backdoor_dash.tres" id="10"]
+[ext_resource type="Resource" path="res://data/moves/envelope_express.tres" id="11"]
+[ext_resource type="Resource" path="res://data/moves/queue_skip_kick.tres" id="12"]
+
+[resource]
+script = ExtResource("1")
+enemy_name = "Fixer Fredo"
+title = "The Shortcut Dealer"
+max_hp = 170
+portrait = ExtResource("2")
+background = ExtResource("3")
+lore = "He is already at the gate before you reach it, holding a clipboard nobody gave him. For a fee, he says, the line simply stops applying to you."
+is_boss = false
+moves = [ExtResource("10"), ExtResource("11"), ExtResource("12")]
+idle_dir = "res://assets/images/characters/fixer_fredo_idle"
+idle_count = 4
+attack_dir = "res://assets/images/characters/fixer_fredo_backdoor_dash"
+attack_count = 6
+hit_dir = "res://assets/images/characters/fixer_fredo_hit"
+hit_count = 4

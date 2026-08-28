@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="EnemyMove" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_move.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/images/moves/cash_drawer_bash.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+move_id = "cash_drawer_bash"
+move_name = "Cash Drawer Bash"
+description = "The whole drawer, swung like a hammer."
+icon = ExtResource("2")
+direct_damage = 20
+animation_style = "slam"
+effect_color = Color(0.94, 0.8, 0.36, 0.95)
+attack_dir = "res://assets/images/characters/cashier_kaltas_cash_drawer_bash"
+attack_count = 6

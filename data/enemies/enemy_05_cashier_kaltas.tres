@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/images/portraits/enemy_cashier_kaltas.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/images/backgrounds/cityhall_treasury.png" id="3"]
+[ext_resource type="Resource" path="res://data/moves/cash_drawer_bash.tres" id="10"]
+[ext_resource type="Resource" path="res://data/moves/coin_flick.tres" id="11"]
+[ext_resource type="Resource" path="res://data/moves/receipt_whip.tres" id="12"]
+
+[resource]
+script = ExtResource("1")
+enemy_name = "Cashier Kaltas"
+title = "The Deduction Collector"
+max_hp = 230
+portrait = ExtResource("2")
+background = ExtResource("3")
+lore = "The amount was correct until she looked at it. Now there is a service charge, a processing fee, and something she has not named yet."
+is_boss = false
+moves = [ExtResource("10"), ExtResource("11"), ExtResource("12")]
+idle_dir = "res://assets/images/characters/cashier_kaltas_idle"
+idle_count = 4
+attack_dir = "res://assets/images/characters/cashier_kaltas_cash_drawer_bash"
+attack_count = 6
+hit_dir = "res://assets/images/characters/cashier_kaltas_hit"
+hit_count = 4

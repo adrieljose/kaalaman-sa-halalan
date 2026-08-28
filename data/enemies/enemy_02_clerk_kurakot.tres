@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/images/portraits/enemy_clerk_kurakot.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/images/backgrounds/cityhall_lobby.png" id="3"]
+[ext_resource type="Resource" path="res://data/moves/stamp_slam.tres" id="10"]
+[ext_resource type="Resource" path="res://data/moves/paper_cut_volley.tres" id="11"]
+[ext_resource type="Resource" path="res://data/moves/counter_charge.tres" id="12"]
+
+[resource]
+script = ExtResource("1")
+enemy_name = "Clerk Kurakot"
+title = "The Counter Crook"
+max_hp = 185
+portrait = ExtResource("2")
+background = ExtResource("3")
+lore = "Every form you bring him is the wrong form. He has been reaching for the same stamp since morning and has not stamped anything yet."
+is_boss = false
+moves = [ExtResource("10"), ExtResource("11"), ExtResource("12")]
+idle_dir = "res://assets/images/characters/clerk_kurakot_idle"
+idle_count = 4
+attack_dir = "res://assets/images/characters/clerk_kurakot_stamp_slam"
+attack_count = 6
+hit_dir = "res://assets/images/characters/clerk_kurakot_hit"
+hit_count = 4

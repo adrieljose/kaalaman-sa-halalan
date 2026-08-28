@@ -11,7 +11,16 @@ class_name MainMenu
 const BATTLE_SCENE := "res://scenes/word_battle.tscn"
 ## Only chapter 1 exists so far; the rest are drawn locked and answer with a
 ## notice. Raising this is all that is needed once chapter 2 ships.
-const UNLOCKED_CHAPTERS := 1
+## Chapters with real content behind them. Derived from what is actually on
+## disk rather than typed in, so shipping chapter 3 means adding its data and
+## nothing else -- this constant stops being a thing anyone has to remember.
+static func unlocked_chapters() -> int:
+	var n := 0
+	for i in range(1, TOTAL_CHAPTERS + 1):
+		if not GameState.chapter_exists(i):
+			break
+		n = i
+	return n
 const TOTAL_CHAPTERS := 5
 ## How long the "AVAILABLE SOON!" notice stays up before fading itself out.
 const TOAST_HOLD := 1.3
@@ -56,7 +65,7 @@ const DIFFICULTY_BLURB := {
 var _reviewer_entry_width := 556.0
 
 ## Which chapter unlocks the certificate. Chapter 1 only, matching
-## UNLOCKED_CHAPTERS — there is only one chapter to complete anyway, but this
+## the unlocked set — there is only one certificate chapter for now, but this
 ## names the requirement rather than leaving a bare "1" in the unlock check.
 const CERTIFICATE_CHAPTER := 1
 ## Master switch. While true the certificate is locked for everyone regardless
@@ -588,7 +597,7 @@ func _build_map_list() -> void:
 	_map_list.add_child(title)
 
 	for i in range(1, TOTAL_CHAPTERS + 1):
-		var locked := i > UNLOCKED_CHAPTERS
+		var locked := i > unlocked_chapters()
 		var button := Button.new()
 		button.name = "ListChapter%d" % i
 		# The short tab names, not the long map captions: the scroll stylebox
@@ -700,6 +709,26 @@ func _connect_chapter_pins() -> void:
 			push_warning("MainMenu: no map pin for chapter %d" % i)
 			continue
 		pin.pressed.connect(_on_chapter_pressed.bind(i))
+	_refresh_chapter_pins()
+
+## Repaints the map to match what is actually playable. The scene file carries
+## "(LOCKED)" baked into every caption past chapter 1, which was true when only
+## chapter 1 existed and quietly stops being true the moment another chapter's
+## data lands — so the caption and the dimming are both derived here instead.
+func _refresh_chapter_pins() -> void:
+	var unlocked := unlocked_chapters()
+	for i in range(1, TOTAL_CHAPTERS + 1):
+		var locked := i > unlocked
+		var label := map_panel.get_node_or_null("Chapter%dScrim/Chapter%dLabel" % [i, i]) as Label
+		if label != null:
+			var title := String(CHAPTER_TITLES.get(i, "Chapter %d" % i))
+			label.text = title + ("  (LOCKED)" if locked else "")
+			label.modulate = Color(0.72, 0.70, 0.66) if locked else Color.WHITE
+		var pin := map_panel.get_node_or_null("Chapter%dButton" % i) as Button
+		if pin != null:
+			# The gold pin is the scene's "available" look; locked ones keep the
+			# grey it was authored with.
+			pin.self_modulate = Color(0.62, 0.60, 0.58) if locked else Color(1.0, 0.84, 0.36)
 
 ## Starts the title music on the first real interaction of any kind, anywhere
 ## on the page — not just a press of one of our own buttons. A button click
@@ -735,11 +764,19 @@ func _on_play_pressed() -> void:
 	map_panel.show()
 
 func _on_chapter_pressed(chapter: int) -> void:
-	if chapter > UNLOCKED_CHAPTERS:
+	if chapter > unlocked_chapters():
+		Audio.play_sfx("word_rejected")
+		_show_soon_toast()
+		return
+	# Load it here rather than at _start_run, so everything downstream — the
+	# difficulty hints, the certificate panel, the question pool — is already
+	# talking about the chapter the player just picked.
+	if not GameState.load_chapter(chapter):
 		Audio.play_sfx("word_rejected")
 		_show_soon_toast()
 		return
 	Audio.play_sfx("button_click")
+	_apply_difficulty_hints()
 	character_panel.show()
 
 ## A self-dismissing notice, so a locked chapter never traps the player behind
@@ -974,11 +1011,11 @@ func _build_reviewer() -> void:
 	# Only chapters the player can actually reach get a tab. QuestionBank holds
 	# data for all five (chapters 2-5 were written ahead of the content that
 	# unlocks them), but a reviewer entry for a chapter nobody can play would
-	# just be confusing. Reusing UNLOCKED_CHAPTERS means this needs no changes
+	# just be confusing. Reusing unlocked_chapters() means this needs no changes
 	# when chapter 2 ships — it gains a tab the same moment its map pin opens.
 	var chapter_row := _add_tab_row(column, "CHAPTER")
 	for chapter_no in QuestionBank.chapters_available():
-		if int(chapter_no) > UNLOCKED_CHAPTERS:
+		if int(chapter_no) > unlocked_chapters():
 			continue
 		var tab := _make_tab(String(CHAPTER_TABS.get(chapter_no, "CH %d" % chapter_no)))
 		tab.pressed.connect(_on_reviewer_chapter_selected.bind(int(chapter_no)))

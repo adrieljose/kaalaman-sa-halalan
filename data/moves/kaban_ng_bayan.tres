@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="EnemyMove" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_move.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/images/moves/kaban_ng_bayan.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+move_id = "kaban_ng_bayan"
+move_name = "Kaban ng Bayan"
+description = "He swings the treasury itself."
+icon = ExtResource("2")
+direct_damage = 26
+animation_style = "slam"
+effect_color = Color(0.94, 0.78, 0.3, 0.95)
+attack_dir = "res://assets/images/characters/don_eraptado_kaban_ng_bayan"
+attack_count = 6

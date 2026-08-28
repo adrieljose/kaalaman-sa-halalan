@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="EnemyMove" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_move.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/images/moves/permit_board_bash.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+move_id = "permit_board_bash"
+move_name = "Permit Board Bash"
+description = "A signboard swung flat. APPROVED, then PEKE."
+icon = ExtResource("2")
+direct_damage = 18
+animation_style = "slam"
+effect_color = Color(0.9, 0.58, 0.3, 0.95)
+attack_dir = "res://assets/images/characters/permit_peke_permit_board_bash"
+attack_count = 6

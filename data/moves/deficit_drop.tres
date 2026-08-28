@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="EnemyMove" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_move.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/images/moves/deficit_drop.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+move_id = "deficit_drop"
+move_name = "Deficit Drop"
+description = "A red figure, then the sack it belongs to."
+icon = ExtResource("2")
+direct_damage = 23
+animation_style = "slam"
+effect_color = Color(0.86, 0.28, 0.26, 0.95)
+attack_dir = "res://assets/images/characters/budget_bandido_deficit_drop"
+attack_count = 6
