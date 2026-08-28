@@ -248,6 +248,7 @@ var _difficulty_label: Label
 var _hud_player_portrait: TextureRect
 var _hud_enemy_portrait: TextureRect
 var _hud_chapter_ribbon_label: Label
+var _hud_chapter_plate: PanelContainer
 ## Which phase the current rival is in, 1-based. Only a rival that declares
 ## phase_thresholds ever leaves phase 1, so every Chapter 1 encounter sits at 1
 ## for its whole fight and none of the phase code below does anything.
@@ -470,9 +471,19 @@ func _hud_metrics(profile: LayoutProfile) -> Dictionary:
 		"info_w": 150.0, "ribbon_w": 94.0,
 		"player_ribbon_top": 9.0, "enemy_ribbon_top": 4.0,
 		"hearts_top": 27.0, "enemy_hearts_top": 32.0,
-		"pillar_a_x": HUD_PILLAR_A_X, "pillar_b_x": w - HUD_PILLAR_B_INSET,
-		"centre_x": HUD_PILLAR_A_X + 16.0,
-		"centre_r": w - HUD_PILLAR_B_INSET - 4.0,
+		# The pillars were pinned at absolute insets tuned for a 640-wide bar.
+		# The bar is 480 wide here, which put them at 204 and 264 and left a
+		# 48px gap between them -- narrower than the 124px chapter ribbon meant
+		# to sit inside it, so the pillars painted over the first and last
+		# letters ("CHAPTER 2" read as "HAPTER") and squeezed the chapter-name
+		# plate to 32px for 127px of text ("CITY HALL SHADOWS" read as "CIT").
+		#
+		# Deriving them from the bar's own width keeps the centre section
+		# proportional at any size. At 640 this lands within a few pixels of the
+		# old constants, so the desktop bar is unchanged.
+		"pillar_a_x": _hud_pillar_a(w), "pillar_b_x": _hud_pillar_b(w),
+		"centre_x": _hud_pillar_a(w) + HUD_PILLAR_W,
+		"centre_r": _hud_pillar_b(w),
 		"chapter_top": 24.0,
 		"encounter_x": w - HUD_RIGHT_INFO_INSET,
 		"encounter_r": w - HUD_RIGHT_INFO_R_INSET,
@@ -1344,6 +1355,32 @@ func _build_hud_player_section() -> void:
 		"PlayerHeartSlot", player_heart_row, left, left + _hud["info_w"],
 		_hud["hearts_top"], false)
 
+## The pillars divide the bar, so they belong just outside the sections they
+## divide rather than at absolute insets: hard-coded 204 / w-216 assumed a
+## 640-wide bar and left only a 48px gap on the 480-wide one this actually
+## renders at. Derived from the neighbours, the centre gets every pixel the
+## player and rival sections are not using, at any width.
+static func _hud_pillar_a(w: float) -> float:
+	return HUD_LEFT_INFO_X + 94.0 + 4.0        # just right of the player ribbon
+
+static func _hud_pillar_b(w: float) -> float:
+	return w - HUD_RIGHT_INFO_INSET - HUD_PILLAR_W - 4.0
+
+## Steps a label's font down until its text fits the width it has. The chapter
+## name is the one HUD string whose length is content, not layout -- "CITY HALL
+## SHADOWS" is half again as long as "BARANGAY BEGINNINGS" is wide -- so it is
+## fitted rather than trimmed, and chapters 3 to 5 inherit that for free.
+static func _fit_label_font(label: Label, width: float,
+		start: int = 12, floor_size: int = 7) -> void:
+	var font: Font = label.get_theme_font("font")
+	if font == null or label.text.is_empty():
+		return
+	var size := start
+	while size > floor_size and font.get_string_size(
+			label.text, HORIZONTAL_ALIGNMENT_LEFT, -1, size).x > width:
+		size -= 1
+	label.add_theme_font_size_override("font_size", size)
+
 func _build_hud_centre_section() -> void:
 	# The chapter number gets the ribbon and the chapter's name sits below it
 	# in the open: number as the label, name as the thing you actually read.
@@ -1351,14 +1388,21 @@ func _build_hud_centre_section() -> void:
 	_hud_chapter_ribbon_label.name = "ChapterRibbonLabel"
 	var centre: float = (_hud["centre_x"] + _hud["centre_r"]) * 0.5
 	if _hud["show_chapter_ribbon"]:
+		# Never wider than the gap between the pillars. A fixed 124 wide ribbon
+		# straddled them on a narrow bar, and because the label centres its text
+		# inside the ribbon, the pillars hid the first and last characters
+		# rather than the ribbon simply looking too long.
+		var half: float = minf(62.0,
+			(float(_hud["centre_r"]) - float(_hud["centre_x"])) * 0.5 - 2.0)
 		_add_ribbon("ChapterRibbon", _hud_chapter_ribbon_label,
-			centre - 62.0, centre + 62.0, 6.0)
+			centre - half, centre + half, 6.0)
 
 	# The chapter name is the one piece of HUD text that is a heading rather
 	# than a stat, so it gets a light parchment ground and dark ink — the
 	# inverse of everything around it. Dark-on-dark with an outline, which is
 	# what it looked like before the plate went in, just read as muddy.
 	var plate := PanelContainer.new()
+	_hud_chapter_plate = plate
 	plate.name = "ChapterPlate"
 	plate.offset_left = _hud["centre_x"] + 4.0
 	plate.offset_right = _hud["centre_r"] - 4.0
@@ -1558,6 +1602,13 @@ func _refresh_encounter_hud() -> void:
 	# HEIR", which stayed put through every later encounter and so was wrong
 	# for four fights out of five. The rival has its own nameplate now.
 	chapter_label.text = chapter_title.to_upper()
+	# Fitted from the width the plate was BUILT with rather than the width it
+	# currently reports: the metrics are already known here, and reading the
+	# live size would mean awaiting a frame, which would turn a plain HUD
+	# refresh into a coroutine for a purely cosmetic measurement.
+	if _hud.has("centre_r"):
+		_fit_label_font(chapter_label,
+			float(_hud["centre_r"]) - float(_hud["centre_x"]) - 16.0)
 
 	if _hud_player_portrait != null:
 		_hud_player_portrait.texture = _portrait_texture(
