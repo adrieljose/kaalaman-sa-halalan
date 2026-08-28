@@ -181,8 +181,10 @@ func _play_once(frames: Array[Texture2D], rate: float = -1.0) -> bool:
 	_current_frames = frames
 	_frame_index = 0
 	_one_shot = true
-	# The clip was drawn upright; let it play that way.
-	_reset_idle_pose()
+	# The pose is NOT reset here. _tick_idle_pose stops while a one-shot runs,
+	# so the body simply holds the lean it already had for the length of the
+	# clip. Zeroing it instead put a visible snap at the front of every hit
+	# reaction, which is the same pop _body_begin used to cause.
 	_timer = 0.0
 	texture = _current_frames[0]
 	return true

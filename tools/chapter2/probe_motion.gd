@@ -5,8 +5,7 @@ extends Node
 ## does not move at all is a stall; a frame where its velocity jumps sharply is
 ## a jerk. Both are measurable, so measure them and fix what the numbers show.
 
-const MOVES := ["kaban_ng_bayan", "stamp_slam", "briefcase_beatdown",
-	"codex_crusher", "backdoor_dash"]
+const MOVES := ["stamp_slam", "kaban_ng_bayan"]
 
 func _ready() -> void:
 	await get_tree().process_frame
@@ -42,7 +41,10 @@ func _ready() -> void:
 func _sample(rival: Control, out: Array, still_going: Callable) -> void:
 	while still_going.call():
 		await get_tree().process_frame
-		out.append(rival.position)
+		# Rotation and scale matter as much as position: the idle pose writes
+		# both every frame, and if handing the body to a skill zeroes them in
+		# one frame the sprite visibly pops even though it never moved.
+		out.append({"p": rival.position, "r": rival.rotation, "s": rival.scale})
 	get_tree().quit(0)
 
 func _report(move_id: String, s: Array) -> void:
@@ -51,9 +53,16 @@ func _report(move_id: String, s: Array) -> void:
 	var max_jerk := 0.0
 	var at := 0
 	var detail := ""
+	var max_rot_pop := 0.0
+	var max_scale_pop := 0.0
+	for i in range(1, s.size()):
+		max_rot_pop = maxf(max_rot_pop,
+			absf(rad_to_deg(s[i]["r"]) - rad_to_deg(s[i - 1]["r"])))
+		max_scale_pop = maxf(max_scale_pop,
+			(s[i]["s"] - s[i - 1]["s"]).length())
 	for i in range(2, s.size()):
-		var v1: Vector2 = s[i - 1] - s[i - 2]
-		var v2: Vector2 = s[i] - s[i - 1]
+		var v1: Vector2 = s[i - 1]["p"] - s[i - 2]["p"]
+		var v2: Vector2 = s[i]["p"] - s[i - 1]["p"]
 		if v2.length() < 0.05 and v1.length() > 0.5:
 			stalls += 1          # was travelling, then froze for a frame
 		if v2.length() > 0.05:
@@ -65,5 +74,5 @@ func _report(move_id: String, s: Array) -> void:
 			detail = "v %s -> %s" % [v1, v2]
 	if max_jerk > 8.0:
 		print("    peak at frame %d of %d: %s" % [at, s.size(), detail])
-	print("%-22s frames=%3d  moving=%3d  mid-motion stalls=%2d  peak velocity jump=%5.1f px/f" % [
-		move_id, s.size(), moving, stalls, max_jerk])
+	print("%-22s stalls=%2d  vel jump=%5.1f px/f  rot pop=%5.2f deg/f  scale pop=%.4f/f" % [
+		move_id, stalls, max_jerk, max_rot_pop, max_scale_pop])

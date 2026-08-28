@@ -3104,23 +3104,37 @@ func _beat(dx: float, dy: float, deg: float, sx: float, sy: float, secs: float,
 	return {"dx": dx, "dy": dy, "deg": deg, "sx": sx, "sy": sy, "secs": secs,
 		"trans": trans, "ease": ease}
 
+## Moves a node's pivot without moving the node's PICTURE.
+##
+## A Control renders as `position + pivot + M·(p - pivot)`, where M is its
+## rotation and scale. Change the pivot alone and every rendered pixel shifts by
+## `(I - M)·(p0 - p1)`, so the sprite jumps. Subtracting that from the position
+## cancels it exactly, at any rotation and any scale.
+##
+## This is what lets a skill take over a body that is mid-lean. The old code
+## sidestepped the jump by zeroing rotation and scale first -- which was itself
+## a jump: every rival snapped its idle lean upright in a single frame at the
+## start of every attack, up to 2.9 degrees on Budget Bandido.
+func _repivot(who: Control, new_pivot: Vector2) -> void:
+	var d := who.pivot_offset - new_pivot
+	var m := Transform2D(who.rotation, Vector2.ZERO).scaled(who.scale)
+	who.position += d - m * d
+	who.pivot_offset = new_pivot
+
 func _body_begin(who: Control, pivot: Vector2) -> void:
 	# Hand the body over from the idle personality, which writes rotation and
-	# scale every frame, to the choreography, which tweens the same two. Also
-	# clears the idle's tilt first, so the pivot move below happens while the
-	# node is genuinely unrotated -- which is what makes it invisible.
+	# scale every frame, to the choreography, which tweens the same two. The
+	# live pose is kept and becomes the pose the first beat tweens FROM, so the
+	# attack grows out of the stance instead of interrupting it.
 	if who is AnimatedCharacter:
-		var actor := who as AnimatedCharacter
-		actor.pose_locked = true
-		actor.scale = Vector2.ONE
-		actor.rotation = 0.0
+		(who as AnimatedCharacter).pose_locked = true
+	_repivot(who, Vector2(who.size.x * pivot.x, who.size.y * pivot.y))
+	# Captured AFTER the repivot, because that adjusts position -- and this is
+	# the pose _body_end returns the rival to, which is its idle stance.
 	_body_home[who] = {
 		"pos": who.position, "rot": who.rotation,
 		"scale": who.scale, "pivot": who.pivot_offset,
 	}
-	# Safe to move the pivot only while the node is unrotated and unscaled —
-	# which it is at rest. Moving it later would visibly jump the sprite.
-	who.pivot_offset = Vector2(who.size.x * pivot.x, who.size.y * pivot.y)
 
 ## How far past its target an accelerating beat carries, as a fraction of that
 ## beat's own travel, and how long it takes to settle back.
@@ -3196,7 +3210,9 @@ func _body_end(who: Control, secs: float = 0.18) -> void:
 	tween.tween_property(who, "scale", home["scale"], secs) \
 		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	await tween.finished
-	who.pivot_offset = home["pivot"]
+	# Compensated on the way back as well: at this point the body is once more
+	# carrying its idle lean, so restoring the pivot raw would jump it.
+	_repivot(who, home["pivot"])
 	# Only this character's entry -- clearing the lot would strand anyone else
 	# who happens to be mid-move.
 	_body_home.erase(who)

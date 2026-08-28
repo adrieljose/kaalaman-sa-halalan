@@ -228,3 +228,39 @@ snapshotted a mid-flight position. Awaiting properly, every move measures
 `backdoor_dash` still reports a 221 px/frame jump and that is correct -- the
 rival teleports behind the player, and the jump happens while `modulate:a` is 0.
 `tools/chapter2/probe_motion.tscn` samples position only, so it cannot see that.
+
+## Chapter-select map
+
+`tools/chapter2/make_map.py` composes the map from five whole-island
+illustrations in `tools/chapter2/islands/`. Each is ONE generated image --
+shoreline, grounds, paths, planting and building drawn together.
+
+The earlier version pasted a building sprite onto the original artwork's
+generic islands and always looked pasted, because the building and the terrain
+were drawn by different passes and knew nothing about each other. Position
+tuning cannot fix that; the two have to be drawn as one picture.
+
+The islands are dropped onto an EMPTY lagoon: `empty_lagoon()` erases the
+original islands a row at a time, treating anything between the leftmost and
+rightmost sea pixel of a row as enclosed land. The parchment border and compass
+fall outside that span on every row, so they need no special case.
+
+`MARKER_POINTS` in `main_menu.gd` comes from this script's own output. Keeping
+the marker positions and the island positions in one place is what stops the
+pins drifting onto open water when the art moves -- which is exactly what
+happened when the islands were first redrawn.
+
+## Idle-to-attack handover
+
+`_body_begin` used to zero rotation and scale before handing a body to a skill,
+so every rival snapped its idle lean upright in a single frame at the start of
+every attack -- 2.9 degrees on Budget Bandido, measured. It did that because
+moving a Control's pivot while the node is rotated shifts every rendered pixel.
+
+`_repivot()` now cancels that shift exactly: a Control renders as
+`position + pivot + M*(p - pivot)`, so changing the pivot moves the picture by
+`(I - M)*(p0 - p1)`, and subtracting it from the position leaves the image
+where it was at any rotation and scale. The live pose is kept and becomes the
+pose the first beat tweens from, so an attack grows out of the stance.
+`tools/chapter2/probe_pop.tscn` measures the handover; it now reports 0.00
+degrees for all nine rivals.

@@ -715,20 +715,50 @@ func _connect_chapter_pins() -> void:
 ## "(LOCKED)" baked into every caption past chapter 1, which was true when only
 ## chapter 1 existed and quietly stops being true the moment another chapter's
 ## data lands — so the caption and the dimming are both derived here instead.
-## How far each numbered marker drops below its pin so it clears the landmark.
-## The pins were authored against the old artwork, where they marked a bare
-## spot on an island; they now sit at the foot of a building, and a 44px disc
-## centred there covered the doorway of every chapter it was meant to label.
-const MARKER_DROP := 20.0
+## Centre of each chapter's numbered marker on the 640x480 map.
+##
+## The scene's own offsets were authored against the map's ORIGINAL artwork.
+## Every island has since been redrawn and repositioned, so those offsets point
+## at open water. These come straight out of tools/chapter2/make_map.py, which
+## reports a marker point per island once it has placed it -- keeping the two in
+## one place is what stops the pins drifting off the art again.
+const MARKER_POINTS := {
+	1: Vector2(104, 347), 2: Vector2(238, 290), 3: Vector2(352, 155),
+	4: Vector2(470, 321), 5: Vector2(556, 178),
+}
+
+## Puts a chapter's caption directly under its marker and off its island.
+##
+## The scene positions the captions against the map's original artwork, where
+## they sat beside the old pins. With the islands redrawn they landed squarely
+## on the buildings they were naming -- the City Hall caption covered the City
+## Hall. Hanging them off the marker keeps the two together wherever the island
+## moves, and clamping keeps the rightmost one inside the parchment.
+func _place_caption(chapter: int, at: Vector2, marker_h: float) -> void:
+	var scrim := map_panel.get_node_or_null("Chapter%dScrim" % chapter) as Control
+	if scrim == null:
+		return
+	var w: float = scrim.size.x
+	scrim.position = Vector2(
+		clampf(at.x - w * 0.5, 6.0, MAP_ART.x - w - 6.0),
+		at.y + marker_h * 0.5 + 4.0)
+
+## The map artwork's own size. Captions are clamped to it rather than to the
+## panel, which is larger than the picture on a wide screen.
+const MAP_ART := Vector2(640, 480)
 
 func _refresh_chapter_pins() -> void:
 	var unlocked := unlocked_chapters()
 	for i in range(1, TOTAL_CHAPTERS + 1):
 		var locked := i > unlocked
 		var marker := map_panel.get_node_or_null("Chapter%dButton" % i) as Control
-		if marker != null and not marker.has_meta("dropped"):
-			marker.position.y += MARKER_DROP
-			marker.set_meta("dropped", true)   # layout re-runs; drop only once
+		if marker != null and MARKER_POINTS.has(i):
+			# Centre on the point, not top-left: the buttons are 44px discs.
+			var at: Vector2 = MARKER_POINTS[i]
+			marker.position = at - marker.size * 0.5
+			# Above the scrims, so the number is never hidden by its own label.
+			map_panel.move_child(marker, map_panel.get_child_count() - 1)
+			_place_caption(i, at, marker.size.y)
 		var label := map_panel.get_node_or_null("Chapter%dScrim/Chapter%dLabel" % [i, i]) as Label
 		if label != null:
 			var title := String(CHAPTER_TITLES.get(i, "Chapter %d" % i))
