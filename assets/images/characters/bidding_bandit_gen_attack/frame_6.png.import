@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b8gupe5wp27ua"
-path="res://.godot/imported/frame_4.png-2fca800660f11225f7f68b36e9320d57.ctex"
+uid="uid://baymne8y2i6vn"
+path="res://.godot/imported/frame_6.png-aa4bf709d4bc42b1ecbb943539a8a038.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/images/characters/ordinance_ogre_gen_hit/frame_4.png"
-dest_files=["res://.godot/imported/frame_4.png-2fca800660f11225f7f68b36e9320d57.ctex"]
+source_file="res://assets/images/characters/bidding_bandit_gen_attack/frame_6.png"
+dest_files=["res://.godot/imported/frame_6.png-aa4bf709d4bc42b1ecbb943539a8a038.ctex"]
 
 [params]
 

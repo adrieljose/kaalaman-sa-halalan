@@ -80,8 +80,9 @@ rival's own frames by `tools/chapter2/import_pixellab.py`:
 |---|---|
 | Cashier Kaltas | attack |
 | Budget Bandido | hit |
-| Bidding Bandit | attack, hit |
-| Ordinance Ogre | attack, hit |
+
+Bidding Bandit and Ordinance Ogre were regenerated in full on the second
+account, so only two synthesised clips remain out of the original nine.
 
 A synthesised attack uses the character's `west` rotation -- the same figure in
 profile, facing the player -- so the rival turns out of its idle, drives in and
@@ -163,3 +164,39 @@ Rooms also react to every hit: `_react_room` tints the backdrop toward the
 skill's `effect_color` and knocks the props about. It is hooked into
 `_fx_impact`, the one beat every skill in both chapters already shares, so all
 43 skills got it without touching a single skill function.
+
+## Idle personality
+
+Every Chapter 2 rival's idle came from the same `breathing-idle` template, so
+nine characters breathed at the same rate in the same pose -- one enemy in nine
+costumes. Replacing the clips would mean regenerating each rival, so the
+personality lives in the MOTION instead: `scripts/idle_personality.gd` gives
+each a breath depth and rate, a sway, and a resting lean, applied over whatever
+frames it has.
+
+Two constraints shape it:
+
+* **Rotation and scale only, never position.** The battle controller owns
+  position -- melee approach, knockback -- and writing it here would fight
+  those tweens. Both are taken about the FEET, so a breath lifts the chest
+  rather than sliding the rival off the floor.
+* **It yields during a skill.** `_body_play` tweens the same rotation and scale
+  it writes, so `_body_begin` sets `pose_locked` and `_body_end` clears it.
+
+A rival with no row keeps its frames exactly as drawn, which is how Chapter 1
+is untouched and how a Chapter 3 rival opts in.
+
+## Chapter select map
+
+`tools/chapter2/make_map.py` rebuilds `chapter_map.png` from the untouched
+original plus one generated sheet of five government buildings
+(`landmarks_raw.png`), so re-running never stacks landmarks.
+
+* The five buildings are cut apart on the alpha channel's **column runs**, not
+  fixed cells, so uneven spacing in the generation cannot mis-slice them.
+* They arrive near-monochrome and are recoloured by luminance onto a
+  per-chapter ramp -- one drawing style across all five, with the palette
+  carrying the progression from timber barangay hall to marble Congress.
+* Each landmark is **snapped to land**: the pins were placed against the old
+  artwork and several sit slightly off their island, so the placer searches
+  around the pin for the spot whose footprint is most solidly ground.

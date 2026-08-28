@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b8gupe5wp27ua"
-path="res://.godot/imported/frame_4.png-2fca800660f11225f7f68b36e9320d57.ctex"
+uid="uid://cgrffkniayrag"
+path="res://.godot/imported/landmarks_raw.png-9c9c1e6894b9cb0dd0e55fcc192566e1.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/images/characters/ordinance_ogre_gen_hit/frame_4.png"
-dest_files=["res://.godot/imported/frame_4.png-2fca800660f11225f7f68b36e9320d57.ctex"]
+source_file="res://tools/chapter2/landmarks_raw.png"
+dest_files=["res://.godot/imported/landmarks_raw.png-9c9c1e6894b9cb0dd0e55fcc192566e1.ctex"]
 
 [params]
 

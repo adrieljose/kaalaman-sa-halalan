@@ -30,6 +30,15 @@ var _frame_index: int = 0
 var _timer: float = 0.0
 var _one_shot: bool = false
 
+## Per-rival idle motion (see IdlePersonality). Empty means "stand exactly as
+## the frames were drawn", which is what Chapter 1 does.
+var idle_style: Dictionary = {}
+var _idle_t: float = 0.0
+## Set while the battle controller is choreographing this body. The idle pose
+## writes rotation and scale every frame, and _body_play tweens the same two
+## properties -- without this the idle would fight the skill mid-swing.
+var pose_locked: bool = false
+
 func _ready() -> void:
 	_reload_frames()
 
@@ -61,6 +70,9 @@ func configure_clips(clips: Dictionary) -> void:
 	# missing flag has to actively un-mirror the previous one rather than let it
 	# carry over.
 	flip_h = bool(clips.get("flip_h", false))
+	idle_style = IdlePersonality.for_idle_dir(String(clips.get("idle_dir", "")))
+	_idle_t = 0.0
+	_reset_idle_pose()
 	_reload_frames()
 
 func configure_from(enemy: EnemyData) -> void:
@@ -90,6 +102,7 @@ func _load_frames(dir: String, count: int) -> Array[Texture2D]:
 	return frames
 
 func _process(delta: float) -> void:
+	_tick_idle_pose(delta)
 	if _current_frames.size() <= 1:
 		return
 	_timer += delta
@@ -153,9 +166,36 @@ func _play_once(frames: Array[Texture2D]) -> bool:
 	_current_frames = frames
 	_frame_index = 0
 	_one_shot = true
+	# The clip was drawn upright; let it play that way.
+	_reset_idle_pose()
 	_timer = 0.0
 	texture = _current_frames[0]
 	return true
+
+## Breathes, sways and leans the sprite according to its personality.
+##
+## Only rotation and scale are touched, never position: the battle controller
+## owns position (melee approach, knockback), and writing it here would fight
+## the tweens that close the distance. Both are taken about the FEET rather
+## than the sprite centre, so a breath lifts the chest and a sway rocks the
+## shoulders instead of sliding the whole rival off the floor.
+func _tick_idle_pose(delta: float) -> void:
+	if idle_style.is_empty() or _one_shot or pose_locked:
+		return
+	_idle_t += delta
+	pivot_offset = Vector2(size.x * 0.5, size.y)
+	var breathe: float = float(idle_style.get("breathe", 0.0))
+	var b: float = sin(_idle_t * float(idle_style.get("rate", 0.6)) * TAU)
+	# Chest rises as the shoulders narrow, which reads as breathing rather
+	# than as the sprite being stretched.
+	scale = Vector2(1.0 - breathe * 0.45 * b, 1.0 + breathe * b)
+	var sway: float = float(idle_style.get("sway", 0.0))
+	rotation = deg_to_rad(float(idle_style.get("lean", 0.0))
+		+ sway * sin(_idle_t * float(idle_style.get("sway_rate", 0.4)) * TAU))
+
+func _reset_idle_pose() -> void:
+	scale = Vector2.ONE
+	rotation = 0.0
 
 func _play_idle() -> void:
 	_current_frames = _idle_frames

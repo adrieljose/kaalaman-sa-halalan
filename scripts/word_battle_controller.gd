@@ -3105,6 +3105,15 @@ func _beat(dx: float, dy: float, deg: float, sx: float, sy: float, secs: float,
 		"trans": trans, "ease": ease}
 
 func _body_begin(who: Control, pivot: Vector2) -> void:
+	# Hand the body over from the idle personality, which writes rotation and
+	# scale every frame, to the choreography, which tweens the same two. Also
+	# clears the idle's tilt first, so the pivot move below happens while the
+	# node is genuinely unrotated -- which is what makes it invisible.
+	if who is AnimatedCharacter:
+		var actor := who as AnimatedCharacter
+		actor.pose_locked = true
+		actor.scale = Vector2.ONE
+		actor.rotation = 0.0
 	_body_home[who] = {
 		"pos": who.position, "rot": who.rotation,
 		"scale": who.scale, "pivot": who.pivot_offset,
@@ -3144,6 +3153,8 @@ func _body_end(who: Control, secs: float = 0.18) -> void:
 	# Only this character's entry -- clearing the lot would strand anyone else
 	# who happens to be mid-move.
 	_body_home.erase(who)
+	if who is AnimatedCharacter:
+		(who as AnimatedCharacter).pose_locked = false
 
 ## Fires the sprite's arm clip WITHOUT waiting for it, so it overlaps the body
 ## choreography instead of adding its full second on top. Used only on the

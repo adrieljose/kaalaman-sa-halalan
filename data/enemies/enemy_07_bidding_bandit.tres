@@ -20,6 +20,6 @@ moves = [ExtResource("10"), ExtResource("11"), ExtResource("12")]
 idle_dir = "res://assets/images/characters/bidding_bandit_gen_idle"
 idle_count = 4
 attack_dir = "res://assets/images/characters/bidding_bandit_gen_attack"
-attack_count = 6
+attack_count = 7
 hit_dir = "res://assets/images/characters/bidding_bandit_gen_hit"
 hit_count = 6

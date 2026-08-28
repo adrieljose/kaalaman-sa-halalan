@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b8gupe5wp27ua"
-path="res://.godot/imported/frame_4.png-2fca800660f11225f7f68b36e9320d57.ctex"
+uid="uid://cgn48vmd6te2e"
+path="res://.godot/imported/chapter_map_original.png-44c5abf33f05e1ed702757ee7732bddd.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/images/characters/ordinance_ogre_gen_hit/frame_4.png"
-dest_files=["res://.godot/imported/frame_4.png-2fca800660f11225f7f68b36e9320d57.ctex"]
+source_file="res://tools/chapter2/chapter_map_original.png"
+dest_files=["res://.godot/imported/chapter_map_original.png-44c5abf33f05e1ed702757ee7732bddd.ctex"]
 
 [params]
 
