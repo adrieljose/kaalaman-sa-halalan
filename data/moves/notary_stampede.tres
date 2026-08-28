@@ -12,5 +12,3 @@ icon = ExtResource("2")
 direct_damage = 19
 animation_style = "lunge"
 effect_color = Color(0.88, 0.26, 0.24, 0.95)
-attack_dir = "res://assets/images/characters/notaryo_naku_notary_stampede"
-attack_count = 6

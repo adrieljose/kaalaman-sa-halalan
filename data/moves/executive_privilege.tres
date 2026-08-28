@@ -13,5 +13,3 @@ direct_damage = 34
 animation_style = "slam"
 effect_color = Color(0.98, 0.88, 0.52, 0.95)
 min_phase = 2
-attack_dir = "res://assets/images/characters/don_eraptado_executive_privilege"
-attack_count = 6

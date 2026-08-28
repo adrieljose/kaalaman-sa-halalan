@@ -12,5 +12,3 @@ icon = ExtResource("2")
 direct_damage = 12
 animation_style = "volley"
 effect_color = Color(0.88, 0.82, 0.62, 0.95)
-attack_dir = "res://assets/images/characters/fixer_fredo_envelope_express"
-attack_count = 6

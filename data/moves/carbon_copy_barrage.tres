@@ -12,5 +12,3 @@ icon = ExtResource("2")
 direct_damage = 16
 animation_style = "volley"
 effect_color = Color(0.86, 0.88, 0.94, 0.95)
-attack_dir = "res://assets/images/characters/permit_peke_carbon_copy_barrage"
-attack_count = 6

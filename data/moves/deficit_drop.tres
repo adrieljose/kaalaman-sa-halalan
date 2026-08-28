@@ -12,5 +12,3 @@ icon = ExtResource("2")
 direct_damage = 23
 animation_style = "slam"
 effect_color = Color(0.86, 0.28, 0.26, 0.95)
-attack_dir = "res://assets/images/characters/budget_bandido_deficit_drop"
-attack_count = 6

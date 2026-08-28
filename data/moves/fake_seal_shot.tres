@@ -12,5 +12,3 @@ icon = ExtResource("2")
 direct_damage = 15
 animation_style = "spray"
 effect_color = Color(0.92, 0.3, 0.28, 0.95)
-attack_dir = "res://assets/images/characters/permit_peke_fake_seal_shot"
-attack_count = 6

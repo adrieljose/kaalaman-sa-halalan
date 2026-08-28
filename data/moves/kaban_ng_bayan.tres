@@ -12,5 +12,3 @@ icon = ExtResource("2")
 direct_damage = 26
 animation_style = "slam"
 effect_color = Color(0.94, 0.78, 0.3, 0.95)
-attack_dir = "res://assets/images/characters/don_eraptado_kaban_ng_bayan"
-attack_count = 6

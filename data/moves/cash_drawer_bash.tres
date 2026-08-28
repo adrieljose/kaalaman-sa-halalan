@@ -12,5 +12,3 @@ icon = ExtResource("2")
 direct_damage = 20
 animation_style = "slam"
 effect_color = Color(0.94, 0.8, 0.36, 0.95)
-attack_dir = "res://assets/images/characters/cashier_kaltas_cash_drawer_bash"
-attack_count = 6

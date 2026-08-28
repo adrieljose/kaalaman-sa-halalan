@@ -12,5 +12,3 @@ icon = ExtResource("2")
 direct_damage = 24
 animation_style = "spray"
 effect_color = Color(0.9, 0.42, 0.62, 0.95)
-attack_dir = "res://assets/images/characters/don_eraptado_jueteng_jackpot"
-attack_count = 6

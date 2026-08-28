@@ -12,5 +12,3 @@ icon = ExtResource("2")
 direct_damage = 19
 animation_style = "volley"
 effect_color = Color(0.56, 0.82, 0.72, 0.95)
-attack_dir = "res://assets/images/characters/bidding_bandit_bid_folder_fan"
-attack_count = 6

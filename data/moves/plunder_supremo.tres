@@ -12,5 +12,3 @@ icon = ExtResource("2")
 direct_damage = 22
 animation_style = "volley"
 effect_color = Color(0.96, 0.84, 0.4, 0.95)
-attack_dir = "res://assets/images/characters/don_eraptado_plunder_supremo"
-attack_count = 6

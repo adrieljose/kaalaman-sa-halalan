@@ -12,5 +12,3 @@ icon = ExtResource("2")
 direct_damage = 20
 animation_style = "lunge"
 effect_color = Color(0.94, 0.86, 0.52, 0.95)
-attack_dir = "res://assets/images/characters/ordinance_ogre_citation_cannon"
-attack_count = 6

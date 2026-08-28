@@ -12,5 +12,3 @@ icon = ExtResource("2")
 direct_damage = 20
 animation_style = "curse"
 effect_color = Color(0.94, 0.78, 0.34, 0.95)
-attack_dir = "res://assets/images/characters/notaryo_naku_seal_of_approval"
-attack_count = 6

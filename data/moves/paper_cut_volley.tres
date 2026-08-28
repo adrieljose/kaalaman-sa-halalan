@@ -12,5 +12,3 @@ icon = ExtResource("2")
 direct_damage = 13
 animation_style = "volley"
 effect_color = Color(0.94, 0.92, 0.86, 0.95)
-attack_dir = "res://assets/images/characters/clerk_kurakot_paper_cut_volley"
-attack_count = 6

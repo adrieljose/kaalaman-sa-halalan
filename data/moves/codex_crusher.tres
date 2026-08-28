@@ -12,5 +12,3 @@ icon = ExtResource("2")
 direct_damage = 24
 animation_style = "slam"
 effect_color = Color(0.72, 0.58, 0.34, 0.95)
-attack_dir = "res://assets/images/characters/ordinance_ogre_codex_crusher"
-attack_count = 6

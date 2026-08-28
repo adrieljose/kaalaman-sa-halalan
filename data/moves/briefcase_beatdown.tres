@@ -12,5 +12,3 @@ icon = ExtResource("2")
 direct_damage = 22
 animation_style = "lunge"
 effect_color = Color(0.62, 0.68, 0.86, 0.95)
-attack_dir = "res://assets/images/characters/bidding_bandit_briefcase_beatdown"
-attack_count = 6

@@ -12,5 +12,3 @@ icon = ExtResource("2")
 direct_damage = 18
 animation_style = "spray"
 effect_color = Color(0.98, 0.84, 0.34, 0.95)
-attack_dir = "res://assets/images/characters/budget_bandido_coin_burst"
-attack_count = 6

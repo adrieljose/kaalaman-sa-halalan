@@ -12,5 +12,3 @@ icon = ExtResource("2")
 direct_damage = 16
 animation_style = "lunge"
 effect_color = Color(0.3, 0.34, 0.62, 0.95)
-attack_dir = "res://assets/images/characters/notaryo_naku_signature_slash"
-attack_count = 6

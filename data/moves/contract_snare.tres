@@ -12,5 +12,3 @@ icon = ExtResource("2")
 direct_damage = 24
 animation_style = "curse"
 effect_color = Color(0.88, 0.72, 0.44, 0.95)
-attack_dir = "res://assets/images/characters/bidding_bandit_contract_snare"
-attack_count = 6

@@ -12,5 +12,3 @@ icon = ExtResource("2")
 direct_damage = 26
 animation_style = "slam"
 effect_color = Color(0.82, 0.62, 0.28, 0.95)
-attack_dir = "res://assets/images/characters/ordinance_ogre_session_smash"
-attack_count = 6

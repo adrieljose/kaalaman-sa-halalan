@@ -12,5 +12,3 @@ icon = ExtResource("2")
 direct_damage = 17
 animation_style = "slam"
 effect_color = Color(0.86, 0.24, 0.2, 0.95)
-attack_dir = "res://assets/images/characters/clerk_kurakot_stamp_slam"
-attack_count = 6

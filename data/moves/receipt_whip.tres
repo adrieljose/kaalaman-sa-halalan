@@ -12,5 +12,3 @@ icon = ExtResource("2")
 direct_damage = 19
 animation_style = "lunge"
 effect_color = Color(0.9, 0.9, 0.84, 0.95)
-attack_dir = "res://assets/images/characters/cashier_kaltas_receipt_whip"
-attack_count = 6

@@ -12,5 +12,3 @@ icon = ExtResource("2")
 direct_damage = 18
 animation_style = "slam"
 effect_color = Color(0.9, 0.58, 0.3, 0.95)
-attack_dir = "res://assets/images/characters/permit_peke_permit_board_bash"
-attack_count = 6

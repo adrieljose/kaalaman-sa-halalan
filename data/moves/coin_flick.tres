@@ -12,5 +12,3 @@ icon = ExtResource("2")
 direct_damage = 17
 animation_style = "volley"
 effect_color = Color(0.98, 0.86, 0.42, 0.95)
-attack_dir = "res://assets/images/characters/cashier_kaltas_coin_flick"
-attack_count = 6
