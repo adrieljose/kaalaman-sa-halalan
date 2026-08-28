@@ -658,8 +658,143 @@ func _place_battle_background(d: Vector2, stage_floor: float) -> void:
 	background.anchor_top = 0.0
 	background.anchor_right = 0.0
 	background.anchor_bottom = 0.0
-	_place_node(background, Rect2((d.x - drawn.x) * 0.5,
-		stage_floor - drawn.y * BATTLE_GROUND_FRACTION, drawn.x, drawn.y))
+	var rect := Rect2((d.x - drawn.x) * 0.5,
+		stage_floor - drawn.y * BATTLE_GROUND_FRACTION, drawn.x, drawn.y)
+	_place_node(background, rect)
+	_build_props(rect)
+
+# --- ambient props --------------------------------------------------------
+#
+# Rooms are single images, so anything that moves in one is a sprite composited
+# over it. The props sit on their own layer directly above the backdrop and
+# below the fighters, which is the only place they can go: Godot draws siblings
+# in tree order, so a prop added at the end would paint over the characters.
+#
+# Every position is a fraction of the DRAWN backdrop rather than a pixel offset
+# (see AmbientProps), so the props follow the art when the backdrop is rescaled
+# for a phone instead of drifting off it.
+
+var _prop_layer: Control = null
+var _props: Array = []
+
+## Changes the room. Always use this rather than assigning background.texture:
+## the props belong to the backdrop, and the layout pass that would rebuild
+## them has already run by the time an encounter picks its room, so a bare
+## assignment leaves the previous room's props hanging in the new one.
+func _set_room(texture: Texture2D) -> void:
+	background.texture = texture
+	# _stage_floor() reads the floor back off the player's placed rect, so this
+	# needs no state of its own -- but it is only meaningful once the layout
+	# pass has actually placed the fighters.
+	if player_character != null and player_character.size.y > 0.0:
+		_place_battle_background(Layout.profile.design_size, _stage_floor())
+
+## Rebuilds the prop layer for the current room. Called from
+## _place_battle_background, so it re-runs on rotation and on every encounter.
+func _build_props(drawn: Rect2) -> void:
+	if _prop_layer == null:
+		_prop_layer = Control.new()
+		_prop_layer.name = "PropLayer"
+		_prop_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		add_child(_prop_layer)
+	# Directly above the backdrop, and therefore behind everything else.
+	move_child(_prop_layer, background.get_index() + 1)
+
+	for child in _prop_layer.get_children():
+		child.queue_free()
+	_props.clear()
+
+	var budget: float = Layout.profile.fx_budget
+	for row in AmbientProps.for_background(background.texture):
+		var frames := AmbientProps.load_clip(String(row.get("clip", "")))
+		if frames.is_empty():
+			continue
+		# Phones thin the scatter rather than dropping props entirely, so every
+		# room still reads as the same room on every device.
+		var count: int = maxi(1, int(round(float(row.get("count", 1)) * budget)))
+		for i in count:
+			_props.append(_make_prop(row, frames, drawn, i, count))
+
+func _make_prop(row: Dictionary, frames: Array[Texture2D], drawn: Rect2,
+		index: int, count: int) -> Dictionary:
+	var node := TextureRect.new()
+	node.texture = frames[0]
+	node.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	node.stretch_mode = TextureRect.STRETCH_SCALE
+	node.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var w: float = drawn.size.x * float(row.get("scale", 0.1))
+	var h: float = w * (float(frames[0].get_height()) / float(frames[0].get_width()))
+	node.size = Vector2(w, h)
+	node.pivot_offset = node.size * 0.5
+	_prop_layer.add_child(node)
+
+	# Copies of one prop are spread across the room and started out of step, so
+	# a count of five reads as five things rather than one thing five times.
+	var spread: float = 0.0 if count <= 1 else (float(index) / float(count - 1) - 0.5)
+	var home := Vector2(
+		drawn.position.x + drawn.size.x * (float(row.get("u", 0.5)) + spread * 0.16),
+		drawn.position.y + drawn.size.y * float(row.get("v", 0.3)))
+	node.position = home - node.size * 0.5
+
+	return {
+		"node": node, "frames": frames, "home": home,
+		"fps": float(row.get("fps", 8.0)),
+		"drift": row.get("drift", Vector2.ZERO) as Vector2,
+		"sway": float(row.get("sway", 0.0)),
+		"t": float(index) * 0.7,          # phase offset
+		"travel": 0.0,
+		"jolt": 0.0,
+		"drawn": drawn,
+	}
+
+## Advances every prop. Called from _process ahead of its early returns,
+## because scenery must keep moving during an attack sequence -- that is when
+## the player is actually looking at the room.
+func _tick_props(delta: float) -> void:
+	for p in _props:
+		var node: TextureRect = p["node"]
+		if not is_instance_valid(node):
+			continue
+		p["t"] = float(p["t"]) + delta
+		var frames: Array = p["frames"]
+		node.texture = frames[int(float(p["t"]) * float(p["fps"])) % frames.size()]
+
+		var drawn: Rect2 = p["drawn"]
+		var pos: Vector2 = p["home"]
+		var drift: Vector2 = p["drift"]
+		if drift != Vector2.ZERO:
+			p["travel"] = float(p["travel"]) + delta
+			var d: Vector2 = drift * drawn.size * float(p["travel"])
+			# Falling props loop back to the top instead of leaving the room
+			# empty after a few seconds.
+			var span: float = drawn.size.y * 0.55
+			if drift.y > 0.0 and d.y > span:
+				p["travel"] = 0.0
+				d = Vector2.ZERO
+			pos += d
+
+		if float(p["sway"]) > 0.0:
+			node.rotation = deg_to_rad(sin(float(p["t"]) * 1.6) * float(p["sway"]))
+
+		if float(p["jolt"]) > 0.001:
+			p["jolt"] = float(p["jolt"]) * maxf(0.0, 1.0 - delta * 6.0)
+			var j: float = float(p["jolt"])
+			pos += Vector2(randf_range(-j, j), randf_range(-j, j))
+
+		node.position = pos - node.size * 0.5
+
+## The room reacting to a hit: the backdrop takes the skill's colour for a
+## moment and the props are knocked about. Hooked into _fx_impact, which is the
+## one beat every skill in both chapters already shares.
+func _react_room(color: Color, strength: float) -> void:
+	if background != null and is_instance_valid(background):
+		var tint := Color(
+			1.0 + color.r * 0.30, 1.0 + color.g * 0.30, 1.0 + color.b * 0.30)
+		var tween := create_tween()
+		tween.tween_property(background, "modulate", tint, 0.05)
+		tween.tween_property(background, "modulate", Color.WHITE, 0.30)
+	for p in _props:
+		p["jolt"] = clampf(strength * 0.35, 0.0, 6.0)
 
 ## Largest tile pitch that fits `budget`, snapped so the six columns come out to
 ## a whole number of units. Clamped at both ends: never so small a finger cannot
@@ -1049,7 +1184,7 @@ func _start_encounter(full_reset: bool) -> void:
 	# one path every encounter goes through — walking in, Try Again, or booting
 	# this scene directly all land on the right backdrop.
 	if _enemy.background != null:
-		background.texture = _enemy.background
+		_set_room(_enemy.background)
 
 	_enemy_hp = _enemy.max_hp
 	# Every encounter starts at phase 1, including a boss being retried.
@@ -1516,6 +1651,9 @@ func _update_timer_ui() -> void:
 ## The countdown only runs while the player actually has control — it pauses
 ## through attack animations so a slow flinch can't eat the clock.
 func _process(delta: float) -> void:
+	# Ahead of the early returns below: the room keeps breathing while a skill
+	# plays out and after the match ends, which is when it is most on show.
+	_tick_props(delta)
 	if _match_over or _sequence_running or _question.is_empty():
 		return
 	if _time_left <= 0.0:
@@ -2430,6 +2568,7 @@ func _fx_charge(who: Control, color: Color, time: float) -> void:
 func _fx_impact(move_id: String, shake: float, color: Color, flash: float = 0.22) -> void:
 	Audio.play_move_sfx(move_id, "hit")
 	_shake_screen(shake)
+	_react_room(color, shake)
 	if flash > 0.0:
 		_fx_flash(color, flash)
 
@@ -3815,7 +3954,7 @@ func _play_phase_transition(index: int) -> void:
 			var dim := create_tween()
 			dim.tween_property(veil, "color:a", 0.85, 0.22)
 			await dim.finished
-			background.texture = next_bg
+			_set_room(next_bg)
 			var lift := create_tween()
 			lift.tween_property(veil, "color:a", 0.0, 0.35)
 

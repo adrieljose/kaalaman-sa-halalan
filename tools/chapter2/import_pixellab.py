@@ -36,7 +36,9 @@ PAD = 4          # breathing room around the union box, in pixels
 MIN_WIDTH = 96   # keeps a slim rival from ending up on a comically narrow canvas
 
 
-ACCOUNT = "594552b7-4c6b-481a-9fb1-e15564f87e98"
+# Assets live under the account that generated them, so a rival made on an
+# earlier account keeps its own id here rather than being re-pointed.
+ACCOUNT = "cfd6f3c4-a37e-4079-aab4-f40969b16c04"
 FRAME_URL = ("https://backblaze.pixellab.ai/file/pixellab-characters/"
              "%(account)s/%(char)s/animations/%(anim)s/south/%(i)d.png?t=%(t)s")
 ROT_URL = ("https://backblaze.pixellab.ai/file/pixellab-characters/"
@@ -51,13 +53,13 @@ def fetch(url):
         return Image.open(io.BytesIO(r.read())).convert("RGBA")
 
 
-def clip_urls(char, anim, token, count):
-    return [FRAME_URL % dict(account=ACCOUNT, char=char, anim=anim, t=token, i=i)
+def clip_urls(char, anim, token, count, account=ACCOUNT):
+    return [FRAME_URL % dict(account=account, char=char, anim=anim, t=token, i=i)
             for i in range(count)]
 
 
-def rotation(char, token, facing):
-    return fetch(ROT_URL % dict(account=ACCOUNT, char=char, t=token, dir=facing))
+def rotation(char, token, facing, account=ACCOUNT):
+    return fetch(ROT_URL % dict(account=account, char=char, t=token, dir=facing))
 
 
 # --- synthesised clips ----------------------------------------------------
@@ -193,7 +195,8 @@ if __name__ == "__main__":
     with open(src, "r", encoding="utf-8") as fh:
         data = json.load(fh)
     for slug, entry in data.items():
-        clips = {name: clip_urls(entry["char"], anim, token, count)
+        acct = entry.get("account", ACCOUNT)
+        clips = {name: clip_urls(entry["char"], anim, token, count, acct)
                  for name, (anim, token, count) in entry["clips"].items()}
         synth = entry.get("synth", [])
         counts, size = import_rival(slug, clips, synth,

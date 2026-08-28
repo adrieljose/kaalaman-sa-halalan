@@ -62,14 +62,17 @@ its move styles, so the body reads as the right kind of aggression.
 |---|---|---|
 | Character frames | `assets/images/characters/<slug>_gen_{idle,attack,hit}/frame_N.png` | ~98-116 wide x 180 tall. One canvas per rival across all three clips -- that shared canvas is what keeps the feet planted when the battle scene switches clips. |
 | Portraits | `assets/images/portraits/enemy_<slug>.png` | 128x128, cropped from idle frame 0. |
-| Backgrounds | `assets/images/backgrounds/cityhall_*.png` | **Still placeholders.** 384x256, and the floor line must sit at 91.25% of image height. |
+| Backgrounds | `assets/images/backgrounds/cityhall_*.png` | Generated. 384x256, floor line at 91.25% of image height. |
+| Animated props | `assets/images/props/<clip>/frame_N.png` | Generated. 64x64, 9 frames each: `fan`, `papers`, `banner`, `coins`. |
 | Move icons | `assets/images/moves/<move_id>.png` | **Still placeholders.** 28x28. |
 | Move sounds | `assets/audio/sfx/moves/<move_id>_{cast,hit}.wav` | **Still placeholders.** Mono 16-bit 22.05 kHz. |
 
-### Nine clips are synthesised, not generated
+### Eight clips are synthesised, not generated
 
-The generation trial hit a daily cap partway through the run, so five rivals
-lost clips. Rather than leave those as flat placeholders beside real art --
+The generation trial hit a daily cap partway through the first run, so five
+rivals lost clips. Don Eraptado has since been regenerated in full on a second
+account -- with a real barong rather than a recoloured suit -- so only four
+rivals are still affected. Rather than leave those as flat placeholders beside real art --
 which looks worse than placeholders throughout -- they are built from the
 rival's own frames by `tools/chapter2/import_pixellab.py`:
 
@@ -79,7 +82,6 @@ rival's own frames by `tools/chapter2/import_pixellab.py`:
 | Budget Bandido | hit |
 | Bidding Bandit | attack, hit |
 | Ordinance Ogre | attack, hit |
-| **Don Eraptado** | idle, attack, hit |
 
 A synthesised attack uses the character's `west` rotation -- the same figure in
 profile, facing the player -- so the rival turns out of its idle, drives in and
@@ -134,8 +136,30 @@ captions and dimming derive from the same count.
 - **The certificate is still Chapter 1 only** (`MainMenu.CERTIFICATE_CHAPTER`).
   Completing Chapter 2 does not award one. Deliberate — left as-is rather than
   changing certificate semantics without being asked.
-- **Environmental reactivity is not implemented.** The design document suggests
-  props reacting during attacks (papers lifting off council desks, monitors
-  changing during Coin Burst, the photocopier animating). Backgrounds are
-  single images, so this would need either animated backdrops or foreground
-  prop nodes — neither exists yet.
+- **Chapter 1 has no props.** `AmbientProps.ROOMS` only lists Chapter 2 rooms;
+  Chapter 1's five backdrops are static. Adding rows there would light them up
+  with no code change.
+
+## Animated props
+
+Rooms are single images, so anything that moves in one is a sprite composited
+over it. `scripts/ambient_props.gd` maps a background's file stem to its props;
+`WordBattleController._build_props` instantiates them on a layer sitting
+directly above the backdrop and below the fighters.
+
+Two things to know before adding a room:
+
+* **Positions are fractions of the drawn backdrop, not pixels.** The backdrop
+  is rescaled per device, so a pixel offset tuned on desktop slides off the art
+  on a phone.
+* **The usable window is much smaller than the image.** The HUD and question
+  panel cover the top, the letter board covers the right, and the fighters
+  occupy roughly u 0.06-0.18 and u 0.47-0.60. Props belong in the gap between
+  them: about **u 0.26-0.42, v 0.40-0.65**. Props outside it render correctly
+  and are simply never seen -- the ceiling fans were first placed on the actual
+  ceiling and were invisible in all ten rooms.
+
+Rooms also react to every hit: `_react_room` tints the backdrop toward the
+skill's `effect_color` and knocks the props about. It is hooked into
+`_fx_impact`, the one beat every skill in both chapters already shares, so all
+43 skills got it without touching a single skill function.
