@@ -51,24 +51,52 @@ Phases are data-driven, not hard-coded: see `EnemyData.phase_thresholds`,
 `phase_backgrounds`, `phase_banners`, and `EnemyMove.min_phase`. Any future
 rival can declare any number of phases without touching the battle controller.
 
-## Placeholder assets — need final artwork and audio
+## Artwork
 
-Everything below is a real, correctly-wired file so the game runs without
-console errors. Replace by **overwriting the file of the same name**; no code
-or data changes are needed.
+The rivals are generated pixel art (PixelLab), front-facing at eye level to
+match Chapter 1. Each has an idle, an attack and a hit clip, plus a
+head-and-shoulders portrait. The attack template was chosen per rival to suit
+its move styles, so the body reads as the right kind of aggression.
 
-| Asset | Count | Path | Notes |
-|---|---|---|---|
-| Character frames | 240 | `assets/images/characters/<slug>_{idle,hit,<skill>}/frame_N.png` | 128×180. 4 idle, 4 hit, and 6 frames per skill for each of the 9 rivals. |
-| Backgrounds | 10 | `assets/images/backgrounds/cityhall_*.png` | 384×256. **The floor line must sit at 91.25% of image height** — that is where the battle scene stands the fighters. |
-| Portraits | 9 | `assets/images/portraits/enemy_<slug>.png` | 128×128, HUD head crop. |
-| Move icons | 28 | `assets/images/moves/<move_id>.png` | 28×28. |
-| Move sounds | 56 | `assets/audio/sfx/moves/<move_id>_{cast,hit}.wav` | Mono 16-bit 22.05 kHz, procedurally synthesised per material. |
+| Asset | Path | Notes |
+|---|---|---|
+| Character frames | `assets/images/characters/<slug>_gen_{idle,attack,hit}/frame_N.png` | ~98-116 wide x 180 tall. One canvas per rival across all three clips -- that shared canvas is what keeps the feet planted when the battle scene switches clips. |
+| Portraits | `assets/images/portraits/enemy_<slug>.png` | 128x128, cropped from idle frame 0. |
+| Backgrounds | `assets/images/backgrounds/cityhall_*.png` | **Still placeholders.** 384x256, and the floor line must sit at 91.25% of image height. |
+| Move icons | `assets/images/moves/<move_id>.png` | **Still placeholders.** 28x28. |
+| Move sounds | `assets/audio/sfx/moves/<move_id>_{cast,hit}.wav` | **Still placeholders.** Mono 16-bit 22.05 kHz. |
 
-None of the above is final art. The character placeholders are flat coloured
-figures with a faint scanline so a stand-in is never mistaken for finished
-work; each rival has a distinct silhouette, palette and prop so the roster is
-readable while the real art is produced.
+### Nine clips are synthesised, not generated
+
+The generation trial hit a daily cap partway through the run, so five rivals
+lost clips. Rather than leave those as flat placeholders beside real art --
+which looks worse than placeholders throughout -- they are built from the
+rival's own frames by `tools/chapter2/import_pixellab.py`:
+
+| Rival | Synthesised |
+|---|---|
+| Cashier Kaltas | attack |
+| Budget Bandido | hit |
+| Bidding Bandit | attack, hit |
+| Ordinance Ogre | attack, hit |
+| **Don Eraptado** | idle, attack, hit |
+
+A synthesised attack uses the character's `west` rotation -- the same figure in
+profile, facing the player -- so the rival turns out of its idle, drives in and
+settles back, with every frame real generated art. Offsets are whole pixels,
+because translation is lossless on pixel art where rotation and fractional
+scaling are not. A synthesised hit is a knockback with a brief flash.
+
+To replace them with real generations, add the clip to `frames.json`, drop the
+name from that rival's `synth` list, and re-run the importer.
+
+### Per-skill clips were removed
+
+All 28 moves had their own placeholder clip. There is now one generated attack
+clip per rival, so a skill keeping its own clip would change art style
+mid-fight. `EnemyMove.attack_dir` is empty everywhere in Chapter 2, which makes
+it fall back to the rival's attack clip. The skills remain distinct through
+their movement, projectiles and impact effects -- those are code, not frames.
 
 ## Regenerating
 
