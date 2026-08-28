@@ -200,3 +200,31 @@ original plus one generated sheet of five government buildings
 * Each landmark is **snapped to land**: the pins were placed against the old
   artwork and several sit slightly off their island, so the placer searches
   around the pin for the spot whose footprint is most solidly ground.
+
+## Enemy animation timing
+
+Two things were wrong, and only one of them was what it looked like.
+
+**Clip rate.** Every clip ran at `AnimatedCharacter.fps` (6), so a six-frame
+attack took a full second while the body choreography that drives it strikes in
+about a tenth of one. The sprite was still winding up when the damage landed and
+was still swinging while the body retreated. Attack, hit and walk now have their
+own rates (15 / 12 / 8), which puts a clip at 0.20-0.47s against a ~0.34s strike.
+
+**Beat stalls.** `_body_play` created a tween per beat and awaited each, costing
+a frame at every junction. Beats now run chained on one tween.
+
+A beat that accelerates into its target (`EASE_IN`) also gets an automatic
+follow-through, so a strike carries slightly past its mark and eases back
+instead of stopping dead.
+
+### What was NOT wrong
+
+An early probe showed a 72 px/frame "snap" on Stamp Slam. That was the probe:
+it fired moves without awaiting them, so the next move's `_body_begin`
+snapshotted a mid-flight position. Awaiting properly, every move measures
+2.4-3.7 px/frame with zero mid-motion stalls.
+
+`backdoor_dash` still reports a 221 px/frame jump and that is correct -- the
+rival teleports behind the player, and the jump happens while `modulate:a` is 0.
+`tools/chapter2/probe_motion.tscn` samples position only, so it cannot see that.

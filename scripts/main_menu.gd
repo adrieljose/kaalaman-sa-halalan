@@ -715,10 +715,20 @@ func _connect_chapter_pins() -> void:
 ## "(LOCKED)" baked into every caption past chapter 1, which was true when only
 ## chapter 1 existed and quietly stops being true the moment another chapter's
 ## data lands — so the caption and the dimming are both derived here instead.
+## How far each numbered marker drops below its pin so it clears the landmark.
+## The pins were authored against the old artwork, where they marked a bare
+## spot on an island; they now sit at the foot of a building, and a 44px disc
+## centred there covered the doorway of every chapter it was meant to label.
+const MARKER_DROP := 20.0
+
 func _refresh_chapter_pins() -> void:
 	var unlocked := unlocked_chapters()
 	for i in range(1, TOTAL_CHAPTERS + 1):
 		var locked := i > unlocked
+		var marker := map_panel.get_node_or_null("Chapter%dButton" % i) as Control
+		if marker != null and not marker.has_meta("dropped"):
+			marker.position.y += MARKER_DROP
+			marker.set_meta("dropped", true)   # layout re-runs; drop only once
 		var label := map_panel.get_node_or_null("Chapter%dScrim/Chapter%dLabel" % [i, i]) as Label
 		if label != null:
 			var title := String(CHAPTER_TITLES.get(i, "Chapter %d" % i))

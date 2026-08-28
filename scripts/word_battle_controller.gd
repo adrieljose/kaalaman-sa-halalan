@@ -3122,20 +3122,67 @@ func _body_begin(who: Control, pivot: Vector2) -> void:
 	# which it is at rest. Moving it later would visibly jump the sprite.
 	who.pivot_offset = Vector2(who.size.x * pivot.x, who.size.y * pivot.y)
 
+## How far past its target an accelerating beat carries, as a fraction of that
+## beat's own travel, and how long it takes to settle back.
+const FOLLOW_THROUGH := 0.14
+const FOLLOW_THROUGH_SECS := 0.075
+
+## Appends a follow-through to a beat list whose last beat ACCELERATES into its
+## target.
+##
+## An EASE_IN beat arrives at maximum speed, and whatever ran next held station
+## -- so the rival went from travelling to stopped between two frames. Measured
+## on Stamp Slam, that was a 72 px/frame velocity reversal, which is the snap
+## that made the attacks read as broken rather than merely fast.
+##
+## A body cannot stop dead, so it does not: the strike carries a little past
+## its mark and eases back. That is the follow-through every one of these
+## skills was missing, and adding it here gives it to all of them at once
+## rather than editing twenty-eight hand-written beat lists.
+func _with_follow_through(beats: Array, from: Vector2) -> Array:
+	if beats.is_empty():
+		return beats
+	var last: Dictionary = beats[-1]
+	if int(last["ease"]) != int(Tween.EASE_IN):
+		return beats
+	# Measured against where the beat STARTS, which for a single-beat list is
+	# wherever the previous call left the body -- not the resting pose. Reading
+	# it as travel-from-rest made a strike that merely tilted in place carry a
+	# thirty-pixel overshoot it never earned.
+	var start := from
+	if beats.size() > 1:
+		var prev: Dictionary = beats[-2]
+		start = Vector2(float(prev["dx"]), float(prev["dy"]))
+	var carry := (Vector2(float(last["dx"]), float(last["dy"])) - start) * FOLLOW_THROUGH
+	if carry.length() < 0.5:
+		return beats
+	var out := beats.duplicate()
+	out.append(_beat(float(last["dx"]) + carry.x, float(last["dy"]) + carry.y,
+		float(last["deg"]), float(last["sx"]), float(last["sy"]),
+		FOLLOW_THROUGH_SECS, Tween.TRANS_SINE, Tween.EASE_OUT))
+	return out
+
 func _body_play(who: Control, beats: Array) -> void:
 	if not _body_home.has(who):
 		return
 	var home: Vector2 = _body_home[who]["pos"]
-	for beat: Dictionary in beats:
-		var tween := create_tween().set_parallel(true)
+	# One tween for the whole list, chained. A tween per beat cost a frame at
+	# every junction while the next one was created, so a five-beat skill sat
+	# still for five frames spread through its own animation.
+	var tween := create_tween()
+	for beat: Dictionary in _with_follow_through(beats, who.position - home):
 		var secs: float = beat["secs"]
-		tween.tween_property(who, "position", home + Vector2(beat["dx"], beat["dy"]), secs) \
+		var step := tween.tween_property(
+			who, "position", home + Vector2(beat["dx"], beat["dy"]), secs)
+		step.set_trans(beat["trans"]).set_ease(beat["ease"])
+		tween.parallel().tween_property(
+			who, "rotation", deg_to_rad(beat["deg"]), secs) \
 			.set_trans(beat["trans"]).set_ease(beat["ease"])
-		tween.tween_property(who, "rotation", deg_to_rad(beat["deg"]), secs) \
+		tween.parallel().tween_property(
+			who, "scale", Vector2(beat["sx"], beat["sy"]), secs) \
 			.set_trans(beat["trans"]).set_ease(beat["ease"])
-		tween.tween_property(who, "scale", Vector2(beat["sx"], beat["sy"]), secs) \
-			.set_trans(beat["trans"]).set_ease(beat["ease"])
-		await tween.finished
+		tween.chain()
+	await tween.finished
 
 func _body_end(who: Control, secs: float = 0.18) -> void:
 	if not _body_home.has(who):

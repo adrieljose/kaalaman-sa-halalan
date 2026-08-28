@@ -83,6 +83,110 @@ def grass_patch(world, w, h):
     return world.crop((best[0], best[1], best[0] + w, best[1] + h))
 
 
+# The mountains are violet -- but so are the palm trunks, which share the
+# artwork's purple shadow colour. Colour alone healed 926 tree pixels per
+# island and turned the palms into dark smears, so SIZE is what separates them:
+# a mountain is one big connected violet region, a trunk is a handful of
+# pixels. Only components above this area are treated as mountains.
+# Size alone is not enough either: Chapter 1's mountain is 173 pixels, smaller
+# than several palm clusters on the central island. Location settles it -- the
+# palms are all on the big central island, the mountains are all on the
+# outlying ones -- so the central island is left alone entirely and everywhere
+# else uses a low threshold that catches even the smallest peak.
+MIN_MOUNTAIN_AREA = 70
+MOUNTAIN_GROW = 3       # covers each mountain's near-black outline
+
+# The compass rose is violet too, and it is decoration rather than terrain.
+COMPASS_BOX = (0, 0, 250, 175)
+
+
+def is_violet(p):
+    r, g, b = p[:3]
+    return r > g + 18 and b > g + 18 and not (r > 200 and g > 150)
+
+
+def mountain_mask(px, w, h):
+    """Violet regions big enough to be a mountain, grown to take their outline."""
+    seen = set()
+    keep = set()
+    for y0 in range(h):
+        for x0 in range(w):
+            if (x0, y0) in seen:
+                continue
+            if COMPASS_BOX[0] <= x0 < COMPASS_BOX[2] and COMPASS_BOX[1] <= y0 < COMPASS_BOX[3]:
+                continue
+            if not is_violet(px[x0, y0]):
+                continue
+            # Flood the connected violet blob this pixel belongs to.
+            blob, stack = [], [(x0, y0)]
+            seen.add((x0, y0))
+            while stack:
+                x, y = stack.pop()
+                blob.append((x, y))
+                for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+                    nx, ny = x + dx, y + dy
+                    if not (0 <= nx < w and 0 <= ny < h) or (nx, ny) in seen:
+                        continue
+                    if is_violet(px[nx, ny]):
+                        seen.add((nx, ny))
+                        stack.append((nx, ny))
+            # The central island is the palm island; it has no mountains, and
+            # anything violet on it is a trunk.
+            cx = sum(b[0] for b in blob) / len(blob)
+            cy = sum(b[1] for b in blob) / len(blob)
+            on_central = (ISLAND_BOX[0] <= cx < ISLAND_BOX[2]
+                and ISLAND_BOX[1] <= cy < ISLAND_BOX[3])
+            if len(blob) >= MIN_MOUNTAIN_AREA and not on_central:
+                keep.update(blob)
+
+    # Grow outward so the mountain's black outline goes with it; without this
+    # the peak vanishes and its silhouette stays behind as a dark scar.
+    grown = set(keep)
+    for _ in range(MOUNTAIN_GROW):
+        edge = set()
+        for (x, y) in grown:
+            for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+                nx, ny = x + dx, y + dy
+                if 0 <= nx < w and 0 <= ny < h and (nx, ny) not in grown:
+                    if not is_sea(px[nx, ny]):
+                        edge.add((nx, ny))
+        grown |= edge
+    return grown
+
+
+def heal_mountains(world):
+    """Grow the island's own terrain back over where a mountain used to be.
+
+    The chapters are meant to read as places, and a random purple peak beside a
+    city hall reads as neither. Each removed pixel takes the colour of the
+    nearest surviving land pixel, so the grass and sand close over the hole with
+    their own texture rather than as a flat patch.
+    """
+    w, h = world.size
+    rgb = world.convert("RGB")
+    px = rgb.load()
+    holes = mountain_mask(px, w, h)
+    if not holes:
+        return world, 0
+
+    # Filled from a TILED patch of real grass rather than from each hole's
+    # nearest neighbour. A mountain is 30-odd pixels across, so its interior
+    # pixels have no grass anywhere near them -- nearest-neighbour kept finding
+    # the mountain's own black outline and left the peak behind as a dark scar.
+    turf = grass_patch(world, 48, 48)
+    if turf is None:
+        return world, 0
+    turf = turf.convert("RGB")
+    tw, th = turf.size
+
+    out = world.copy()
+    op = out.load()
+    tp = turf.load()
+    for (x, y) in holes:
+        op[x, y] = tp[x % tw, y % th] + (255,)
+    return out, len(holes)
+
+
 def is_sea(p):
     r, g, b = p[:3]
     return b > 120 and b >= g - 10 and r < 140
@@ -176,6 +280,7 @@ def build():
         raise SystemExit("expected 5 buildings, found %d: %s" % (len(runs), runs))
 
     world = Image.open(ORIGINAL if os.path.exists(ORIGINAL) else MAP).convert("RGBA")
+    world, healed = heal_mountains(world)
 
     # Clear the old temple so the City Hall is the only landmark on that island.
     tw = TEMPLE_BOX[2] - TEMPLE_BOX[0]
@@ -203,6 +308,7 @@ def build():
         placed.append((i + 1, sprite.size, pos))
 
     world.save(MAP)
+    print("mountain pixels healed: %d" % healed)
     return placed
 
 

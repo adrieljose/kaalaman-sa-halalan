@@ -19,7 +19,20 @@ signal one_shot_finished
 ## slides, which still reads as travel.
 @export var walk_dir: String = ""
 @export var walk_count: int = 0
+## Idle rate. Slow on purpose: this is breathing, not action.
 @export var fps: float = 6.0
+## One rate per clip, because they are different kinds of motion.
+##
+## Everything used to run at `fps`, so a six-frame attack took a full second
+## while the body choreography that drives it strikes in about a tenth of one.
+## The sprite was still winding up when the damage landed and was still
+## swinging while the body retreated -- the hit never lined up with the blow.
+@export var attack_fps: float = 15.0
+@export var hit_fps: float = 12.0
+@export var walk_fps: float = 8.0
+
+## Rate of whatever clip is playing now.
+var _fps: float = 6.0
 
 var _idle_frames: Array[Texture2D] = []
 var _attack_frames: Array[Texture2D] = []
@@ -106,7 +119,7 @@ func _process(delta: float) -> void:
 	if _current_frames.size() <= 1:
 		return
 	_timer += delta
-	if _timer < 1.0 / fps:
+	if _timer < 1.0 / maxf(_fps, 0.1):
 		return
 	_timer = 0.0
 	_frame_index += 1
@@ -125,7 +138,7 @@ func play_attack() -> bool:
 	return _play_once(_attack_frames)
 
 func play_hit() -> bool:
-	return _play_once(_hit_frames)
+	return _play_once(_hit_frames, hit_fps)
 
 ## Plays a one-shot clip from an arbitrary folder — the hook a skill uses to
 ## swing with its OWN animation instead of the rival's shared attack. Frames
@@ -147,6 +160,7 @@ func play_clip(dir: String, count: int) -> bool:
 func play_walk() -> void:
 	if _walk_frames.size() < 2:
 		return
+	_fps = walk_fps
 	_current_frames = _walk_frames
 	_frame_index = 0
 	_one_shot = false
@@ -158,7 +172,8 @@ func play_walk() -> void:
 func play_idle() -> void:
 	_play_idle()
 
-func _play_once(frames: Array[Texture2D]) -> bool:
+func _play_once(frames: Array[Texture2D], rate: float = -1.0) -> bool:
+	_fps = rate if rate > 0.0 else attack_fps
 	if frames.size() < 2:
 		if not frames.is_empty():
 			texture = frames[0]
@@ -198,6 +213,7 @@ func _reset_idle_pose() -> void:
 	rotation = 0.0
 
 func _play_idle() -> void:
+	_fps = fps
 	_current_frames = _idle_frames
 	_frame_index = 0
 	_one_shot = false
