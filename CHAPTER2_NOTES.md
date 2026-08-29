@@ -264,3 +264,29 @@ where it was at any rotation and scale. The live pose is kept and becomes the
 pose the first beat tweens from, so an attack grows out of the stance.
 `tools/chapter2/probe_pop.tscn` measures the handover; it now reports 0.00
 degrees for all nine rivals.
+
+## Battle orientation
+
+The rivals fought front-on, looking at the camera instead of at the player.
+They were animated from their `south` rotation because that is the one the
+importer took first -- but create_character produced FOUR directions for each
+of them, and `west` is the same character, drawn by the same model, in profile
+facing left. The player stands on the left of the stage, so west is the way a
+rival should be looking.
+
+`tools/chapter2/make_west_clips.py` builds idle/attack/hit from those west
+rotations. It does NOT mirror the front pose: a mirrored front pose is still a
+front pose. Motion is layered on because the game already supplies most of it
+-- the skill choreography does the travel and follow-through in tweens, and
+IdlePersonality supplies the breathing -- so the clips only have to add POSE.
+That is done by shearing the sprite in bands about the hips, the same cut-out
+idea `AnimatedCharacter.rig_enable` uses in-engine, at whole-pixel offsets so
+nothing is resampled.
+
+The front-facing `<slug>_gen_*` folders are left on disk. Reverting is a
+`repoint_tres.py` away.
+
+**Juan and Maria are still front-facing.** Their sprites predate this work and
+no PixelLab character id for them was ever recorded, so their east-facing views
+cannot be fetched the way the rivals' west views were -- they would have to be
+generated.

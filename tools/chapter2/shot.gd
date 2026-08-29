@@ -10,11 +10,10 @@ extends Node
 ##   godot --path . res://tools/chapter2/shot.tscn --resolution 640x480
 
 const SHOTS := [
-	{"chapter": 1, "encounter": 0, "file": "shot_ch1.png"},
-	{"chapter": 2, "encounter": 0, "file": "shot_plaza.png"},
-	{"chapter": 2, "encounter": 3, "file": "shot_archive.png"},
-	{"chapter": 2, "encounter": 8, "file": "shot_boss.png"},
-	{"chapter": 2, "encounter": 1, "file": "shot_lobby.png"},
+	{"chapter": 2, "encounter": 0, "file": "shot_e1.png"},
+	{"chapter": 2, "encounter": 4, "file": "shot_e5.png"},
+	{"chapter": 2, "encounter": 7, "file": "shot_e8.png"},
+	{"chapter": 2, "encounter": 8, "file": "shot_e9.png"},
 ]
 
 func _ready() -> void:
