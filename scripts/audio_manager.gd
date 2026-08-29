@@ -15,9 +15,21 @@ const SFX_VOLUME_DB := -5.0
 const SFX_POLYPHONY := 8
 
 const MUSIC := {
+	"menu": "res://assets/audio/music/menu_theme.ogg",
 	"battle": "res://assets/audio/music/battle_theme.ogg",
 	"victory": "res://assets/audio/music/victory.ogg",
 	"defeat": "res://assets/audio/music/defeat.ogg",
+}
+
+## Per-track level match, applied on the player rather than baked into the file.
+##
+## The tracks were not mastered together: the menu theme is 4 LU quieter than
+## the battle theme, so on one shared bus volume the title screen would sound
+## like the game had been turned down. Correcting it here keeps the source audio
+## untouched and puts the balance somewhere it can be read and re-tuned, instead
+## of hiding it in a re-encode nobody can see.
+const MUSIC_TRIM_DB := {
+	"menu": 4.0,
 }
 
 const SFX := {
@@ -48,6 +60,10 @@ const SFX := {
 var _music_player: AudioStreamPlayer
 var _sfx_players: Array[AudioStreamPlayer] = []
 var _next_sfx: int = 0
+## Whether the player has interacted with the page yet, and the music request
+## being held until they do. See _input.
+var _user_gestured: bool = false
+var _pending_music: String = ""
 
 func _ready() -> void:
 	_ensure_buses()
@@ -72,30 +88,64 @@ func _ensure_buses() -> void:
 	AudioServer.set_bus_volume_db(AudioServer.get_bus_index(MUSIC_BUS), MUSIC_VOLUME_DB)
 	AudioServer.set_bus_volume_db(AudioServer.get_bus_index(SFX_BUS), SFX_VOLUME_DB)
 
-## Starting the track that's already playing is a no-op, so moving from the
-## title screen into a battle carries the same loop across without a restart.
+## Requesting the track that is already playing is a no-op, so a scene that
+## re-asks for the loop it is already under does not restart it mid-phrase.
 func play_music(key: String) -> void:
-	var stream := _load_stream(MUSIC.get(key, ""))
-	if stream == null:
+	if not _user_gestured:
+		# Held, not dropped: the browser will refuse this, and the request is
+		# replayed the moment the player touches anything. See _input.
+		_pending_music = key
 		return
-	if _music_player.stream == stream and _music_player.playing:
-		return
-	_set_loop(stream, true)
-	_music_player.stream = stream
-	_music_player.play()
+	_start_music(key, true)
 
 ## One-shot music: stops the loop and plays a sting through to its end
 ## (victory fanfare, defeat sting).
 func play_sting(key: String) -> void:
+	_start_music(key, false)
+
+func stop_music() -> void:
+	# Clearing the pending request too, or a track suppressed before the first
+	# gesture would start up again after something else deliberately silenced it.
+	_pending_music = ""
+	_music_player.stop()
+
+func _start_music(key: String, loop: bool) -> void:
 	var stream := _load_stream(MUSIC.get(key, ""))
 	if stream == null:
 		return
-	_set_loop(stream, false)
+	if loop and _music_player.stream == stream and _music_player.playing:
+		return
+	_set_loop(stream, loop)
+	_music_player.volume_db = float(MUSIC_TRIM_DB.get(key, 0.0))
 	_music_player.stream = stream
 	_music_player.play()
 
-func stop_music() -> void:
-	_music_player.stop()
+## Web browsers refuse to start any audio until the player has interacted with
+## the page, and a play_music() from a scene's _ready() is silently dropped
+## there with no error. So the request is remembered and flushed on the first
+## real gesture of any kind — a key or a tap on blank space counts, not just a
+## press of one of our own buttons.
+##
+## This lives on the autoload rather than the title screen, where it used to,
+## because the flag has to outlive the scene. Held per-scene, coming back to the
+## menu after a battle reset it, and the title screen sat under the battle loop
+## until the player clicked something. Desktop is unaffected either way.
+func _input(event: InputEvent) -> void:
+	if _user_gestured:
+		return
+	var pressed := false
+	if event is InputEventMouseButton:
+		pressed = (event as InputEventMouseButton).pressed
+	elif event is InputEventScreenTouch:
+		pressed = (event as InputEventScreenTouch).pressed
+	elif event is InputEventKey:
+		pressed = (event as InputEventKey).pressed
+	if not pressed:
+		return
+	_user_gestured = true
+	if not _pending_music.is_empty():
+		_start_music(_pending_music, true)
+		_pending_music = ""
 
 ## An SFX entry is either a single path or an array of interchangeable takes;
 ## an array picks one at random each call.

@@ -195,15 +195,6 @@ var _map_scrim: TextureRect
 ## Tracked so a second click restarts the notice cleanly instead of two fades
 ## fighting over the same node.
 var _toast_tween: Tween
-## Browsers refuse to play any audio on a page until the user has interacted
-## with it at least once — a title screen that calls play_music() straight
-## from _ready() gets silently muted on the web export, with no error. This
-## flag makes sure the very first play_music call happens strictly after a
-## real click, tap, or key press, so the browser never has cause to block it.
-## Desktop builds are unaffected; this restriction is web-only, but gating it
-## here costs nothing on desktop either.
-var _music_started: bool = false
-
 ## The reviewer is built in code rather than added to main_menu.tscn on disk.
 ## The editor silently overwrites scene-file edits when it has that scene open,
 ## and this is a large subtree to lose; building it here also keeps the whole
@@ -271,6 +262,11 @@ func _ready() -> void:
 	character_panel.hide()
 	soon_toast.hide()
 	_apply_difficulty_hints()
+	# Asked for unconditionally. On the web it is held until the player's first
+	# touch and flushed then; on desktop it starts here. Either way this also
+	# covers coming BACK from a battle, which is what puts the title screen back
+	# under its own theme instead of leaving the battle loop running.
+	Audio.play_music("menu")
 	_build_reviewer()
 	_build_certificate()
 	# Both characters stand on the plaza, Juan on the left and Maria on the
@@ -789,26 +785,6 @@ func _refresh_chapter_pins() -> void:
 			# The gold pin is the scene's "available" look; locked ones keep the
 			# grey it was authored with.
 			pin.self_modulate = Color(0.62, 0.60, 0.58) if locked else Color(1.0, 0.84, 0.36)
-
-## Starts the title music on the first real interaction of any kind, anywhere
-## on the page — not just a press of one of our own buttons. A button click
-## would also satisfy the browser, but gating on *any* input means someone who
-## presses a key or taps blank space first still gets music immediately,
-## instead of waiting until they happen to hit a button.
-func _input(event: InputEvent) -> void:
-	if _music_started:
-		return
-	var is_gesture := false
-	if event is InputEventMouseButton:
-		is_gesture = (event as InputEventMouseButton).pressed
-	elif event is InputEventScreenTouch:
-		is_gesture = (event as InputEventScreenTouch).pressed
-	elif event is InputEventKey:
-		is_gesture = (event as InputEventKey).pressed
-	if not is_gesture:
-		return
-	_music_started = true
-	Audio.play_music("battle")
 
 ## Play opens the chapter map first — picking where you are going comes before
 ## picking how hard it will be.

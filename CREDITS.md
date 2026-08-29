@@ -5,10 +5,13 @@
 
 ## Audio
 
-All audio in this project is royalty-free. Every item below is **CC0 / public
-domain**, so none of it legally *requires* attribution — this list exists so
-the sources stay traceable, and because crediting CC0 creators is good practice
-even when it isn't mandatory.
+Every third-party asset below is **CC0 / public domain**, so none of it legally
+*requires* attribution — this list exists so the sources stay traceable, and
+because crediting CC0 creators is good practice even when it isn't mandatory.
+
+The one exception is the menu theme, which is not a stock asset but a recording
+of a Himamaylan City Cluster 4 performance supplied for this project. It is
+credited below and is **not** CC0.
 
 ### Music
 
@@ -17,9 +20,17 @@ even when it isn't mandatory.
 | `assets/audio/music/battle_theme.ogg` | [Battle Theme — OpenGameArt](https://opengameart.org/content/battle-theme-0) | Wolfgang_ (Theodore Kerr) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) |
 | `assets/audio/music/victory.ogg` | [Music Jingles — Kenney](https://kenney.nl/assets/music-jingles) | Kenney (kenney.nl) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) |
 | `assets/audio/music/defeat.ogg` | [Music Jingles — Kenney](https://kenney.nl/assets/music-jingles) | Kenney (kenney.nl) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) |
+| `assets/audio/music/menu_theme.ogg` | "Padayaw" — supplied for this project | Himamaylan City — Cluster 4 | Used by permission of the performers; not CC0 |
 
 The battle theme was re-encoded from the original 320 kbps MP3 to Ogg Vorbis
 (~q4) to reduce size and to loop cleanly in Godot. No other edits were made.
+
+The menu theme was re-encoded the same way (192 kbps MP3 → Ogg Vorbis ~q4,
+4.2 MB → 2.6 MB) and had 0.67 s of trailing silence trimmed so it loops without
+a gap. Its playback level is lifted 4 dB in `audio_manager.gd` rather than in
+the file, because it was mastered 4 LU quieter than the battle theme and would
+otherwise sound like the game had been turned down on the title screen. No
+other edits were made.
 
 ### Sound Effects
 
