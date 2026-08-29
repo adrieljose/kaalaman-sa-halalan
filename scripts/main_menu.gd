@@ -14,12 +14,28 @@ const BATTLE_SCENE := "res://scenes/word_battle.tscn"
 ## Chapters with real content behind them. Derived from what is actually on
 ## disk rather than typed in, so shipping chapter 3 means adding its data and
 ## nothing else -- this constant stops being a thing anyone has to remember.
+## Caps what the WEB BUILD shows as unlocked, independent of which
+## chapter_XX.tres files exist on disk. Chapter 2 is finished enough to test
+## locally but not to release, and this is the one knob that keeps it out of
+## the public build without deleting or renaming anything: chapter_02.tres
+## stays in place, every local run still sees it, and un-capping later is a
+## one-line change back to TOTAL_CHAPTERS.
+##
+## OS.has_feature("editor") is true whenever the project runs through the
+## editor executable — pressing Play, or any `godot --path .` invocation used
+## by this project's own tooling — and false in an exported template, which is
+## the only thing Vercel is ever serving. That is what makes "local" and
+## "deployed" the same thing as "editor" and "not editor" here.
+const RELEASE_CAP := 1
+
 static func unlocked_chapters() -> int:
 	var n := 0
 	for i in range(1, TOTAL_CHAPTERS + 1):
 		if not GameState.chapter_exists(i):
 			break
 		n = i
+	if not OS.has_feature("editor"):
+		n = mini(n, RELEASE_CAP)
 	return n
 const TOTAL_CHAPTERS := 5
 ## How long the "AVAILABLE SOON!" notice stays up before fading itself out.
