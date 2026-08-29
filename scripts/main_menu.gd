@@ -182,6 +182,9 @@ var _map_scrim: TextureRect
 @onready var character_back_button: Button = $CharacterPanel/VBox/BackButton
 @onready var title_character: AnimatedCharacter = $PlayerCharacter
 @onready var title_character_female: AnimatedCharacter = $PlayerCharacterFemale
+## Drives the pair's dance. Built in code alongside the other title-screen
+## builders, and re-cut on every layout change — see TitleDance.rebuild().
+var _dance: TitleDance
 @onready var difficulty_panel: PanelContainer = $DifficultyPanel
 @onready var easy_button: Button = $DifficultyPanel/VBox/EasyButton
 @onready var medium_button: Button = $DifficultyPanel/VBox/MediumButton
@@ -275,6 +278,9 @@ func _ready() -> void:
 	# selection is made on its own screen a click later anyway.
 	title_character.configure_clips(GameState.PLAYER_CHARACTERS["male"])
 	title_character_female.configure_clips(GameState.PLAYER_CHARACTERS["female"])
+	_dance = TitleDance.new()
+	_dance.name = "TitleDance"
+	add_child(_dance)
 	_group_map()
 	# Last, and after every builder above: the layout pass positions panels that
 	# do not exist until those builders have run. bind() also runs it once
@@ -304,6 +310,21 @@ func _apply_layout(profile: LayoutProfile) -> void:
 	# this scene assigned one stylebox to all four states, so until now none of
 	# them acknowledged a press at all — see TouchFeedback.
 	TouchFeedback.apply_to_tree(self)
+	_restart_dance()
+
+## Re-cuts the dancers after the arrangement has moved or resized them.
+##
+## Deferred a frame on purpose: the layout above writes offsets, and the rig is
+## built from the node's SIZE. Cutting in the same frame slices against the rect
+## the characters had a moment ago, which lands the bands beside the character
+## instead of on it.
+func _restart_dance() -> void:
+	if _dance == null:
+		return
+	await get_tree().process_frame
+	if not is_instance_valid(_dance):
+		return
+	_dance.setup({"juan": title_character, "maria": title_character_female})
 
 ## Every overlay was positioned by a hardcoded rect measured against the 640x480
 ## canvas — 150..490 for the difficulty picker, 16..624 for the reviewer, and so

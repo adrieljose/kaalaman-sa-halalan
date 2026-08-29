@@ -299,22 +299,31 @@ static func melee_rest_x(mover: AnimatedCharacter, anchor: AnimatedCharacter,
 # motion comes from the hand-drawn attack clip instead, which is what that clip
 # is actually good at.
 
-## Fractions of the sprite's height. Tuned against the silhouettes: the heads
-## end around 0.26, the hips sit near 0.58.
-const RIG_BANDS := {
-	"legs": Vector2(0.575, 1.0),
-	"torso": Vector2(0.245, 0.60),
-	"head": Vector2(0.0, 0.27),
-}
+## Fractions of the sprite's height, ORDERED OUTERMOST FIRST: each part is
+## parented to the one before it, so rotating the legs carries everything above
+## them. Tuned against the rivals' silhouettes: the heads end around 0.26, the
+## hips sit near 0.58.
+##
+## A caller can pass its own chain to rig_enable — the title screen splits the
+## torso in two so the shoulders can turn against the hips, which is most of
+## what makes a body read as dancing rather than swaying.
+const RIG_CHAIN := [
+	{"name": "legs", "band": Vector2(0.575, 1.0)},
+	{"name": "torso", "band": Vector2(0.245, 0.60)},
+	{"name": "head", "band": Vector2(0.0, 0.27)},
+]
 
 var _rig: Dictionary = {}
+## The chain's names in build order, so a part can find its parent without the
+## hardcoded legs -> torso -> head assumption.
+var _rig_order: Array[String] = []
 
 func is_rigged() -> bool:
 	return not _rig.is_empty()
 
 ## Builds the cut-out from whichever frame is on screen right now and hides the
 ## flat sprite behind it.
-func rig_enable() -> void:
+func rig_enable(chain: Array = RIG_CHAIN) -> void:
 	if is_rigged() or texture == null:
 		return
 	var tex_size := texture.get_size()
@@ -327,9 +336,11 @@ func rig_enable() -> void:
 	var origin := (size - draw_size) * 0.5
 
 	var parent: Control = self
+	_rig_order.clear()
 	# Outermost first: rotating the legs has to carry the torso and head with it.
-	for part_name: String in ["legs", "torso", "head"]:
-		var band: Vector2 = RIG_BANDS[part_name]
+	for entry: Dictionary in chain:
+		var part_name := String(entry["name"])
+		var band: Vector2 = entry["band"]
 		var region := Rect2(0.0, band.x * tex_size.y, tex_size.x, (band.y - band.x) * tex_size.y)
 		var atlas := AtlasTexture.new()
 		atlas.atlas = texture
@@ -350,24 +361,39 @@ func rig_enable() -> void:
 		piece.size = Vector2(draw_size.x, region.size.y * scale_fit)
 		var here := Vector2(origin.x, origin.y + band.x * tex_size.y * scale_fit)
 		# Children are positioned relative to their parent part.
-		piece.position = here if parent == self else here - _rig[_rig_parent_of(part_name)]["abs"]
-		# Legs pivot at the hip (their top); the others at the joint below them.
+		piece.position = here if parent == self else here - _rig[_rig_order[-1]]["abs"]
+		# The outermost part pivots at the hip (its top); the others at the
+		# joint below them, which is where they meet the part underneath.
 		piece.pivot_offset = Vector2(piece.size.x * 0.5,
-			0.0 if part_name == "legs" else piece.size.y)
+			0.0 if _rig_order.is_empty() else piece.size.y)
 		parent.add_child(piece)
 		_rig[part_name] = {"node": piece, "abs": here, "home": piece.position}
+		_rig_order.append(part_name)
 		parent = piece
 	# The flat sprite would show through the joints; the cut-out replaces it.
 	self_modulate.a = 0.0
 
-func _rig_parent_of(part_name: String) -> String:
-	return "legs" if part_name == "torso" else "torso"
+## Writes one part's pose immediately, with no tween.
+##
+## rig_pose() spawns a Tween per call, which is right for a handful of combat
+## beats and wrong for anything driven every frame: a looping dance would create
+## sixty tweens a second, each still interpolating when the next replaced it.
+## This is the per-frame door onto the same rig.
+func rig_set(part_name: String, degrees: float, offset := Vector2.ZERO) -> void:
+	var part: Dictionary = _rig.get(part_name, {})
+	if part.is_empty():
+		return
+	var node: Control = part["node"]
+	node.rotation = deg_to_rad(degrees)
+	node.position = Vector2(part["home"]) + offset
 
 ## One rigged pose. Angles in degrees; `bob` lifts the whole figure, `sway`
 ## shifts it sideways, so a stride can rise and fall as it swings.
 func rig_pose(legs_deg: float, torso_deg: float, head_deg: float,
 		bob: float = 0.0, sway: float = 0.0, secs: float = 0.12) -> Tween:
-	if not is_rigged():
+	# Addresses the default chain's parts by name, so a rig built from a custom
+	# chain is left alone rather than half-posed.
+	if not is_rigged() or not _rig.has("legs") or not _rig.has("torso") or not _rig.has("head"):
 		return null
 	var tween := create_tween().set_parallel(true)
 	var legs: Dictionary = _rig["legs"]
@@ -382,7 +408,19 @@ func rig_pose(legs_deg: float, torso_deg: float, head_deg: float,
 func rig_disable() -> void:
 	if not is_rigged():
 		return
-	var legs: Control = _rig["legs"]["node"]
-	legs.queue_free()
+	# Freeing the outermost part takes the whole chain with it — the others are
+	# its descendants.
+	#
+	# Detached from the tree first, because queue_free() only lands at the end of
+	# the frame. Until then the old cut-out would still draw over the flat sprite
+	# restored below, and would still hold its node names — so a rig rebuilt in
+	# the same frame, which is exactly what a layout change does, would come back
+	# as Rig_legs2 sitting on top of a corpse.
+	var root: Control = _rig[_rig_order[0]]["node"]
+	var parent := root.get_parent()
+	if parent != null:
+		parent.remove_child(root)
+	root.queue_free()
 	_rig.clear()
+	_rig_order.clear()
 	self_modulate.a = 1.0
