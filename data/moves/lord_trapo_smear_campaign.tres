@@ -12,5 +12,5 @@ icon = ExtResource("2")
 direct_damage = 8
 animation_style = "spray"
 effect_color = Color(0.45, 0.32, 0.16, 0.95)
-attack_dir = "res://assets/images/characters/lord_trapo_smear"
+attack_dir = "res://assets/images/characters/lord_trapo_battle_smear"
 attack_count = 7

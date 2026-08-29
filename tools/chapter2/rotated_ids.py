@@ -28,5 +28,9 @@ ROTATED = {
 }
 
 # The rival faces the player; the player faces the rival.
-FACING = {"juan": "south-east", "maria": "south-east"}
+FACING = {"juan": "south-east", "maria": "east"}
+# Maria is the exception. Her south-east came back barely turned -- the model
+# does not rotate every character equally hard -- so she shipped looking at the
+# camera while Juan looked at the rival. Her `east` is a true 3/4 with both
+# eyes still readable, and it was already generated, so the fix cost nothing.
 DEFAULT_FACING = "south-west"

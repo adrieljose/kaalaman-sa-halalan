@@ -46,6 +46,11 @@ func _init() -> void:
 			_frames_ok(enemy.idle_dir, enemy.idle_count, who + " idle", errors)
 			_frames_ok(enemy.attack_dir, enemy.attack_count, who + " attack", errors)
 			_frames_ok(enemy.hit_dir, enemy.hit_count, who + " hit", errors)
+			# Walk is optional -- most rivals have none and fall back to idle --
+			# but a walk left pointing at a character's OLD front-facing art is
+			# invisible here and glaring in play, because it only shows during
+			# the approach. So it is checked whenever it is set.
+			_frames_ok(enemy.walk_dir, enemy.walk_count, who + " walk", errors)
 			if enemy.portrait == null:
 				errors.append("%s: no portrait" % who)
 			for move in enemy.moves:
@@ -54,6 +59,17 @@ func _init() -> void:
 				# the bug this catches.
 				_frames_ok(move.attack_dir, move.attack_count,
 						"%s/%s" % [who, move.move_name], errors)
+
+	# The players are wired in code rather than a resource, and were the half of
+	# the roster the first pose pass got wrong, so they are checked too.
+	for key in GameState.PLAYER_CHARACTERS:
+		var who: Dictionary = GameState.PLAYER_CHARACTERS[key]
+		var label := "player/%s" % who.get("label", key)
+		for clip in ["idle", "attack", "hit", "walk"]:
+			_frames_ok(String(who.get(clip + "_dir", "")),
+					int(who.get(clip + "_count", 0)),
+					"%s %s" % [label, clip], errors)
+		checked += 1
 
 	print("rivals checked: %d" % checked)
 	if errors.is_empty():

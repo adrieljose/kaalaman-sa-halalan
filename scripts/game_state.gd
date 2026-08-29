@@ -34,14 +34,14 @@ const PLAYER_CHARACTERS := {
 		"idle_dir": "res://assets/images/characters/player_battle_idle", "idle_count": 4,
 		"attack_dir": "res://assets/images/characters/player_battle_attack", "attack_count": 6,
 		"hit_dir": "res://assets/images/characters/player_battle_hit", "hit_count": 6,
-		"walk_dir": "res://assets/images/characters/player_walk", "walk_count": 9,
+		"walk_dir": "res://assets/images/characters/player_battle_walk", "walk_count": 8,
 	},
 	"female": {
 		"label": "MARIA",
 		"idle_dir": "res://assets/images/characters/player_female_battle_idle", "idle_count": 4,
 		"attack_dir": "res://assets/images/characters/player_female_battle_attack", "attack_count": 6,
 		"hit_dir": "res://assets/images/characters/player_female_battle_hit", "hit_count": 6,
-		"walk_dir": "res://assets/images/characters/player_female_walk", "walk_count": 9,
+		"walk_dir": "res://assets/images/characters/player_female_battle_walk", "walk_count": 8,
 		# NO flip. The old front-on frames faced the wrong way and were mirrored
 		# to compensate; her battle frames are drawn facing the rival, so
 		# mirroring them now would turn her back on him again.

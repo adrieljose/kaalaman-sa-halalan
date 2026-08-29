@@ -51,6 +51,9 @@ TARGETS = {
     "maria":          ("player_female",      +1),
 }
 
+# Only the players march between encounters; no Chapter 2 rival has a walk.
+WALKERS = {"juan", "maria"}
+
 PAD = 26
 # Every clip lands on a canvas this tall with the feet at FOOT_Y, matching the
 # 180-tall convention the rest of the game's sprites already use.
@@ -62,7 +65,11 @@ PAD = 26
 # scaling keeps each character's TRUE pixel height, so the Ogre still towers
 # over Fredo for the right reason.
 CANVAS_H = 180
-FOOT_Y = 172
+# 176, not 172. Vote Vandal is 175px of character, so a 172 foot line could not
+# hold him -- and Chapter 1's original art already stands its rivals at ~177, so
+# moving the shared baseline down also brings the two chapters into line instead
+# of leaving the untouched Senator Sabaw floating 5px below everyone else.
+FOOT_Y = 176
 
 
 def lean(im, amount, pivot=0.62):
@@ -112,6 +119,120 @@ def idle_frames(base, fwd):
             shifted(lean(base, fwd * 1), 0, -1),
             base,
             shifted(lean(base, -fwd * 1), 0, 1)]
+
+
+def stride(im, amount, pivot=0.62):
+    """Swing the legs by shifting rows BELOW the hips, the feet furthest.
+
+    `lean` is the same idea inverted -- it moves the rows above the hips. Using
+    both together is what separates a walk from a lean: the torso carries one
+    way while the feet carry the other, which is what a stride actually is.
+    """
+    if amount == 0:
+        return im
+    w, h = im.size
+    out = Image.new("RGBA", im.size, (0, 0, 0, 0))
+    hip = int(h * pivot)
+    span = max(1, h - hip)
+    for y in range(h):
+        row = im.crop((0, y, w, y + 1))
+        t = 0.0 if y < hip else (y - hip) / float(span)
+        out.paste(row, (int(round(amount * t)), y), row)
+    return out
+
+
+def leg_split(im, pivot=0.62):
+    """Column that separates the two legs, or None if they cannot be told apart.
+
+    Taken from the widest row in the leg band: in a 3/4 stance the feet are the
+    furthest apart the legs ever get, so that row's midpoint is the cleanest
+    place to cut. Returning None where the legs read as one mass (a long coat,
+    a skirt) is deliberate -- those characters fall back to shearing the band as
+    a block, which is wrong-looking for legs but right for cloth.
+    """
+    w, h = im.size
+    hip = int(h * pivot)
+    a = im.getchannel("A")
+    best = None
+    for y in range(hip, h):
+        xs = [x for x in range(w) if a.getpixel((x, y)) > 127]
+        if len(xs) < 2:
+            continue
+        span = xs[-1] - xs[0]
+        if best is None or span > best[0]:
+            best = (span, (xs[0] + xs[-1]) // 2)
+    if best is None or best[0] < 8:
+        return None
+    return best[1]
+
+
+def scissor(im, amount, split, pivot=0.62):
+    """Swing the two legs in opposite directions about the hips.
+
+    Shearing the whole leg band one way -- which is all a single shear can do --
+    reads as the body sliding, because both feet travel together. Cutting the
+    band at `split` and sending the halves opposite ways is what turns it into a
+    step. The offset ramps from nothing at the hips to full at the feet, so the
+    legs stay attached to the body.
+    """
+    if amount == 0:
+        return im
+    w, h = im.size
+    out = im.copy()
+    hip = int(h * pivot)
+    span = max(1, h - hip)
+    for y in range(hip, h):
+        t = (y - hip) / float(span)
+        row = im.crop((0, y, w, y + 1))
+        blank = Image.new("RGBA", (w, 1), (0, 0, 0, 0))
+        out.paste(blank, (0, y))
+        left = row.crop((0, 0, split, 1))
+        right = row.crop((split, 0, w, 1))
+        dx = int(round(amount * t))
+        out.paste(left, (dx, y), left)
+        out.paste(right, (split - dx, y), right)
+    return out
+
+
+def stride(im, amount, pivot=0.62):
+    """Shift rows BELOW the hips as one block, the feet furthest.
+
+    `lean` is the same idea inverted -- it moves the rows above. This is the
+    fallback for characters whose legs cannot be separated.
+    """
+    if amount == 0:
+        return im
+    w, h = im.size
+    out = Image.new("RGBA", im.size, (0, 0, 0, 0))
+    hip = int(h * pivot)
+    span = max(1, h - hip)
+    for y in range(h):
+        row = im.crop((0, y, w, y + 1))
+        t = 0.0 if y < hip else (y - hip) / float(span)
+        out.paste(row, (int(round(amount * t)), y), row)
+    return out
+
+
+def walk_frames(base, fwd):
+    """An eight-frame march: two steps, the body bobbing on each.
+
+    A synthesized cycle, not drawn limbs. Before it existed the players kept
+    their old front-facing walk, so both turned to the camera for the length of
+    every melee approach and every march between encounters -- the exact revert
+    the pose work exists to prevent.
+    """
+    split = leg_split(base)
+    out = []
+    for i in range(8):
+        step = (1, 2, 1, 0, -1, -2, -1, 0)[i]        # feet fore and aft
+        bob = (0, -1, -2, -1, 0, -1, -2, -1)[i]      # weight rising over each step
+        if split is None:
+            im = stride(base, fwd * step * 3)
+        else:
+            im = scissor(base, fwd * step * 5, split)
+        im = lean(im, fwd * (2 - abs(step)))          # torso counters the legs
+        out.append(shifted(im, 0, bob))
+    return out
 
 
 def attack_frames(base, fwd):
@@ -166,6 +287,8 @@ def build(slug, prefix, fwd):
     clips = {"idle": idle_frames(base, fwd),
              "attack": attack_frames(base, fwd),
              "hit": hit_frames(base, fwd)}
+    if slug in WALKERS:
+        clips["walk"] = walk_frames(base, fwd)
 
     # ONE crop box across all three clips, or the character jumps the moment
     # battle switches between them.
