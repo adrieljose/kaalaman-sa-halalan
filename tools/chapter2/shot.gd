@@ -11,15 +11,16 @@ extends Node
 
 const SHOTS := [
 	{"chapter": 2, "encounter": 0, "file": "shot_e1.png"},
-	{"chapter": 2, "encounter": 4, "file": "shot_e5.png"},
-	{"chapter": 2, "encounter": 7, "file": "shot_e8.png"},
-	{"chapter": 2, "encounter": 8, "file": "shot_e9.png"},
+	{"chapter": 2, "encounter": 4, "file": "shot_e5.png", "who": "female"},
+	{"chapter": 2, "encounter": 7, "file": "shot_e8.png", "who": "female"},
+	{"chapter": 1, "encounter": 0, "file": "shot_ch1.png"},
 ]
 
 func _ready() -> void:
 	await get_tree().process_frame
 	for shot in SHOTS:
 		GameState.load_chapter(int(shot["chapter"]))
+		GameState.character = String(shot.get("who", "male"))
 		GameState.encounter_index = int(shot["encounter"])
 		if "selected_character" in GameState:
 			GameState.selected_character = "juan"

@@ -286,7 +286,41 @@ nothing is resampled.
 The front-facing `<slug>_gen_*` folders are left on disk. Reverting is a
 `repoint_tres.py` away.
 
-**Juan and Maria are still front-facing.** Their sprites predate this work and
-no PixelLab character id for them was ever recorded, so their east-facing views
-cannot be fetched the way the rivals' west views were -- they would have to be
-generated.
+**Superseded.** Both the rivals and the players are now in 3/4 -- see below.
+
+## 3/4 battle poses (supersedes the profile pass)
+
+The `west` rotations fixed the direction but were a flat profile: one eye, no
+shoulder line, props edge-on. `create_character(mode="v3", reference_image_*)`
+rotates a sprite you ALREADY HAVE into eight directions rather than inventing a
+character, so feeding each existing sprite back in is a repose, not a redesign
+-- the same cap, lanyard, briefcase and law book come back, turned.
+
+Two of the eight directions are used:
+
+    south-west   a rival's 3/4 facing LEFT, toward the player
+    south-east   the player's 3/4 facing RIGHT, toward the rival
+
+`make_battle_clips.py` builds idle/attack/hit for all eleven characters from
+those poses. Rivals and players differ only by the sign of `forward`, so one
+code path serves both.
+
+Two things that are not cosmetic:
+
+* **Everything is padded to a 180-tall canvas.** The character TextureRects use
+  KEEP_ASPECT_CENTERED, so a shorter canvas is scaled UP to fill the node -- a
+  rival that happened to crop to 132px would have rendered noticeably larger
+  than one cropping to 171px. Padding rather than scaling keeps each
+  character's true pixel height, so the Ogre still towers over Fredo.
+
+* **Maria's `flip_h` is gone.** It existed only because her old front-on frames
+  faced the wrong way; mirroring her correctly-facing battle frames would turn
+  her back on the rival again.
+
+Cost: 32 generations for eleven characters (v3 is 1-2 for a cropped reference,
+4 for a full 180x180 one, so cropped references were used wherever the base64
+fit inline).
+
+**Chapter 1's five rivals are still front-facing.** The player now faces them,
+so that chapter reads as one fighter confronting an opponent who is posing for
+the camera. Fixing it is the same recipe and about ten more generations.

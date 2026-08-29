@@ -12,7 +12,7 @@ from spec import ROSTER
 
 ENEMIES = r"D:\klhgamefinal\data\enemies"
 CHARS = r"D:\klhgamefinal\assets\images\characters"
-SUFFIX = "west"
+SUFFIX = "battle"
 
 def frames(folder):
     p = os.path.join(CHARS, folder)

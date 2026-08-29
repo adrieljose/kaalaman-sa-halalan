@@ -31,22 +31,20 @@ var encounter_index: int = 0
 const PLAYER_CHARACTERS := {
 	"male": {
 		"label": "JUAN",
-		"idle_dir": "res://assets/images/characters/player_idle", "idle_count": 5,
-		"attack_dir": "res://assets/images/characters/player_attack", "attack_count": 7,
-		"hit_dir": "res://assets/images/characters/player_hit", "hit_count": 5,
+		"idle_dir": "res://assets/images/characters/player_battle_idle", "idle_count": 4,
+		"attack_dir": "res://assets/images/characters/player_battle_attack", "attack_count": 6,
+		"hit_dir": "res://assets/images/characters/player_battle_hit", "hit_count": 6,
 		"walk_dir": "res://assets/images/characters/player_walk", "walk_count": 9,
 	},
 	"female": {
 		"label": "MARIA",
-		"idle_dir": "res://assets/images/characters/player_female_idle", "idle_count": 5,
-		"attack_dir": "res://assets/images/characters/player_female_attack", "attack_count": 7,
-		"hit_dir": "res://assets/images/characters/player_female_hit", "hit_count": 5,
+		"idle_dir": "res://assets/images/characters/player_female_battle_idle", "idle_count": 4,
+		"attack_dir": "res://assets/images/characters/player_female_battle_attack", "attack_count": 6,
+		"hit_dir": "res://assets/images/characters/player_female_battle_hit", "hit_count": 6,
 		"walk_dir": "res://assets/images/characters/player_female_walk", "walk_count": 9,
-		# Her frames were generated facing the other way to the boy's, which
-		# read as turning her back on the rival she is fighting. Mirroring is a
-		# display flag rather than re-generated art: the sprites are close to
-		# front-on, so a flip costs nothing and needs no new PixelLab credits.
-		"flip_h": true,
+		# NO flip. The old front-on frames faced the wrong way and were mirrored
+		# to compensate; her battle frames are drawn facing the rival, so
+		# mirroring them now would turn her back on him again.
 	},
 }
 const DEFAULT_CHARACTER := "male"
