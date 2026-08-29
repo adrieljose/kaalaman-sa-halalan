@@ -1838,7 +1838,9 @@ func _build_move_list() -> void:
 	var wrap_width := side_panel.size.x - PANEL_CONTENT * 2.0
 	# Tighter than the scene's default: three moves plus a heading only clear
 	# the enemy sprite below at this spacing.
-	side_panel_vbox.add_theme_constant_override("separation", 2)
+	# Entries now carry their own edge, so they no longer need a gap to be read
+	# as separate -- which buys back the height the icon slots cost.
+	side_panel_vbox.add_theme_constant_override("separation", 1)
 
 	if _enemy.moves.is_empty():
 		side_panel_vbox.add_child(_roster_heading(_enemy.enemy_name))
@@ -1867,12 +1869,21 @@ func _move_entry(move: EnemyMove, wrap_width: float) -> PanelContainer:
 
 	var header := HBoxContainer.new()
 	header.add_theme_constant_override("separation", 4)
+	# The icon sits in a sunken slot rather than floating against the panel
+	# wood. Twenty-eight skills now have their own drawn subject, and a framed
+	# slot is what makes each read as a skill card's emblem instead of a
+	# decoration next to some text.
+	var slot := PanelContainer.new()
+	slot.name = "IconSlot"
+	slot.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	slot.add_theme_stylebox_override("panel", _move_slot_style(false))
 	var icon := TextureRect.new()
 	icon.texture = move.icon
 	icon.custom_minimum_size = MOVE_ICON_SIZE
 	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	header.add_child(icon)
+	slot.add_child(icon)
+	header.add_child(slot)
 
 	var name_label := Label.new()
 	name_label.text = move.move_name
@@ -1887,7 +1898,7 @@ func _move_entry(move: EnemyMove, wrap_width: float) -> PanelContainer:
 	# sibling. Carrying it in the flow cost every entry ~26px of name width,
 	# which wrapped "Smear Campaign" and "Relief Goods Blitz" onto a second
 	# line and pushed two of the five rosters past SIDE_PANEL_BOTTOM_LIMIT.
-	name_label.custom_minimum_size.x = wrap_width - MOVE_ICON_SIZE.x - 8.0
+	name_label.custom_minimum_size.x = wrap_width - MOVE_ICON_SIZE.x - 14.0
 
 	var desc := _roster_body(move.description, wrap_width - 4.0)
 	entry.add_child(desc)
@@ -1936,6 +1947,25 @@ func _move_entry(move: EnemyMove, wrap_width: float) -> PanelContainer:
 ## The plate behind one move. Both variants carry identical content margins, so
 ## swapping between them lights the entry up without moving a single pixel of
 ## the text inside it.
+## The icon's recess. Lit on the active entry so the emblem reads as switched
+## on, not merely brighter -- dimming alone was too weak to find at a glance in
+## a list of four.
+func _move_slot_style(active: bool) -> StyleBoxFlat:
+	var style := StyleBoxFlat.new()
+	# No inner margin: the 1px border alone frames the icon. The panel has a
+	# hard height budget (SIDE_PANEL_BOTTOM_LIMIT) and padding here is charged
+	# to every entry -- a margin of 1 put Lord Trapo's roster 6px over it.
+	style.set_content_margin_all(0)
+	style.set_corner_radius_all(2)
+	style.set_border_width_all(1)
+	if active:
+		style.bg_color = Color(0.30, 0.17, 0.07, 0.95)
+		style.border_color = MOVE_ALERT_COLOR
+	else:
+		style.bg_color = Color(0.10, 0.08, 0.06, 0.55)
+		style.border_color = Color(0.34, 0.28, 0.20, 0.7)
+	return style
+
 func _move_plate_style(active: bool) -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
 	style.content_margin_left = 3
@@ -1944,15 +1974,22 @@ func _move_plate_style(active: bool) -> StyleBoxFlat:
 	style.content_margin_bottom = 1
 	style.set_corner_radius_all(2)
 	if active:
-		style.bg_color = Color(0.34, 0.13, 0.09, 0.95)
+		style.bg_color = Color(0.36, 0.14, 0.08, 0.96)
 		style.border_width_left = 3
 		style.border_width_top = 1
 		style.border_width_right = 1
 		style.border_width_bottom = 1
 		style.border_color = MOVE_ALERT_COLOR
 	else:
-		style.bg_color = Color(0, 0, 0, 0)
-		style.set_border_width_all(0)
+		# Faintly filled rather than fully transparent. An invisible plate made
+		# the list read as loose text; a whisper of ground gives every entry an
+		# edge, and leaves the active one still obviously ahead of it.
+		style.bg_color = Color(0.10, 0.07, 0.05, 0.34)
+		style.border_width_left = 3
+		style.border_width_top = 0
+		style.border_width_right = 0
+		style.border_width_bottom = 0
+		style.border_color = Color(0.30, 0.24, 0.17, 0.55)
 	return style
 
 ## Marks whichever move the enemy will swing next, and dims the rest.
@@ -1980,6 +2017,9 @@ func _highlight_current_move() -> void:
 		# inactive entry recedes as a whole rather than keeping a bright icon.
 		(entry["icon"] as TextureRect).modulate = (
 			Color.WHITE if is_active else Color(1, 1, 1, 0.55))
+		var slot := (entry["icon"] as TextureRect).get_parent() as PanelContainer
+		if slot != null:
+			slot.add_theme_stylebox_override("panel", _move_slot_style(is_active))
 		(entry["badge"] as PanelContainer).modulate.a = 1.0 if is_active else 0.0
 
 	_start_move_pulse(_move_entries[active_index]["plate"] as PanelContainer)

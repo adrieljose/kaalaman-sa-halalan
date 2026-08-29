@@ -236,8 +236,12 @@ func _ready() -> void:
 	hard_button.pressed.connect(_start_run.bind("hard"))
 	difficulty_back_button.pressed.connect(_on_difficulty_back_pressed)
 	map_back_button.pressed.connect(_on_map_back_pressed)
-	male_button.pressed.connect(_on_character_chosen.bind("male"))
-	female_button.pressed.connect(_on_character_chosen.bind("female"))
+	# Selecting and starting are now two acts: the buttons pick, the confirm
+	# below commits. Choosing used to launch the run on the same click, so
+	# there was never a moment where the screen showed you who you had picked.
+	male_button.pressed.connect(_on_character_selected.bind("male"))
+	female_button.pressed.connect(_on_character_selected.bind("female"))
+	_build_character_cards()
 	character_back_button.pressed.connect(_on_character_back_pressed)
 	_connect_chapter_pins()
 	# Built before the hides below, not after: options_panel does not exist
@@ -295,7 +299,7 @@ func _apply_layout(profile: LayoutProfile) -> void:
 ## are all re-centred against the real design space here, and allowed to go
 ## near-fullscreen when that is all the room there is.
 func _layout_panels(profile: LayoutProfile) -> void:
-	_centre_panel(character_panel, Vector2(340.0, 252.0))
+	_centre_panel(character_panel, CHARACTER_PANEL_SIZE)
 	_centre_panel(difficulty_panel, Vector2(340.0, 252.0))
 	# Never shrink-to-content: the credits body is a RichTextLabel, which reports
 	# almost no minimum height, so fitting the panel to its "content" collapsed
@@ -817,7 +821,16 @@ func _on_chapter_pressed(chapter: int) -> void:
 		return
 	Audio.play_sfx("button_click")
 	_apply_difficulty_hints()
+	# Cleared on every entry: arriving with a stale pick would show a chosen
+	# card for a decision the player has not made this time.
+	_picked_character = ""
+	_paint_character_cards()
 	character_panel.show()
+	# Re-fitted once it is actually on screen. Sizing it while hidden measured
+	# the hint before it had a width to wrap against, which is what left the
+	# panel taller than its contents.
+	await get_tree().process_frame
+	_centre_panel(character_panel, CHARACTER_PANEL_SIZE)
 
 ## A self-dismissing notice, so a locked chapter never traps the player behind
 ## a dialog they have to close.
@@ -835,6 +848,133 @@ func _show_soon_toast() -> void:
 ## Picking a character records it and moves on to difficulty. The choice is
 ## cosmetic — GameState.PLAYER_CHARACTERS gives both identical clip counts — so
 ## nothing downstream needs to branch on it.
+## Which character the cards are currently showing as chosen. Empty until the
+## player picks, which is what keeps the confirm button disabled on arrival.
+var _picked_character := ""
+
+## Wraps each preview in a card: a framed plinth with the sprite standing on it
+## and a name plate beneath. The previews are REPARENTED rather than rebuilt,
+## so their idle animation keeps running -- they are AnimatedCharacters, and a
+## fresh TextureRect would have been a still image.
+func _build_character_cards() -> void:
+	var row := character_panel.get_node_or_null("VBox/PreviewRow") as HBoxContainer
+	var buttons := character_panel.get_node_or_null("VBox/ButtonRow") as HBoxContainer
+	if row == null or buttons == null or row.has_meta("carded"):
+		return
+	row.set_meta("carded", true)
+	row.add_theme_constant_override("separation", 14)
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+
+	for spec in [["MalePreview", male_button, "male"],
+			["FemalePreview", female_button, "female"]]:
+		var preview := row.get_node_or_null(String(spec[0])) as Control
+		var button := spec[1] as Button
+		if preview == null or button == null:
+			continue
+		var card := PanelContainer.new()
+		card.name = "Card_%s" % spec[2]
+		card.add_theme_stylebox_override("panel", CharacterCards.card_style(false))
+		var stack := VBoxContainer.new()
+		stack.add_theme_constant_override("separation", 4)
+		stack.alignment = BoxContainer.ALIGNMENT_CENTER
+		card.add_child(stack)
+
+		row.remove_child(preview)
+		stack.add_child(preview)
+		preview.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+
+		# The name button moves INSIDE the card, so the whole card is one
+		# target and the label names the thing directly above it.
+		buttons.remove_child(button)
+		button.add_theme_stylebox_override("normal", CharacterCards.plate_style(false))
+		button.add_theme_stylebox_override("hover", CharacterCards.plate_style(false))
+		button.add_theme_stylebox_override("pressed", CharacterCards.plate_style(true))
+		button.add_theme_stylebox_override("focus", CharacterCards.plate_style(false))
+		button.custom_minimum_size = Vector2(96, 26)
+		button.add_theme_font_size_override("font_size", 14)
+		stack.add_child(button)
+
+		row.add_child(card)
+		_character_cards[String(spec[2])] = {"card": card, "button": button,
+			"preview": preview}
+
+	buttons.hide()          # emptied; its slot would otherwise still take height
+
+	# Give the hint a width to wrap against. Measured with none, an autowrap
+	# Label reports every word as its own line, so its minimum height came out
+	# enormous -- and because Godot clamps a Control UP to its minimum at the
+	# moment size is assigned, the panel was stretched to 453px and stayed
+	# there long after the real minimum settled at 283. That was the slab of
+	# empty black below the Back button.
+	var hint_label := character_panel.get_node_or_null("VBox/CharacterHint") as Label
+	if hint_label != null:
+		hint_label.custom_minimum_size.x = CHARACTER_PANEL_SIZE.x - 20.0
+	_build_confirm_row()
+	_paint_character_cards()
+
+## The panel's authored size. One constant, because it is now used both to fit
+## the panel and to give the hint a wrap width -- and those two disagreeing is
+## exactly how the panel ended up stretched.
+const CHARACTER_PANEL_SIZE := Vector2(340.0, 258.0)
+
+var _character_cards: Dictionary = {}
+var _confirm_button: Button = null
+
+## The single "start" action. Disabled until a character is picked, so the
+## screen always answers "what do I click next".
+func _build_confirm_row() -> void:
+	var vbox := character_panel.get_node_or_null("VBox") as VBoxContainer
+	var hint := character_panel.get_node_or_null("VBox/CharacterHint") as Label
+	if vbox == null or _confirm_button != null:
+		return
+	_confirm_button = Button.new()
+	_confirm_button.name = "ConfirmButton"
+	_confirm_button.text = "START"
+	_confirm_button.custom_minimum_size = Vector2(0, 30)
+	_confirm_button.add_theme_font_size_override("font_size", 15)
+	_confirm_button.add_theme_color_override("font_color", Color(1, 0.95, 0.82))
+	_confirm_button.pressed.connect(_on_character_confirmed)
+	vbox.add_child(_confirm_button)
+	# Above the hint and the Back button, below the cards: the order the player
+	# reads them in.
+	if hint != null:
+		vbox.move_child(_confirm_button, hint.get_index())
+
+func _paint_character_cards() -> void:
+	for key in _character_cards:
+		var entry: Dictionary = _character_cards[key]
+		var chosen: bool = String(key) == _picked_character
+		(entry["card"] as PanelContainer).add_theme_stylebox_override(
+			"panel", CharacterCards.card_style(chosen))
+		var button := entry["button"] as Button
+		button.add_theme_stylebox_override("normal", CharacterCards.plate_style(chosen))
+		button.add_theme_stylebox_override("hover", CharacterCards.plate_style(chosen))
+		button.add_theme_color_override("font_color", CharacterCards.name_colour(chosen))
+		# The unchosen one recedes rather than disappearing -- it is still a
+		# live option, just not the current one.
+		(entry["preview"] as Control).modulate = (
+			Color.WHITE if chosen else Color(0.62, 0.60, 0.58))
+	if _confirm_button != null:
+		var ready := not _picked_character.is_empty()
+		_confirm_button.disabled = not ready
+		_confirm_button.add_theme_stylebox_override(
+			"normal", CharacterCards.confirm_style(ready))
+		_confirm_button.add_theme_stylebox_override(
+			"hover", CharacterCards.confirm_style(ready))
+		_confirm_button.add_theme_stylebox_override(
+			"disabled", CharacterCards.confirm_style(false))
+		_confirm_button.text = "START" if ready else "PICK A CHARACTER"
+
+func _on_character_selected(character: String) -> void:
+	Audio.play_sfx("button_click")
+	_picked_character = character
+	_paint_character_cards()
+
+func _on_character_confirmed() -> void:
+	if _picked_character.is_empty():
+		return
+	_on_character_chosen(_picked_character)
+
 func _on_character_chosen(character: String) -> void:
 	Audio.play_sfx("button_click")
 	GameState.character = character
