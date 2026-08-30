@@ -409,6 +409,7 @@ func _apply_layout(profile: LayoutProfile) -> void:
 		_build_move_list()
 		_fit_move_overlay(profile)
 	_refresh_move_strip()
+	_ensure_shadows()
 	TouchFeedback.apply_to_tree(self)
 
 ## Shrinks the compact roster overlay to the moves it actually holds. It has to
@@ -643,6 +644,44 @@ func _place_stage(area: Rect2, height_share: float) -> void:
 	# The backdrop follows the fighters rather than the other way round, so
 	# whatever height the stage ended up with, they are standing on its floor.
 	_place_battle_background(Layout.profile.design_size, floor_y)
+
+# --- floor shadows --------------------------------------------------------
+
+var _shadows: BattleShadows = null
+
+## Puts a shadow under each fighter and tells it where their feet rest.
+##
+## Called from the end of the layout pass rather than from _place_stage,
+## because the wide arrangement never goes through _place_stage at all — it
+## reproduces the authored composition, which stands the two fighters on lines
+## SEVEN PIXELS APART (438 and 445). There is no single stage floor to hand
+## over, so each character's ground is read back off its own placed rect
+## instead, which also means this needs no argument and cannot disagree with
+## the layout that just ran.
+##
+## The layer's tree position is the whole of its correctness: Godot draws
+## siblings in tree order, so immediately BELOW the player character is the only
+## index where a shadow lands on the backdrop and its props while still passing
+## under both fighters. One index later and each character stands in front of
+## its own shadow.
+func _ensure_shadows() -> void:
+	if _shadows == null or not is_instance_valid(_shadows):
+		_shadows = BattleShadows.new()
+		add_child(_shadows)
+		_shadows.add_subject(player_character)
+		_shadows.add_subject(enemy_character)
+	# move_child re-inserts into the list the node has already been REMOVED
+	# from, so landing immediately before the player means aiming one lower
+	# whenever the layer currently sits above it. Getting this wrong makes the
+	# layer leapfrog the player on alternate layout passes.
+	var before: int = player_character.get_index()
+	if _shadows.get_index() < before:
+		before -= 1
+	move_child(_shadows, before)
+	# Safe here and only here: the layout has just written every fighter's rect,
+	# so they are standing at rest whatever the combat choreography was doing a
+	# moment ago.
+	_shadows.capture_floors()
 
 ## Places the backdrop so its painted floor lands under the fighters.
 ##

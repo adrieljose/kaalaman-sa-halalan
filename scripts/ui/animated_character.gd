@@ -267,6 +267,58 @@ func body_rect() -> Rect2:
 		r.position.x = size.x - r.position.x - r.size.x
 	return r
 
+## Fraction of the body's height, measured up from the soles, that counts as
+## "the feet". Low enough to catch shoes and the hem above them, high enough
+## that a single stray pixel cannot define the footprint on its own.
+const FOOT_BAND := 0.09
+
+var _foot_rect_cache: Dictionary = {}
+
+## The character's FOOTPRINT — the opaque bounds of just the bottom of the body,
+## in this node's local coordinates.
+##
+## body_rect() is the wrong measure for anything that happens on the floor. It
+## is the whole silhouette, and these are three-quarter sprites: the Ogre's coat,
+## Ate Ayuda's sack and Juan's raised arm all stick out well past the feet
+## underneath them. A floor shadow sized and centred on that lands off to one
+## side and far too wide, which reads as a puddle the character is standing
+## beside rather than contact with the ground.
+func foot_rect() -> Rect2:
+	var tex: Texture2D = _idle_frames[0] if not _idle_frames.is_empty() else texture
+	if tex == null:
+		return body_rect()
+	var ts := tex.get_size()
+	if ts.x <= 0.0 or ts.y <= 0.0:
+		return body_rect()
+
+	var key := tex.get_rid()
+	if not _foot_rect_cache.has(key):
+		var img := tex.get_image()
+		if img == null:
+			return body_rect()
+		var used := img.get_used_rect()
+		var band: int = maxi(int(round(float(used.size.y) * FOOT_BAND)), 2)
+		var top: int = used.end.y - band
+		var lo := used.end.x
+		var hi := used.position.x
+		for y in range(top, used.end.y):
+			for x in range(used.position.x, used.end.x):
+				if img.get_pixel(x, y).a > 0.5:
+					lo = mini(lo, x)
+					hi = maxi(hi, x + 1)
+		if hi <= lo:
+			_foot_rect_cache[key] = Rect2i(used.position.x, top, used.size.x, band)
+		else:
+			_foot_rect_cache[key] = Rect2i(lo, top, hi - lo, band)
+	var feet: Rect2i = _foot_rect_cache[key]
+
+	var fit: float = minf(size.x / ts.x, size.y / ts.y)
+	var origin := (size - ts * fit) * 0.5
+	var r := Rect2(origin + Vector2(feet.position) * fit, Vector2(feet.size) * fit)
+	if flip_h:
+		r.position.x = size.x - r.position.x - r.size.x
+	return r
+
 ## Where `mover` must be positioned so it comes to rest `gap` from `anchor`,
 ## measured between the two VISIBLE bodies.
 ##
