@@ -117,6 +117,66 @@ Pixel art by Adriel Jose C. Villas
 Godot Engine 4.7 (MIT)
 
 [center][color=#6f211b][b]Full details in CREDITS.md.[/b][/color][/center]"""
+## The patch notes shown by the top-right scroll button.
+##
+## THE ONLY COPY. The credits text exists twice -- once here and once in
+## scenes/main_menu.tscn, where a stale duplicate sits that _style_credits_panel()
+## silently overwrites at runtime -- and that trap has already cost an edit that
+## appeared to do nothing. This panel is built entirely in code and its text
+## lives here alone, so editing this constant is the whole job.
+##
+## Dates are the dates each change actually shipped, taken from the repository
+## history rather than from memory. Newest first.
+const PATCH_NOTES_COPY := """[center][color=#6f211b][font_size=12][b]WHAT'S NEW[/b][/font_size][/color]
+[color=#59442d]Everything added since Chapter 1[/color][/center]
+
+[color=#234c63][font_size=15][b]v1.3 — 2 September 2026[/b][/font_size][/color]
+[color=#8b6b2d]━━━━━━━━━━━━━━━━━━━━━━━━━━━━[/color]
+[b]Tutorial[/b]
+A new TUTORIAL on the title screen walks you through a real encounter — reading the question, spelling the answer, attacking, potions, the rival's moves, and what happens when the clock runs out.
+
+[b]Damage preview[/b]
+Every question now shows what it is worth before you answer. Spell the answer quickly and it is worth more.
+
+[b]150 City Hall questions[/b]
+Chapter 2's question bank grew from 60 entries to 150, each one carrying a fact about how local government works.
+
+[b]Also[/b]
+A proper game icon in the browser tab, and a noticeably smaller download.
+
+[color=#234c63][font_size=15][b]v1.2 — 30 August 2026[/b][/font_size][/color]
+[color=#8b6b2d]━━━━━━━━━━━━━━━━━━━━━━━━━━━━[/color]
+[b]Every rival faces you[/b]
+All fourteen rivals across both chapters were redrawn in a three-quarter battle pose instead of standing square to the camera.
+
+[b]Skills look like themselves[/b]
+18 of the 28 skills gained their own attack animation rather than sharing one generic swing.
+
+[b]Rivals have voices[/b]
+Each one grunts in its own register when hit, and the chapter boss has a second, angrier voice once badly hurt.
+
+[b]Fighters stand on the floor[/b]
+Contact shadows under both fighters, and every room's floor line corrected — nobody hovers in the seating any more.
+
+[b]Title screen[/b]
+Juan and Maria now dance on the plaza, with a theme of its own.
+
+[color=#234c63][font_size=15][b]v1.1 — 29 August 2026[/b][/font_size][/color]
+[color=#8b6b2d]━━━━━━━━━━━━━━━━━━━━━━━━━━━━[/color]
+[b]Chapter 2 — City Hall[/b]
+Nine new encounters, ending with a two-phase boss: Don Eraptado.
+
+[b]New rooms[/b]
+Every encounter is fought somewhere different — the service lobby, the archive, the bidding room, the council chamber — each one painted for this chapter, with props that move.
+
+[b]A real map[/b]
+The chapter map rebuilt around actual landmarks instead of placeholder pins.
+
+[b]Skill icons and a new character picker[/b]
+All 28 skills gained icons, and choosing Juan or Maria became its own screen.
+
+[center][color=#6f211b][b]Chapter 1 is v1.0.[/b][/color][/center]"""
+
 ## How wide a reviewer entry may run before it wraps. The wrap width has to be
 ## set explicitly: a RichTextLabel left to guess reports its height as if every
 ## word were on its own line.
@@ -228,6 +288,10 @@ var _first_time_prompted: bool = false
 ## them -- see _fit_first_time_prompt().
 var _first_time_buttons: Array[Button] = []
 var _first_time_blurb: Label
+## The top-right scroll button and the panel it opens.
+var _patch_button: Button
+var _patch_panel: PanelContainer
+var _patch_close_button: Button
 
 @onready var play_button: Button = $Menu/PlayButton
 @onready var options_button: Button = $Menu/OptionsButton
@@ -338,6 +402,7 @@ func _ready() -> void:
 	# under PLAY, above the two things that only mean something once you have
 	# played.
 	_build_tutorial()
+	_build_patch_notes()
 	_style_main_menu()
 	_style_credits_panel()
 	_build_static_title_characters()
@@ -406,6 +471,8 @@ func _layout_panels(profile: LayoutProfile) -> void:
 	# rect by then, so the panel grows downward from a centre computed for a
 	# height it never had, and sits low on the screen by half the difference.
 	_centre_panel(_first_time_panel, Vector2(286.0, 268.0))
+	_centre_panel(_patch_panel, Vector2(460.0, 360.0), false)
+	_layout_patch_button(profile)
 
 	# The pickers' buttons were sized for a cursor. A finger needs a target it
 	# can hit without aiming, so on touch they grow to 40 design units — about
@@ -1427,6 +1494,8 @@ func _on_credits_pressed() -> void:
 	credits_close_button.grab_focus()
 
 func _on_close_panels() -> void:
+	if _patch_panel != null:
+		_patch_panel.hide()
 	Audio.play_sfx("button_click")
 	var focus_target: Button = credits_button if credits_panel.visible else options_button
 	options_panel.hide()
@@ -1807,6 +1876,172 @@ func _make_prompt_button(text: String, accent: Color) -> Button:
 		if style != null:
 			button.add_theme_stylebox_override(state, style)
 	return button
+
+## The scroll in the top corner, and the notes it opens.
+##
+## A Button carrying its own icon-over-label column rather than Button.icon:
+## the built-in icon slot lays the icon BESIDE the text, and stacking them needs
+## the two as real children. They ignore the mouse so the button underneath
+## still takes the whole click.
+func _build_patch_notes() -> void:
+	_patch_button = Button.new()
+	_patch_button.name = "PatchNotesButton"
+	_patch_button.flat = true
+	_patch_button.tooltip_text = "What changed since Chapter 1"
+	_patch_button.pressed.connect(_on_patch_notes_pressed)
+	add_child(_patch_button)
+
+	var column := VBoxContainer.new()
+	column.name = "Stack"
+	column.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	column.alignment = BoxContainer.ALIGNMENT_CENTER
+	column.add_theme_constant_override("separation", 1)
+	column.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_patch_button.add_child(column)
+
+	var art := TextureRect.new()
+	art.name = "Icon"
+	art.texture = load("res://assets/images/ui/icon_patch_notes.png")
+	art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	art.custom_minimum_size = Vector2(0, 30.0)
+	art.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	column.add_child(art)
+
+	var caption := Label.new()
+	caption.name = "Caption"
+	caption.text = "Patch Notes"
+	caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	caption.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	caption.add_theme_font_size_override("font_size", 9)
+	caption.add_theme_color_override("font_color", Color(1, 0.92, 0.72))
+	# The plaza behind this is bright sky; without a shadow the caption vanishes
+	# into the clouds at the top of the frame.
+	caption.add_theme_color_override("font_shadow_color", Color(0.1, 0.06, 0.03, 0.9))
+	caption.add_theme_constant_override("shadow_offset_x", 1)
+	caption.add_theme_constant_override("shadow_offset_y", 1)
+	caption.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	column.add_child(caption)
+
+	_patch_panel = PanelContainer.new()
+	_patch_panel.name = "PatchNotesPanel"
+	_patch_panel.add_theme_stylebox_override("panel", _overlay_style())
+	add_child(_patch_panel)
+
+	var body := VBoxContainer.new()
+	body.add_theme_constant_override("separation", 8)
+	_patch_panel.add_child(body)
+
+	var heading := Label.new()
+	heading.text = "PATCH NOTES"
+	heading.add_theme_font_override("font", load("res://assets/fonts/TitanOne-Regular.ttf"))
+	heading.add_theme_font_size_override("font_size", 20)
+	heading.add_theme_color_override("font_color", Color(1, 0.87, 0.5))
+	heading.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	body.add_child(heading)
+
+	var notes := RichTextLabel.new()
+	notes.name = "PatchNotesText"
+	notes.bbcode_enabled = true
+	notes.text = PATCH_NOTES_COPY
+	notes.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	notes.add_theme_font_override("normal_font", load(
+		"res://assets/fonts/PlayfairDisplay-Variable.ttf"))
+	notes.add_theme_font_override("bold_font", load(
+		"res://assets/fonts/PlayfairDisplay-Variable.ttf"))
+	notes.add_theme_font_size_override("normal_font_size", 12)
+	notes.add_theme_font_size_override("bold_font_size", 12)
+	notes.add_theme_color_override("default_color", Color(0.22, 0.14, 0.075))
+	# The same parchment the credits are read off, so the two panels are one
+	# family rather than two designs.
+	notes.add_theme_stylebox_override("normal", _credits_paper_style())
+	body.add_child(notes)
+	_style_credits_scrollbar(notes.get_v_scroll_bar())
+
+	# Dressed exactly like the credits panel's own CLOSE, by running the same
+	# accent through the same stylebox builder. Copying the finished boxes off
+	# that button instead would depend on _style_credits_panel() having already
+	# run, which is a build-order dependency this does not need.
+	_patch_close_button = Button.new()
+	_patch_close_button.text = "CLOSE"
+	_patch_close_button.custom_minimum_size = Vector2(0, 34.0)
+	_patch_close_button.add_theme_font_override("font", load(
+		"res://assets/fonts/TitanOne-Regular.ttf"))
+	_patch_close_button.add_theme_font_size_override("font_size", 13)
+	_patch_close_button.add_theme_color_override("font_color", Color(1.0, 0.91, 0.66))
+	_patch_close_button.add_theme_color_override("font_hover_color", Color.WHITE)
+	_patch_close_button.add_theme_color_override("font_pressed_color", Color(0.95, 0.80, 0.48))
+	var close_accent := Color(0.56, 0.17, 0.15)
+	for state in ["normal", "hover", "pressed", "focus"]:
+		var style := _main_menu_button_style(close_accent, state)
+		style.bg_color = close_accent
+		match state:
+			"hover", "focus":
+				style.bg_color = close_accent.lightened(0.12)
+			"pressed":
+				style.bg_color = close_accent.darkened(0.20)
+		_patch_close_button.add_theme_stylebox_override(state, style)
+	_patch_close_button.pressed.connect(_on_close_panels)
+	body.add_child(_patch_close_button)
+
+	_patch_panel.hide()
+
+func _on_patch_notes_pressed() -> void:
+	Audio.play_sfx("button_click")
+	options_panel.hide()
+	credits_panel.hide()
+	difficulty_panel.hide()
+	character_panel.hide()
+	map_panel.hide()
+	_reviewer_panel.hide()
+	_certificate_panel.hide()
+	_first_time_panel.hide()
+	_set_title_visible(true)
+	_pop_panel(_patch_panel)
+	var notes := _patch_panel.get_node_or_null("VBoxContainer/PatchNotesText") as RichTextLabel
+	if notes != null:
+		notes.get_v_scroll_bar().value = 0.0
+	_patch_close_button.grab_focus()
+
+## Where the scroll sits, which is "the top corner that is actually free".
+##
+## Measured off the LIVE rects of the logo and the menu rather than recomputed
+## from the same numbers the layout passes use. Two reasons: the title art is
+## opaque edge to edge -- there is no transparent margin to hide under, so a
+## few units of overlap is a few units of the logo covered -- and a second copy
+## of "how tall is the logo here" is a second thing to keep in step. Asking the
+## node is always right.
+##
+## All three arrangements are the same request, honoured as far as each allows:
+## WIDE has open sky right of the logo, PORTRAIT has none because the logo spans
+## the full width, and LANDSCAPE_COMPACT has neither because the menu column owns
+## the right edge.
+func _layout_patch_button(profile: LayoutProfile) -> void:
+	if _patch_button == null:
+		return
+	var d := profile.design_size
+	# 64 tall, not 58: "Patch Notes" wraps to two lines at 52 wide, and the icon
+	# plus both lines needs the room. The centred column overflows both ends of a
+	# box that is too short rather than clipping, so it shows up as a caption
+	# hanging past the button rather than as a missing one.
+	var size := Vector2(52.0, 64.0)
+	var margin: float = maxf(d.x * 0.02, 8.0)
+	var logo := ($TitleLogo as Control).get_global_rect()
+
+	var spot: Vector2
+	if profile.is_wide():
+		# Right of the logo, or against the screen edge when the screen is wide
+		# enough that the two do not compete.
+		spot = Vector2(maxf(logo.end.x + 4.0, d.x - margin - size.x), margin)
+	elif profile.is_portrait():
+		spot = Vector2(d.x - margin - size.x, logo.end.y + 4.0)
+	else:
+		var menu := ($Menu as Control).get_global_rect()
+		spot = Vector2(menu.position.x - 4.0 - size.x, logo.end.y + 4.0)
+
+	# Last resort: never off the screen, whatever the arrangement asked for.
+	spot.x = clampf(spot.x, 2.0, maxf(d.x - size.x - 2.0, 2.0))
+	spot.y = clampf(spot.y, 2.0, maxf(d.y - size.y - 2.0, 2.0))
+	_place(_patch_button, Rect2(spot, size))
 
 func _on_tutorial_pressed() -> void:
 	Audio.play_sfx("button_click")
