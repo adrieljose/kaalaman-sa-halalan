@@ -17,3 +17,10 @@ Thumbs.db
 
 # Graphics-driver logs that appear in the project root on Windows.
 NVIDIA Corporation/
+
+# Screenshots and probe output. Regenerate with the tools in tools/ -- these are
+# 20 MB of pictures OF the game, not part of it, and the same reasoning that
+# keeps them out of the web export (exclude_filter in export_presets.cfg) keeps
+# them out of the history.
+output/
+tmp/

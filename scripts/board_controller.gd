@@ -330,6 +330,40 @@ func _handle_tile_click(pos: Vector2) -> void:
 	_emit_selection_changed()
 	tile_lifted.emit(letter, from_rect)
 
+## Taps out `word` on the board as if the player had clicked each cell.
+##
+## Routed through _handle_tile_click() rather than reaching into _selected_cells
+## directly, so a demonstration takes exactly the path a real tap takes: the
+## same tile highlight, the same tile_lifted cue, the same selection_changed
+## that starts the speed stopwatch. Anything that would go wrong for a player
+## goes wrong here too, which is the only reason a demonstration is worth
+## watching.
+##
+## Returns false, having selected nothing, if any letter is not on the board --
+## the caller gets a clean refusal rather than a half-spelled word.
+func demo_select(word: String) -> bool:
+	var wanted := word.to_upper()
+	var claimed: Array[Vector2i] = []
+	for letter in wanted:
+		var found := Vector2i(-1, -1)
+		for col in COLS:
+			for row in ROWS:
+				var cell := Vector2i(col, row)
+				if claimed.has(cell) or _selected_cells.has(cell):
+					continue
+				var tile: LetterTile = grid[col][row]
+				if tile != null and tile.letter == letter:
+					found = cell
+					break
+			if found.x >= 0:
+				break
+		if found.x < 0:
+			return false
+		claimed.append(found)
+	for cell in claimed:
+		_handle_tile_click(_cell_position(cell.x, cell.y) + Vector2(tile_size, tile_size) * 0.5)
+	return true
+
 ## Deselects the letter at `index` in the current word and everything picked
 ## after it. Clicking a chip in the word tray routes here, so undoing from the
 ## tray behaves exactly like tapping the letter's cell on the board.

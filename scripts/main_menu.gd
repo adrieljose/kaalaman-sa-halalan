@@ -70,6 +70,59 @@ const DIFFICULTY_BLURB := {
 	"medium": "Real election terms",
 	"hard": "Long civics words",
 }
+## How wide a difficulty hint's second line may run. The panel is 340 units
+## across in the scene; this leaves a margin either side rather than letting a
+## line reach the frame, which is where chapter 2's longest examples landed.
+const HINT_MAX_WIDTH := 290.0
+
+## Colour-coded civic ribbons for the six title actions. Their parchment body
+## and ballot ornament stay identical; the restrained accent shift makes each
+## destination recognisable without turning the menu into six unrelated skins.
+const MENU_ACCENTS := {
+	"PlayButton": Color(0.15, 0.43, 0.31),
+	"ReviewerButton": Color(0.25, 0.36, 0.58),
+	"CertificateButton": Color(0.67, 0.43, 0.12),
+	"OptionsButton": Color(0.25, 0.45, 0.52),
+	"CreditsButton": Color(0.55, 0.22, 0.18),
+	"QuitButton": Color(0.45, 0.18, 0.20),
+}
+
+## The wording is the scene's original credit record, reorganised into civic
+## notice sections. No names, sources, licences or acknowledgements are lost.
+const CREDITS_COPY := """[center][color=#6f211b][font_size=12][b]KAALAMAN SA HALALAN[/b][/font_size][/color]
+[color=#59442d]A word game about Philippine elections.[/color][/center]
+
+[color=#234c63][font_size=15][b]DEVELOPMENT[/b][/font_size][/color]
+[color=#8b6b2d]━━━━━━━━━━━━━━━━━━━━━━━━━━━━[/color]
+[b]Game Developer[/b] — Adriel Jose Villas
+[b]Election Officer IV[/b] — Atty. Keinth L. Horario
+
+[color=#234c63][font_size=15][b]PROJECT / ELECTION INFORMATION[/b][/font_size][/color]
+[color=#8b6b2d]━━━━━━━━━━━━━━━━━━━━━━━━━━━━[/color]
+[b]Kaalaman sa Halalan[/b] — a word game about Philippine elections.
+All enemies are fictional archetypes, not real people or parties.
+
+[color=#234c63][font_size=15][b]MUSIC & SOUND[/b][/font_size][/color]
+[color=#8b6b2d]━━━━━━━━━━━━━━━━━━━━━━━━━━━━[/color]
+[b]Menu Theme[/b] — "Padayaw", Himamaylan City Cluster 4
+[b]Battle Theme[/b] — Wolfgang_ (Theodore Kerr), CC0, OpenGameArt.org
+[b]Jingles, Interface & Impact Sounds[/b] — Kenney (kenney.nl), CC0
+
+[color=#234c63][font_size=15][b]ASSETS / ATTRIBUTION[/b][/font_size][/color]
+[color=#8b6b2d]━━━━━━━━━━━━━━━━━━━━━━━━━━━━[/color]
+[b]Font[/b]
+Titan One — Rodrigo Fuenzalida, SIL Open Font License 1.1
+
+[b]Word Lists[/b]
+dwyl/english-words (Unlicense) · AustinZuniga/Filipino-wordlist (MIT)
+
+[b]Art[/b]
+Pixel art generated with PixelLab for this project.
+
+[b]Engine[/b]
+Godot Engine 4.7 (MIT)
+
+[center][color=#6f211b][b]Full details in CREDITS.md.[/b][/color][/center]"""
 ## How wide a reviewer entry may run before it wraps. The wrap width has to be
 ## set explicitly: a RichTextLabel left to guess reports its height as if every
 ## word were on its own line.
@@ -144,6 +197,10 @@ const WIDE_COMPOSITION := Vector2(640.0, 480.0)
 ## buttons are a narrow column beside the characters on a monitor and a
 ## full-width stack beneath them on a phone.
 var _menu_bounds := Rect2(372.0, 144.0, 240.0, 290.0)
+## The shortest a menu button may be squeezed. Below this the label starts
+## touching its own border; the font cap in _grow_menu_stack() is what keeps a
+## button this short still legible.
+const MENU_BUTTON_MIN_HEIGHT := 26.0
 ## Preferred button height before the fitting in _grow_menu_stack() shrinks it.
 ## Phones get a taller one so the target clears a fingertip.
 var _menu_button_height := 50.0
@@ -169,6 +226,15 @@ var _map_list: VBoxContainer
 ## compact chapter picker still reads as the map rather than as a bare menu.
 var _map_scrim: TextureRect
 
+## The first-time tutorial offer, and whether this sitting has already made it.
+## The panel is built in code; see _build_first_time_prompt().
+var _first_time_panel: PanelContainer
+var _first_time_prompted: bool = false
+## The prompt's three buttons and its blurb, held so a rotated phone can shrink
+## them -- see _fit_first_time_prompt().
+var _first_time_buttons: Array[Button] = []
+var _first_time_blurb: Label
+
 @onready var play_button: Button = $Menu/PlayButton
 @onready var options_button: Button = $Menu/OptionsButton
 @onready var credits_button: Button = $Menu/CreditsButton
@@ -182,9 +248,8 @@ var _map_scrim: TextureRect
 @onready var character_back_button: Button = $CharacterPanel/VBox/BackButton
 @onready var title_character: AnimatedCharacter = $PlayerCharacter
 @onready var title_character_female: AnimatedCharacter = $PlayerCharacterFemale
-## Drives the pair's dance. Built in code alongside the other title-screen
-## builders, and re-cut on every layout change — see TitleDance.rebuild().
-var _dance: TitleDance
+var _juan_shadow: Panel
+var _maria_shadow: Panel
 @onready var difficulty_panel: PanelContainer = $DifficultyPanel
 @onready var easy_button: Button = $DifficultyPanel/VBox/EasyButton
 @onready var medium_button: Button = $DifficultyPanel/VBox/MediumButton
@@ -272,20 +337,27 @@ func _ready() -> void:
 	Audio.play_music("menu")
 	_build_reviewer()
 	_build_certificate()
-	# Both characters stand on the plaza, Juan on the left and Maria on the
-	# right, rather than only whoever happens to be selected. They are the two
-	# faces of the game and the title screen is where a player meets them; the
-	# selection is made on its own screen a click later anyway.
-	title_character.configure_clips(GameState.PLAYER_CHARACTERS["male"])
-	title_character_female.configure_clips(GameState.PLAYER_CHARACTERS["female"])
-	_dance = TitleDance.new()
-	_dance.name = "TitleDance"
-	add_child(_dance)
+	# After both of the above. _insert_menu_button() places a button directly
+	# below the one it is given, and REVIEWER also anchors itself to PLAY -- so
+	# inserting TUTORIAL first would leave the stack reading PLAY, REVIEWER,
+	# TUTORIAL. Going last puts it where a new player looks for it: immediately
+	# under PLAY, above the two things that only mean something once you have
+	# played.
+	_build_tutorial()
+	_style_main_menu()
+	_style_credits_panel()
+	_build_static_title_characters()
 	_group_map()
 	# Last, and after every builder above: the layout pass positions panels that
 	# do not exist until those builders have run. bind() also runs it once
 	# immediately, so the first frame is already in the right arrangement.
 	Layout.bind(self, "_apply_layout")
+	# The tutorial's START GAME button comes back here rather than launching a
+	# run itself, because picking a chapter, a character and a difficulty is
+	# this screen's job. Cleared as it is read, so it fires once.
+	if GameState.pending_play_request:
+		GameState.pending_play_request = false
+		_on_play_pressed()
 
 # --- responsive layout ----------------------------------------------------
 #
@@ -310,21 +382,7 @@ func _apply_layout(profile: LayoutProfile) -> void:
 	# this scene assigned one stylebox to all four states, so until now none of
 	# them acknowledged a press at all — see TouchFeedback.
 	TouchFeedback.apply_to_tree(self)
-	_restart_dance()
-
-## Re-cuts the dancers after the arrangement has moved or resized them.
-##
-## Deferred a frame on purpose: the layout above writes offsets, and the rig is
-## built from the node's SIZE. Cutting in the same frame slices against the rect
-## the characters had a moment ago, which lands the bands beside the character
-## instead of on it.
-func _restart_dance() -> void:
-	if _dance == null:
-		return
-	await get_tree().process_frame
-	if not is_instance_valid(_dance):
-		return
-	_dance.setup({"juan": title_character, "maria": title_character_female})
+	_layout_title_shadows()
 
 ## Every overlay was positioned by a hardcoded rect measured against the 640x480
 ## canvas — 150..490 for the difficulty picker, 16..624 for the reviewer, and so
@@ -337,13 +395,23 @@ func _layout_panels(profile: LayoutProfile) -> void:
 	# Never shrink-to-content: the credits body is a RichTextLabel, which reports
 	# almost no minimum height, so fitting the panel to its "content" collapsed
 	# it to a title and a Close button with the actual credits clipped away.
-	_centre_panel(credits_panel, Vector2(420.0, 250.0), false)
+	_centre_panel(credits_panel, Vector2(500.0, 350.0), false)
 	_centre_panel(options_panel, Vector2(288.0, 168.0))
 	# 300 units of status label alone is wider than a small phone.
 	if _certificate_status_label != null:
 		_certificate_status_label.custom_minimum_size.x = minf(
 			300.0, profile.design_size.x * 0.88)
 	_centre_panel(_certificate_panel, Vector2(340.0, 226.0))
+	_fit_first_time_prompt(profile)
+	# Narrower than the rest on purpose: a 340-unit slab around this much content
+	# reads as a warning rather than an offer.
+	#
+	# The height has to be at least the content's own, which is 248 with three
+	# buttons. Nothing is clipped when it is not -- Godot raises a Control back
+	# to its minimum size -- but _centre_panel() has already CENTRED the smaller
+	# rect by then, so the panel grows downward from a centre computed for a
+	# height it never had, and sits low on the screen by half the difference.
+	_centre_panel(_first_time_panel, Vector2(286.0, 268.0))
 
 	# The pickers' buttons were sized for a cursor. A finger needs a target it
 	# can hit without aiming, so on touch they grow to 40 design units — about
@@ -572,6 +640,297 @@ func _place(node: Control, rect: Rect2) -> void:
 	node.offset_top = rect.position.y
 	node.offset_right = rect.end.x
 	node.offset_bottom = rect.end.y
+
+## Freezes the title pair in two existing hand-drawn action frames. Juan points
+## across the plaza; Maria is mirrored toward him with her pen raised. Because
+## these are ordinary TextureRects with processing disabled, there is no hidden
+## idle, timer, tween or per-frame pose loop left behind.
+func _build_static_title_characters() -> void:
+	for who in [title_character, title_character_female]:
+		who.rig_disable()
+		who.pose_locked = true
+		who.set_process(false)
+		who.scale = Vector2.ONE
+		who.rotation = 0.0
+		who.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+
+	title_character.flip_h = false
+	title_character.texture = load(
+		"res://assets/images/characters/player_attack/frame_5.png") as Texture2D
+	title_character_female.flip_h = true
+	title_character_female.texture = load(
+		"res://assets/images/characters/player_female_attack/frame_3.png") as Texture2D
+
+	_juan_shadow = _make_title_shadow("JuanContactShadow")
+	_maria_shadow = _make_title_shadow("MariaContactShadow")
+	_title_pieces.append(_juan_shadow)
+	_title_pieces.append(_maria_shadow)
+
+## A small stepped-looking contact shadow grounds a character without turning
+## into a soft modern drop shadow. It is a sibling behind the figure, so hiding
+## the title composition for a panel also hides the paving shadow with it.
+func _make_title_shadow(shadow_name: String) -> Panel:
+	var shadow := Panel.new()
+	shadow.name = shadow_name
+	shadow.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0.10, 0.055, 0.025, 0.48)
+	style.set_corner_radius_all(10)
+	style.anti_aliasing = false
+	shadow.add_theme_stylebox_override("panel", style)
+	add_child(shadow)
+	# Put each shadow behind both figures but above the painted plaza.
+	move_child(shadow, mini(title_character.get_index(), title_character_female.get_index()))
+	return shadow
+
+func _layout_title_shadows() -> void:
+	_layout_character_shadow(_juan_shadow, title_character)
+	_layout_character_shadow(_maria_shadow, title_character_female)
+
+func _layout_character_shadow(shadow: Panel, who: AnimatedCharacter) -> void:
+	if shadow == null or who == null:
+		return
+	shadow.visible = who.visible
+	if not who.visible:
+		return
+	var feet := who.foot_rect()
+	var body := who.body_rect()
+	var width: float = maxf(feet.size.x * 1.65, body.size.x * 0.36)
+	var height: float = clampf(width * 0.20, 4.0, 10.0)
+	var centre_x: float = who.position.x + feet.position.x + feet.size.x * 0.5
+	var floor_y: float = who.position.y + feet.end.y
+	_place(shadow, Rect2(centre_x - width * 0.5, floor_y - height * 0.42, width, height))
+
+# --- title menu visual system --------------------------------------------
+
+func _style_main_menu() -> void:
+	var menu := play_button.get_parent() as VBoxContainer
+	if menu == null:
+		return
+	menu.add_theme_constant_override("separation", 7)
+	for child in menu.get_children():
+		if child is not Button:
+			continue
+		var button := child as Button
+		var accent: Color = MENU_ACCENTS.get(button.name, Color(0.25, 0.40, 0.48))
+		_style_main_menu_button(button, accent)
+
+func _style_main_menu_button(button: Button, accent: Color) -> void:
+	button.self_modulate = Color.WHITE
+	button.focus_mode = Control.FOCUS_ALL
+	button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	button.clip_text = true
+	button.add_theme_font_override("font", load("res://assets/fonts/TitanOne-Regular.ttf"))
+	button.add_theme_color_override("font_color", Color(0.20, 0.115, 0.055))
+	button.add_theme_color_override("font_hover_color", Color(0.12, 0.075, 0.035))
+	button.add_theme_color_override("font_pressed_color", Color(0.28, 0.16, 0.075))
+	button.add_theme_color_override("font_focus_color", Color(0.12, 0.075, 0.035))
+	button.add_theme_color_override("font_outline_color", Color(1.0, 0.89, 0.64, 0.82))
+	button.add_theme_constant_override("outline_size", 1)
+	for state in ["normal", "hover", "pressed", "focus", "disabled"]:
+		button.add_theme_stylebox_override(state, _main_menu_button_style(accent, state))
+
+	var ornament := button.get_node_or_null("ElectionOrnament") as ElectionButtonOrnament
+	if ornament == null:
+		ornament = ElectionButtonOrnament.new()
+		ornament.name = "ElectionOrnament"
+		button.add_child(ornament)
+	ornament.setup(button, accent)
+
+func _main_menu_button_style(accent: Color, state: String) -> StyleBoxFlat:
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0.91, 0.80, 0.58)
+	style.border_color = accent
+	style.border_width_left = 4
+	style.border_width_top = 2
+	style.border_width_right = 4
+	style.border_width_bottom = 3
+	# Opposing rounded corners give the ballot slips a clipped-banner profile
+	# rather than the generic pill/rectangle silhouette used elsewhere.
+	style.corner_radius_top_left = 10
+	style.corner_radius_top_right = 2
+	style.corner_radius_bottom_right = 10
+	style.corner_radius_bottom_left = 2
+	style.corner_detail = 2
+	style.content_margin_left = 40.0
+	style.content_margin_right = 40.0
+	style.content_margin_top = 6.0
+	style.content_margin_bottom = 6.0
+	style.shadow_color = Color(0.09, 0.045, 0.02, 0.58)
+	style.shadow_size = 4
+	style.shadow_offset = Vector2(2.0, 3.0)
+	style.anti_aliasing = false
+	match state:
+		"hover":
+			style.bg_color = Color(1.0, 0.90, 0.66)
+			style.border_color = accent.lightened(0.16)
+			style.shadow_size = 6
+			style.shadow_offset = Vector2(2.0, 4.0)
+		"pressed":
+			style.bg_color = Color(0.78, 0.65, 0.43)
+			style.border_color = accent.darkened(0.18)
+			style.shadow_size = 1
+			style.shadow_offset = Vector2(1.0, 1.0)
+			style.content_margin_top = 8.0
+			style.content_margin_bottom = 4.0
+		"focus":
+			style.bg_color = Color(0.98, 0.86, 0.61)
+			style.border_color = Color(0.96, 0.76, 0.25)
+			style.set_border_width_all(4)
+		"disabled":
+			style.bg_color = Color(0.58, 0.53, 0.44)
+			style.border_color = Color(0.34, 0.31, 0.27)
+	return style
+
+# --- credits civic record ------------------------------------------------
+
+func _style_credits_panel() -> void:
+	credits_panel.add_theme_stylebox_override("panel", _credits_outer_style())
+	var column := credits_panel.get_node_or_null("VBox") as VBoxContainer
+	var title := credits_panel.get_node_or_null("VBox/CreditsTitle") as Label
+	var copy := credits_panel.get_node_or_null("VBox/CreditsText") as RichTextLabel
+	if column == null or title == null or copy == null:
+		return
+	column.add_theme_constant_override("separation", 7)
+
+	var title_style := StyleBoxFlat.new()
+	title_style.bg_color = Color(0.10, 0.24, 0.32, 0.98)
+	title_style.border_color = Color(0.82, 0.61, 0.22)
+	title_style.set_border_width_all(2)
+	title_style.corner_radius_top_left = 8
+	title_style.corner_radius_top_right = 2
+	title_style.corner_radius_bottom_right = 8
+	title_style.corner_radius_bottom_left = 2
+	title_style.content_margin_top = 5.0
+	title_style.content_margin_bottom = 5.0
+	title_style.shadow_color = Color(0.04, 0.025, 0.015, 0.45)
+	title_style.shadow_size = 3
+	title_style.shadow_offset = Vector2(1.0, 2.0)
+	title.add_theme_stylebox_override("normal", title_style)
+	title.add_theme_color_override("font_color", Color(1.0, 0.86, 0.47))
+	title.add_theme_color_override("font_shadow_color", Color(0.04, 0.02, 0.01, 0.8))
+	title.add_theme_constant_override("shadow_offset_x", 1)
+	title.add_theme_constant_override("shadow_offset_y", 2)
+	title.add_theme_font_size_override("font_size", 24)
+	title.custom_minimum_size.y = 42.0
+
+	var subtitle := column.get_node_or_null("RecordSubtitle") as Label
+	if subtitle == null:
+		subtitle = Label.new()
+		subtitle.name = "RecordSubtitle"
+		subtitle.text = "OFFICIAL PROJECT RECORD  •  CIVIC EDUCATION EDITION"
+		subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		subtitle.add_theme_font_override("font", load("res://assets/fonts/PlayfairDisplay-Variable.ttf"))
+		subtitle.add_theme_font_size_override("font_size", 10)
+		subtitle.add_theme_color_override("font_color", Color(0.95, 0.82, 0.48))
+		column.add_child(subtitle)
+		column.move_child(subtitle, title.get_index() + 1)
+
+	var divider := column.get_node_or_null("HeaderDivider") as HSeparator
+	if divider == null:
+		divider = HSeparator.new()
+		divider.name = "HeaderDivider"
+		var divider_style := StyleBoxFlat.new()
+		divider_style.bg_color = Color(0.78, 0.58, 0.22, 0.85)
+		divider_style.content_margin_top = 1.0
+		divider_style.content_margin_bottom = 1.0
+		divider.add_theme_stylebox_override("separator", divider_style)
+		column.add_child(divider)
+		column.move_child(divider, subtitle.get_index() + 1)
+
+	copy.text = CREDITS_COPY
+	copy.add_theme_font_override("normal_font", load(
+		"res://assets/fonts/PlayfairDisplay-Variable.ttf"))
+	copy.add_theme_font_override("bold_font", load(
+		"res://assets/fonts/PlayfairDisplay-Variable.ttf"))
+	copy.add_theme_font_size_override("normal_font_size", 12)
+	copy.add_theme_font_size_override("bold_font_size", 12)
+	copy.add_theme_color_override("default_color", Color(0.22, 0.14, 0.075))
+	copy.add_theme_color_override("font_shadow_color", Color(1.0, 0.92, 0.72, 0.38))
+	copy.add_theme_constant_override("line_separation", 2)
+	copy.add_theme_stylebox_override("normal", _credits_paper_style())
+	copy.scroll_active = true
+	copy.selection_enabled = true
+	_style_credits_scrollbar(copy.get_v_scroll_bar())
+
+	credits_close_button.text = "CLOSE RECORD"
+	credits_close_button.custom_minimum_size.y = 34.0
+	credits_close_button.add_theme_font_override("font", load(
+		"res://assets/fonts/TitanOne-Regular.ttf"))
+	credits_close_button.add_theme_font_size_override("font_size", 13)
+	credits_close_button.add_theme_color_override("font_color", Color(1.0, 0.91, 0.66))
+	credits_close_button.add_theme_color_override("font_hover_color", Color.WHITE)
+	credits_close_button.add_theme_color_override("font_pressed_color", Color(0.95, 0.80, 0.48))
+	var close_accent := Color(0.56, 0.17, 0.15)
+	for state in ["normal", "hover", "pressed", "focus"]:
+		var style := _main_menu_button_style(close_accent, state)
+		style.bg_color = close_accent
+		style.border_color = Color(0.82, 0.61, 0.22)
+		match state:
+			"hover":
+				style.bg_color = close_accent.lightened(0.12)
+			"pressed":
+				style.bg_color = close_accent.darkened(0.20)
+			"focus":
+				style.bg_color = Color(0.12, 0.30, 0.40)
+		style.content_margin_left = 18.0
+		style.content_margin_right = 18.0
+		credits_close_button.add_theme_stylebox_override(state, style)
+
+func _credits_outer_style() -> StyleBoxFlat:
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0.085, 0.055, 0.028, 0.985)
+	style.border_color = Color(0.76, 0.56, 0.20)
+	style.set_border_width_all(6)
+	style.corner_radius_top_left = 12
+	style.corner_radius_top_right = 3
+	style.corner_radius_bottom_right = 12
+	style.corner_radius_bottom_left = 3
+	style.content_margin_left = 15.0
+	style.content_margin_right = 15.0
+	style.content_margin_top = 13.0
+	style.content_margin_bottom = 13.0
+	style.shadow_color = Color(0.0, 0.0, 0.0, 0.68)
+	style.shadow_size = 12
+	style.shadow_offset = Vector2(4.0, 6.0)
+	style.anti_aliasing = false
+	return style
+
+func _credits_paper_style() -> StyleBoxFlat:
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0.93, 0.84, 0.65, 0.98)
+	style.border_color = Color(0.46, 0.31, 0.13, 0.95)
+	style.set_border_width_all(3)
+	style.corner_radius_top_left = 2
+	style.corner_radius_top_right = 8
+	style.corner_radius_bottom_right = 2
+	style.corner_radius_bottom_left = 8
+	style.content_margin_left = 14.0
+	style.content_margin_right = 10.0
+	style.content_margin_top = 10.0
+	style.content_margin_bottom = 10.0
+	style.anti_aliasing = false
+	return style
+
+func _style_credits_scrollbar(bar: VScrollBar) -> void:
+	if bar == null:
+		return
+	bar.custom_minimum_size.x = 15.0
+	var track := StyleBoxFlat.new()
+	track.bg_color = Color(0.27, 0.18, 0.09, 0.28)
+	track.border_color = Color(0.36, 0.24, 0.10, 0.62)
+	track.set_border_width_all(1)
+	track.set_corner_radius_all(2)
+	bar.add_theme_stylebox_override("scroll", track)
+	for state in ["grabber", "grabber_highlight", "grabber_pressed"]:
+		var handle := StyleBoxFlat.new()
+		handle.bg_color = Color(0.55, 0.19, 0.15) if state == "grabber" else Color(0.69, 0.28, 0.19)
+		handle.border_color = Color(0.82, 0.61, 0.22)
+		handle.set_border_width_all(2)
+		handle.set_corner_radius_all(3)
+		handle.content_margin_left = 4.0
+		handle.content_margin_right = 4.0
+		bar.add_theme_stylebox_override(state, handle)
 
 ## Moves the map illustration and its pins into one Control so they can be
 ## scaled together. Done in code rather than in main_menu.tscn because the
@@ -817,6 +1176,22 @@ func _on_play_pressed() -> void:
 	character_panel.hide()
 	_reviewer_panel.hide()
 	_certificate_panel.hide()
+	# Offered once, to somebody who has never finished it, and never in the way
+	# of anyone else: declining or finishing it both let PLAY behave exactly as
+	# it always has.
+	if not GameState.tutorial_completed and not _first_time_prompted:
+		# The flag is set by the buttons that decide something, not here.
+		# Setting it on merely showing the panel would make BACK behave as a
+		# silent "no" -- the prompt would never return, though the player never
+		# answered it.
+		_layout_panels(Layout.profile)
+		_pop_panel(_first_time_panel)
+		return
+	_open_chapter_map()
+
+## PLAY past the first-time prompt: the chapter map, with the title art out of
+## the way behind it.
+func _open_chapter_map() -> void:
 	_set_title_visible(false)
 	map_panel.show()
 
@@ -1052,11 +1427,17 @@ func _on_credits_pressed() -> void:
 	_reviewer_panel.hide()
 	_certificate_panel.hide()
 	credits_panel.show()
+	var copy := credits_panel.get_node_or_null("VBox/CreditsText") as RichTextLabel
+	if copy != null:
+		copy.get_v_scroll_bar().value = 0.0
+	credits_close_button.grab_focus()
 
 func _on_close_panels() -> void:
 	Audio.play_sfx("button_click")
+	var focus_target: Button = credits_button if credits_panel.visible else options_button
 	options_panel.hide()
 	credits_panel.hide()
+	focus_target.grab_focus()
 
 func _on_quit_pressed() -> void:
 	Audio.play_sfx("button_click")
@@ -1104,11 +1485,9 @@ func _apply_difficulty_hints() -> void:
 		# The clock gets its own line, in caps, above the flavour: it is the one
 		# thing here a player needs before committing to a tier, and it was
 		# unreadable when run together with the description on a single line.
-		var detail: Array[String] = [String(DIFFICULTY_BLURB.get(tier, ""))]
-		var examples := _example_answers(chapter_no, tier, 2)
-		if not examples.is_empty():
-			detail.append(", ".join(examples))
-		label.text = "%d SECONDS PER QUESTION\n%s" % [seconds, "  ·  ".join(detail)]
+		var blurb := String(DIFFICULTY_BLURB.get(tier, ""))
+		label.text = "%d SECONDS PER QUESTION\n%s" % [
+			seconds, _hint_line(blurb, _example_answers(chapter_no, tier, 2), label)]
 	_fit_difficulty_panel()
 
 ## Grows the difficulty panel to whatever its two-line hints actually need,
@@ -1124,38 +1503,78 @@ func _fit_difficulty_panel() -> void:
 		return
 	_regrow_panel(difficulty_panel, needed)
 
+## Joins the blurb to its examples, dropping examples until the line fits.
+##
+## The hint Labels do not wrap, and the panel is a PanelContainer — which
+## clamps itself UP to its children's minimum width rather than clipping them.
+## So an over-long line does not overflow visibly; it silently widens the whole
+## panel off the centred position the rest of the menu is built around.
+##
+## Chapter 1's answers are nearly all single words and two of them never came
+## close to the edge. Chapter 2's City Hall terms are mostly two and three words
+## each, and two of those runs the line to within a few pixels of the frame. So
+## the count is measured rather than fixed: short-answer chapters still get two
+## examples, long-answer ones fall back to one, and no chapter added later can
+## quietly push the panel out of shape.
+func _hint_line(blurb: String, examples: Array[String], label: Label) -> String:
+	var font := label.get_theme_font("font")
+	var font_size := label.get_theme_font_size("font_size")
+	while not examples.is_empty():
+		var line := "%s  ·  %s" % [blurb, ", ".join(examples)]
+		if font == null:
+			return line
+		if font.get_string_size(line, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x <= HINT_MAX_WIDTH:
+			return line
+		examples.remove_at(examples.size() - 1)
+	return blurb
+
 ## A couple of representative answers from one pool, for the difficulty hint.
 ##
-## Picks the words whose length sits closest to that pool's median, so the
-## examples read as typical of the tier rather than as its easiest or most
-## punishing outliers. Multi-word terms are skipped: run together for the board
-## (SANGGUNIANGBARANGAY) they look like a mistake out of context.
+## Picks the terms whose answer sits closest to that pool's median LENGTH, so
+## the examples read as typical of the tier rather than as its easiest or most
+## punishing outliers.
+##
+## Two different strings are in play and the distinction matters. Ranking is on
+## the answer — the run of letters actually traced across the board — because
+## that is what makes a tier feel long or short. Printing is the display form,
+## because a multi-word term run together for the board (SANGGUNIANGPANLUNGSOD)
+## looks like a mistake out of context.
+##
+## Printing the display is what lets multi-word terms be shown at all. They used
+## to be skipped outright, which was fine while chapter 1 was almost entirely
+## single words — but chapter 2's City Hall vocabulary is mostly two- and
+## three-word terms, and its medium tier has no single-word answer at all. Under
+## the old rule that tier's hint would simply have lost its examples.
 func _example_answers(chapter_no: int, tier: String, wanted: int) -> Array[String]:
 	var pool := QuestionBank.entries_for(chapter_no, tier)
-	var single_words: Array[String] = []
+	var terms: Array[Dictionary] = []
+	var seen: Array[String] = []
 	for entry in pool:
 		var answer := String(entry.get("answer", ""))
-		if answer.is_empty() or String(entry.get("display", answer)) != answer:
+		if answer.is_empty() or seen.has(answer):
 			continue
-		if not single_words.has(answer):
-			single_words.append(answer)
-	if single_words.is_empty():
+		seen.append(answer)
+		terms.append({"answer": answer, "display": String(entry.get("display", answer))})
+	if terms.is_empty():
 		return []
 	var lengths: Array[int] = []
-	for word in single_words:
-		lengths.append(word.length())
+	for term in terms:
+		lengths.append(String(term["answer"]).length())
 	lengths.sort()
 	# Truncating is the point: for an even count either middle element is an
 	# equally good centre to sort distance from.
 	@warning_ignore("integer_division")
 	var median: int = lengths[lengths.size() / 2]
-	single_words.sort_custom(func(a: String, b: String) -> bool:
-		var da := absi(a.length() - median)
-		var db := absi(b.length() - median)
+	terms.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+		var da := absi(String(a["answer"]).length() - median)
+		var db := absi(String(b["answer"]).length() - median)
 		if da == db:
-			return a < b
+			return String(a["display"]) < String(b["display"])
 		return da < db)
-	return single_words.slice(0, mini(wanted, single_words.size()))
+	var out: Array[String] = []
+	for term in terms.slice(0, mini(wanted, terms.size())):
+		out.append(String(term["display"]))
+	return out
 
 # --------------------------------------------------------------------------
 # Reviewer
@@ -1290,6 +1709,151 @@ func _add_certificate_menu_button() -> void:
 	if button != null:
 		button.pressed.connect(_on_certificate_pressed)
 
+## Puts TUTORIAL in the stack and builds the prompt a first-time player meets.
+func _build_tutorial() -> void:
+	var button := _insert_menu_button(
+		"TutorialButton", "TUTORIAL", Color(0.72, 1.0, 0.90), play_button)
+	if button != null:
+		button.pressed.connect(_on_tutorial_pressed)
+	_build_first_time_prompt()
+
+## The "first time playing?" card, shown once ahead of the chapter map.
+##
+## Built here rather than added to main_menu.tscn for the same reason the
+## reviewer and certificate panels are: the scene file is edited in the Godot
+## editor, and a save there silently reverts panels added on disk.
+func _build_first_time_prompt() -> void:
+	_first_time_panel = PanelContainer.new()
+	_first_time_panel.name = "FirstTimePanel"
+	_first_time_panel.add_theme_stylebox_override("panel", _overlay_style())
+	add_child(_first_time_panel)
+
+	var column := VBoxContainer.new()
+	column.add_theme_constant_override("separation", 9)
+	_first_time_panel.add_child(column)
+
+	var heading := Label.new()
+	heading.text = "First time playing?"
+	heading.add_theme_font_override("font", load("res://assets/fonts/TitanOne-Regular.ttf"))
+	heading.add_theme_font_size_override("font_size", 19)
+	heading.add_theme_color_override("font_color", Color(1, 0.87, 0.5))
+	heading.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	column.add_child(heading)
+
+	var blurb := Label.new()
+	blurb.text = "The tutorial runs a real encounter and walks you through it. It takes about a minute, and it is always on the title screen if you would rather come back to it."
+	blurb.add_theme_font_size_override("font_size", 11)
+	blurb.add_theme_color_override("font_color", Color(0.90, 0.85, 0.75))
+	blurb.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	blurb.custom_minimum_size.x = 250.0
+	column.add_child(blurb)
+	_first_time_blurb = blurb
+
+	var play_tutorial := _make_prompt_button("PLAY TUTORIAL", Color(0.72, 1.0, 0.90))
+	play_tutorial.pressed.connect(_on_first_time_accepted)
+	column.add_child(play_tutorial)
+	_first_time_buttons.append(play_tutorial)
+
+	var skip := _make_prompt_button("SKIP TUTORIAL", Color(0.86, 0.80, 0.70))
+	skip.pressed.connect(_on_first_time_declined)
+	column.add_child(skip)
+	_first_time_buttons.append(skip)
+
+	# A way out that commits to neither.
+	#
+	# The two buttons above are both decisions: one starts the tutorial, the
+	# other walks on to the chapter map. Somebody who opened PLAY by accident
+	# had no third option and no way back to the title screen -- and unlike every
+	# other panel on this screen, which all carry a Back or Close, this one
+	# trapped them. Deliberately smaller and duller than the other two so it
+	# reads as the escape hatch rather than a third thing to weigh up.
+	var back := _make_prompt_button("BACK", Color(0.62, 0.56, 0.48))
+	back.custom_minimum_size.y = 30.0
+	back.add_theme_font_size_override("font_size", 12)
+	back.pressed.connect(_on_first_time_back)
+	column.add_child(back)
+	_first_time_buttons.append(back)
+
+	_first_time_panel.hide()
+
+## Squeezes the prompt onto a rotated phone.
+##
+## Three buttons and four lines of blurb come to 248 units, and
+## LANDSCAPE_COMPACT offers about 240 between its margins. Asking _centre_panel()
+## for more than fits does not clip anything -- Godot raises the panel back to
+## its minimum -- but it does centre the rect BEFORE that happens, so the panel
+## grows downward and ends up sitting low. Trimming the buttons on that one
+## arrangement is what buys the room; every other layout keeps the roomier card.
+func _fit_first_time_prompt(profile: LayoutProfile) -> void:
+	if _first_time_panel == null:
+		return
+	var tight: bool = profile.design_size.y < 320.0
+	_first_time_blurb.add_theme_font_size_override("font_size", 10 if tight else 11)
+	for i in _first_time_buttons.size():
+		var button: Button = _first_time_buttons[i]
+		# The third is the BACK escape hatch and is already the small one.
+		var full: float = 30.0 if i == 2 else 38.0
+		button.custom_minimum_size.y = (full - 8.0) if tight else full
+
+func _make_prompt_button(text: String, accent: Color) -> Button:
+	var button := Button.new()
+	button.text = text
+	# Taller than the 34 a text button would need: the stylebox borrowed from
+	# PLAY is a painted scroll, and stretching that banner into a short box
+	# squashes its end caps.
+	button.custom_minimum_size = Vector2(0, 38.0)
+	button.self_modulate = accent
+	button.add_theme_font_override("font", load("res://assets/fonts/TitanOne-Regular.ttf"))
+	button.add_theme_font_size_override("font_size", 15)
+	button.add_theme_color_override("font_color", Color(0.2, 0.11, 0.05))
+	# Borrowed from PLAY, the same way _insert_menu_button() does it, so the
+	# prompt is wearing the menu's own wood rather than a second button style.
+	for state in ["normal", "pressed", "hover", "focus"]:
+		var style := play_button.get_theme_stylebox(state)
+		if style != null:
+			button.add_theme_stylebox_override(state, style)
+	return button
+
+func _on_tutorial_pressed() -> void:
+	Audio.play_sfx("button_click")
+	_start_tutorial()
+
+func _on_first_time_accepted() -> void:
+	Audio.play_sfx("button_click")
+	_first_time_panel.hide()
+	_start_tutorial()
+
+## Declining does NOT mark the tutorial as done -- only reaching its last card
+## does that. What it does do is stop the prompt reappearing for the rest of
+## this sitting, so somebody who said no is not asked again two clicks later.
+func _on_first_time_declined() -> void:
+	Audio.play_sfx("button_click")
+	_first_time_prompted = true
+	_first_time_panel.hide()
+	_open_chapter_map()
+
+## Backing out answers nothing, so nothing is recorded: the player lands back on
+## the title screen exactly as they left it, and pressing PLAY again asks again.
+## That is what makes this a cancel rather than a quieter way of declining --
+## SKIP TUTORIAL is already the way to say no and move on.
+func _on_first_time_back() -> void:
+	Audio.play_sfx("button_click")
+	_first_time_panel.hide()
+
+## Boots the battle scene in tutorial mode.
+##
+## Chapter 1, encounter 1, easy: the tutorial quotes a five-letter answer and a
+## specific damage figure, and the hint share that produces "M _ Y _ R" is the
+## easy one. Nothing here is progress -- GameState.tutorial_mode keeps the
+## battle scene from writing any.
+func _start_tutorial() -> void:
+	GameState.tutorial_mode = true
+	GameState.load_chapter(1)
+	GameState.encounter_index = 0
+	GameState.difficulty = "easy"
+	GameState.reset_potions()
+	get_tree().change_scene_to_file(BATTLE_SCENE)
+
 ## Adds one button to the PLAY/REVIEWER/.../QUIT stack, positioned right after
 ## `after`, and grows the stack to fit. Shared by REVIEWER and CERTIFICATE so
 ## both get identical styling (borrowed from PLAY's own stylebox) instead of
@@ -1331,12 +1895,30 @@ func _grow_menu_stack(menu: VBoxContainer) -> void:
 	var separation := menu.get_theme_constant("separation")
 	var available: float = _menu_bounds.size.y
 	var fitted_height: float = (available - separation * (count - 1)) / float(count)
-	var button_height: float = clampf(fitted_height, 30.0, _menu_button_height)
+	var button_height: float = clampf(fitted_height, MENU_BUTTON_MIN_HEIGHT,
+		_menu_button_height)
 	for child in menu.get_children():
 		if child is Button:
 			var button := child as Button
 			button.custom_minimum_size.y = button_height
-			button.add_theme_font_size_override("font_size", _menu_font_size)
+			# The compact 190-unit column leaves 80 units to the ballot box and
+			# seal. CERTIFICATE is the only label that reaches that inner edge;
+			# trim it two points there instead of clipping its final letter.
+			var fitted_font := _menu_font_size
+			if _menu_bounds.size.x < 220.0 and button.text.length() > 9:
+				fitted_font -= 2
+			# And the type comes down with the buttons.
+			#
+			# custom_minimum_size is a floor, not a ceiling: a button is never
+			# shorter than its own font plus the stylebox margins, so setting a
+			# 30-unit height on a 21-point label still yields a 31-unit button.
+			# Seven entries at that size overran the rotated-phone column by two
+			# units. Deriving the size from the height that actually fitted makes
+			# the stack self-correcting for any button count -- and changes
+			# nothing on desktop or portrait, where the band is roomy enough that
+			# this cap never bites.
+			fitted_font = clampi(int(button_height) - 13, 9, fitted_font)
+			button.add_theme_font_size_override("font_size", fitted_font)
 	var needed := button_height * count + separation * (count - 1)
 	menu.offset_left = _menu_bounds.position.x
 	menu.offset_right = _menu_bounds.end.x

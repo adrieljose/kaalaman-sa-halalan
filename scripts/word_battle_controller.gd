@@ -303,6 +303,14 @@ var _moves_open: bool = false
 ## takes the selection from empty to one letter, so the clock measures the time
 ## spent building THIS word rather than time spent staring at the board first.
 var _selection_started_ms: int = 0
+## The potential-damage plate and the row it shares with the countdown bar.
+## Built in code for the same reason the HUD is -- see _build_damage_badge().
+var _damage_badge: DamageBadge
+var _damage_row: HBoxContainer
+## The coaching overlay, non-null only while GameState.tutorial_mode is set.
+## Doubles as the mode flag inside this scene -- "is the tutorial running" and
+## "is there a director on screen" must be the same question.
+var _tutorial: TutorialDirector
 
 func _ready() -> void:
 	# Re-applied on every load rather than only when the menu sets it, so the
@@ -347,12 +355,15 @@ func _ready() -> void:
 	transition_veil.color.a = 0.0
 	transition_veil.hide()
 	_build_move_strip()
+	_build_damage_badge()
 	# Before _start_encounter, so the first question is presented into a layout
 	# that is already the right shape. bind() runs the pass immediately and then
 	# keeps us subscribed, which is what makes rotating the device mid-fight work.
 	Layout.bind(self, "_apply_layout")
 	_start_encounter(true)
 	Audio.play_music("battle")
+	if GameState.tutorial_mode:
+		_begin_tutorial()
 
 # --- responsive layout ----------------------------------------------------
 #
@@ -389,6 +400,18 @@ const PORTRAIT_STAGE_MIN := 92.0
 ## player's rect ends at y=438 of 480 with the backdrop drawn 1:1 over it.
 const BATTLE_GROUND_FRACTION := 0.9125
 
+## The floor line for the room being fought in, falling back to the authored
+## default for every room that has not needed correcting.
+##
+## Read from EnemyData rather than a table keyed by texture path: the room is
+## already a property of the encounter, and a lookup by filename would silently
+## stop matching the day a backdrop is renamed or a phase swaps the texture out.
+func _ground_fraction() -> float:
+	var data: EnemyData = _enemy if _enemy != null else GameState.current_enemy()
+	if data != null and data.ground_fraction > 0.0:
+		return data.ground_fraction
+	return BATTLE_GROUND_FRACTION
+
 func _apply_layout(profile: LayoutProfile) -> void:
 	_hud = _hud_metrics(profile)
 	_build_hud()
@@ -409,6 +432,7 @@ func _apply_layout(profile: LayoutProfile) -> void:
 		_build_move_list()
 		_fit_move_overlay(profile)
 	_refresh_move_strip()
+	_refresh_damage_preview()
 	_ensure_shadows()
 	TouchFeedback.apply_to_tree(self)
 
@@ -516,11 +540,18 @@ func _layout_battle_wide(profile: LayoutProfile) -> void:
 		potion.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		potion.add_theme_font_size_override("font_size", 10)
 	_place_node(potion_panel, Rect2(inset + 10.0, 55.0, 208.0, 83.0))
-	_place_node(question_panel, Rect2(inset + 220.0, 54.0, 259.0, 84.0))
+	# Eight units taller than the authored 84 -- the badge row costs twenty and
+	# the prompt was already using every line it had, so paying for it out of
+	# the question text would have clipped a three-line prompt. The panel now
+	# ends at 146 instead of 138, which is why the tray below moved with it.
+	_place_node(question_panel, Rect2(inset + 220.0, 54.0, 259.0, 92.0))
+	_size_damage_row(20.0, false)
 	_place_node(side_panel, Rect2(inset + 480.0, 55.0, 150.0, 81.0))
-	_place_node(player_character, Rect2(inset + 37.0, 258.0, 130.0, 180.0))
-	_place_node(enemy_character, Rect2(inset + 478.0, 265.0, 130.0, 180.0))
-	_place_node(word_tray, Rect2(inset, 143.0, 640.0, 32.0))
+	_place_fighter_pair(
+		Rect2(inset + 37.0, 258.0, 130.0, 180.0),
+		Rect2(inset + 478.0, 265.0, 130.0, 180.0),
+		1.0)
+	_place_node(word_tray, Rect2(inset, 149.0, 640.0, 30.0))
 	_place_node(word_preview_label, Rect2(inset - 5.0, 416.0, 640.0, 36.0))
 	_place_board(inset + 205.0, 187.0)
 	_place_node(console_bar, Rect2(inset + 120.0, 454.0, 400.0, 26.0))
@@ -558,8 +589,12 @@ func _layout_battle_portrait(profile: LayoutProfile) -> void:
 	_place_node(_move_strip, Rect2(margin, y, w - potion_w - gap, strip_h))
 	_place_node(potion_panel, Rect2(margin + w - potion_w, y, potion_w, strip_h))
 	y += strip_h + gap
-	var question_h: float = clampf(d.y * 0.10, 58.0, 78.0)
+	# Raised from 0.10/58..78 to pay for the damage row without taking the
+	# increase out of the prompt, which on a 320-unit-wide canvas already wraps
+	# to three or four lines.
+	var question_h: float = clampf(d.y * 0.125, 76.0, 96.0)
 	_place_node(question_panel, Rect2(margin, y, w, question_h))
+	_size_damage_row(18.0, false)
 	var content_top: float = y + question_h + gap
 
 	# --- from the bottom
@@ -611,8 +646,14 @@ func _layout_battle_landscape(profile: LayoutProfile) -> void:
 	# fighters, with the controls pinned to the bottom.
 	var col_w: float = board_x - margin * 2.0
 	var y: float = top
-	_place_node(question_panel, Rect2(margin, y, col_w, 46.0))
-	y += 46.0 + gap
+	# The tightest of the three: a rotated phone gives about 270 units of height
+	# for a question, a word tray, two fighters and a control bar. The badge
+	# rides at 16 and drops its " DMG" suffix (see DamageBadge.set_terse), and
+	# the fourteen units the panel gains come out of the stage below, which has
+	# its own floor and can absorb them.
+	_place_node(question_panel, Rect2(margin, y, col_w, 60.0))
+	_size_damage_row(16.0, true)
+	y += 60.0 + gap
 	var tray_h := 22.0
 	_place_node(word_tray, Rect2(margin, y, col_w, tray_h))
 	_place_node(word_preview_label, Rect2(margin, y, col_w, tray_h))
@@ -639,11 +680,36 @@ func _place_stage(area: Rect2, height_share: float) -> void:
 	var h: float = clampf(area.size.y * height_share, 84.0, 180.0)
 	var w: float = h * 0.72
 	var floor_y: float = area.end.y
-	_place_node(player_character, Rect2(area.position.x + 4.0, floor_y - h, w, h))
-	_place_node(enemy_character, Rect2(area.end.x - 4.0 - w, floor_y - h, w, h))
+	_place_fighter_pair(
+		Rect2(area.position.x + 4.0, floor_y - h, w, h),
+		Rect2(area.end.x - 4.0 - w, floor_y - h, w, h),
+		clampf(area.size.x / 640.0, 0.45, 1.0))
 	# The backdrop follows the fighters rather than the other way round, so
 	# whatever height the stage ended up with, they are standing on its floor.
 	_place_battle_background(Layout.profile.design_size, floor_y)
+
+## Applies the small per-room staging corrections stored on EnemyData while
+## keeping each sprite's feet as the scale pivot. The room texture never
+## changes: only the two fighter rects do.
+func _place_fighter_pair(player_rect: Rect2, enemy_rect: Rect2,
+		offset_scale: float) -> void:
+	var data: EnemyData = _enemy if _enemy != null else GameState.current_enemy()
+	var scale := 1.0
+	var player_offset := Vector2.ZERO
+	var enemy_offset := Vector2.ZERO
+	if data != null:
+		scale = clampf(data.battle_scale, 0.75, 1.5)
+		player_offset = data.player_battle_offset * offset_scale
+		enemy_offset = data.enemy_battle_offset * offset_scale
+	_place_node(player_character, _scaled_fighter_rect(player_rect, scale, player_offset))
+	_place_node(enemy_character, _scaled_fighter_rect(enemy_rect, scale, enemy_offset))
+
+func _scaled_fighter_rect(rect: Rect2, scale: float, offset: Vector2) -> Rect2:
+	var scaled_size := rect.size * scale
+	return Rect2(
+		Vector2(rect.position.x - (scaled_size.x - rect.size.x) * 0.5,
+			rect.end.y - scaled_size.y) + offset,
+		scaled_size)
 
 # --- floor shadows --------------------------------------------------------
 
@@ -700,7 +766,8 @@ func _place_battle_background(d: Vector2, stage_floor: float) -> void:
 	var ts := background.texture.get_size()
 	if ts.x <= 0.0 or ts.y <= 0.0:
 		return
-	var s: float = maxf(d.x / ts.x, stage_floor / BATTLE_GROUND_FRACTION / ts.y)
+	var g := _ground_fraction()
+	var s: float = maxf(d.x / ts.x, stage_floor / g / ts.y)
 	var drawn := ts * s
 	background.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	background.stretch_mode = TextureRect.STRETCH_SCALE
@@ -709,7 +776,7 @@ func _place_battle_background(d: Vector2, stage_floor: float) -> void:
 	background.anchor_right = 0.0
 	background.anchor_bottom = 0.0
 	var rect := Rect2((d.x - drawn.x) * 0.5,
-		stage_floor - drawn.y * BATTLE_GROUND_FRACTION, drawn.x, drawn.y)
+		stage_floor - drawn.y * g, drawn.x, drawn.y)
 	_place_node(background, rect)
 	_build_props(rect)
 
@@ -1235,8 +1302,15 @@ func _start_encounter(full_reset: bool) -> void:
 	# this scene directly all land on the right backdrop.
 	if _enemy.background != null:
 		_set_room(_enemy.background)
+	# The first layout happens before _enemy is assigned. Re-run it now so an
+	# encounter's sprite-only staging offsets apply on direct boot, retry, and
+	# the walk into the next room.
+	_apply_layout(Layout.profile)
 
 	_enemy_hp = _enemy.max_hp
+	# Or the first blow of this fight could be swallowed by the cooldown left
+	# over from the last blow of the previous one.
+	Audio.reset_voice()
 	# Every encounter starts at phase 1, including a boss being retried.
 	_boss_phase = 1
 	_phase_changing = false
@@ -1263,6 +1337,7 @@ func _start_encounter(full_reset: bool) -> void:
 	_set_tray_word("")
 	_present_question()
 	_update_action_buttons()
+	_refresh_damage_preview()
 
 ## Pulls the next question, lays its answer out on the board, and restarts the
 ## countdown. The board guarantees the answer stays spellable from here on.
@@ -1272,7 +1347,16 @@ func _start_encounter(full_reset: bool) -> void:
 ## whole purpose is to hand you a different question, and a lap boundary can
 ## legitimately repeat.
 func _present_question(avoid_answer: String = "") -> void:
-	_question = QuestionBank.next_question()
+	# One fixed question for the whole tutorial, re-presented every time the
+	# scene asks for a new one. Isolated from the bank on purpose: the lesson
+	# quotes a specific word and a specific damage figure, and a real question
+	# arriving after the demonstration attack would leave both cards describing
+	# something that is no longer on screen. Nothing about the bank is touched,
+	# so neither progress nor the question rotation is disturbed.
+	if GameState.tutorial_mode:
+		_question = TUTORIAL_QUESTION.duplicate()
+	else:
+		_question = QuestionBank.next_question()
 	if not avoid_answer.is_empty() and QuestionBank.question_count() > 1:
 		var guard := 0
 		while not _question.is_empty() 				and String(_question.get("answer", "")) == avoid_answer 				and guard < 8:
@@ -1283,11 +1367,18 @@ func _present_question(avoid_answer: String = "") -> void:
 		board.set_required_answer("")
 		_time_left = 0.0
 		timer_bar.value = 0.0
+		_refresh_damage_preview()
 		return
 	question_label.text = _format_prompt(_question)
 	board.set_required_answer(_question["answer"])
 	_time_left = _question_time
 	_update_timer_ui()
+	# Cleared so the badge does not price the new question against the previous
+	# question's stopwatch. _speed_bonus() reads the same field at submit time,
+	# where the board's own reseed has already restarted it -- this only matters
+	# to the preview, which asks before the first letter is tapped.
+	_selection_started_ms = 0
+	_refresh_damage_preview()
 
 ## Dresses every panel in the carved-wood-and-gold 9-slice, and the timer in a
 ## sunken track with a beveled fill.
@@ -1746,6 +1837,16 @@ func _process(delta: float) -> void:
 	_tick_props(delta)
 	if _match_over or _sequence_running or _question.is_empty():
 		return
+	# Before the clock check, not after: the speed tiers run out on their own
+	# schedule and the badge has to follow them down even on the last frame
+	# before a timeout.
+	_refresh_damage_preview()
+	# The tutorial holds the clock. Its whole job is to be read, and a rival
+	# taking free hits while the player reads about potions teaches the wrong
+	# lesson. The bar stays full and visible so the step about the timer can
+	# still point at it.
+	if _tutorial != null:
+		return
 	if _time_left <= 0.0:
 		return
 	_time_left = maxf(0.0, _time_left - delta)
@@ -1800,6 +1901,7 @@ func _use_power_potion() -> void:
 	_power_up_active = true
 	word_preview_label.text = "Power Up — next word hits x%s" % POWER_UP_MULTIPLIER
 	_refresh_potion_buttons()
+	_refresh_damage_preview()
 
 func _use_purify_potion() -> void:
 	if not board.has_contamination():
@@ -2133,6 +2235,7 @@ func _on_selection_changed(current_text: String) -> void:
 	if _current_selection.is_empty() and not current_text.is_empty():
 		_selection_started_ms = Time.get_ticks_msec()
 	_current_selection = current_text
+	_refresh_damage_preview()
 	_set_tray_word(current_text)
 	word_tray.visible = current_text.length() > 0
 	word_preview_label.text = _idle_hint()
@@ -2272,32 +2375,54 @@ func _on_word_rejected(word: String) -> void:
 		Audio.play_sfx("word_rejected")
 		word_preview_label.text = "\"%s\" isn't a word" % word
 
-## Damage base is the sum of each letter's Scrabble-style value (rare letters
-## hit harder), not word length. Gold scales that base; Spark adds a
-## flat bonus. Spelling the question's answer multiplies the lot — knowing the
-## answer should always beat merely finding a long word.
-func _on_word_accepted(word: String, used_spark: bool, used_gold: bool) -> void:
-	var is_answer := (not _question.is_empty()
-		and word.to_upper() == String(_question.get("answer", "")))
-
+## THE damage formula. Every number the player is shown or dealt comes through
+## here: the blow struck by _on_word_accepted below, and the promise printed on
+## the badge by _potential_damage(). They take different arguments -- the
+## preview cannot know which board tiles the player will route through -- but
+## they cannot disagree about what those arguments are worth, which is the
+## whole point of there being one function rather than two.
+##
+## Pure: it reads _question (to recognise the answer) and nothing else, and it
+## writes nothing. Burning the Power Up is the caller's job, precisely so the
+## preview can ask "what would this be worth" without spending it.
+func _damage_for(word: String, used_spark: bool, used_gold: bool,
+		used_power_up: bool, speed_multiplier: float) -> int:
 	var damage := BoardController.word_value(word)
 	if used_gold:
 		damage *= GOLD_MULTIPLIER
 	if used_spark:
 		damage += SPARK_BONUS_DAMAGE
-	if is_answer:
+	if _is_answer(word):
 		damage = roundi(damage * ANSWER_BONUS_MULTIPLIER)
+	damage = roundi(damage * float(_attack_tier(word.length())["damage"]))
+	damage = roundi(damage * speed_multiplier)
+	if used_power_up:
+		damage = roundi(damage * POWER_UP_MULTIPLIER)
+	return damage
+
+## Whether `word` is the answer the question on screen is asking for.
+func _is_answer(word: String) -> bool:
+	return (not _question.is_empty()
+		and word.to_upper() == String(_question.get("answer", "")))
+
+## Damage base is the sum of each letter's Scrabble-style value (rare letters
+## hit harder), not word length. Gold scales that base; Spark adds a
+## flat bonus. Spelling the question's answer multiplies the lot — knowing the
+## answer should always beat merely finding a long word.
+func _on_word_accepted(word: String, used_spark: bool, used_gold: bool) -> void:
+	var is_answer := _is_answer(word)
+
 	# Speed scales the hit but cannot carry it: the multiplier tops out at
 	# 1.3x, while length drives the base through letter values and can swing it
 	# several-fold. A fast short word still loses to a slow long one.
 	var tier := _attack_tier(word.length())
-	damage = roundi(damage * float(tier["damage"]))
 	var speed := _speed_bonus(word.length())
-	damage = roundi(damage * float(speed["multiplier"]))
 	var used_power_up := _power_up_active
+	var damage := _damage_for(word, used_spark, used_gold, used_power_up,
+		float(speed["multiplier"]))
 	if used_power_up:
-		damage = roundi(damage * POWER_UP_MULTIPLIER)
 		_power_up_active = false
+		_refresh_damage_preview()
 
 	var bonuses: Array[String] = []
 	if is_answer:
@@ -2320,6 +2445,83 @@ func _on_word_accepted(word: String, used_spark: bool, used_gold: bool) -> void:
 	Audio.play_sfx("word_accepted")
 	_play_attack_sequence(damage, is_answer, tier)
 
+## The whole of a rival taking a confirmed damaging hit: health, voice, flinch
+## clip and a body recoil under it.
+##
+## Gathered into one place because the four have to agree with each other and
+## used not to. The voice fired BEFORE the health came off, so the boss's
+## angrier register was chosen from his health as it was a moment earlier and
+## lagged a hit behind the phase it belonged to. And "the rival reacts" was the
+## flinch clip alone -- six frames of the sprite, with the body it is drawn on
+## perfectly still, which is what made a hit read as a texture swap.
+##
+## Called ONLY from the paths where damage is real. Anticipation, a miss and a
+## blocked blow never reach here, which is what keeps the voice honest.
+func _enemy_take_hit(damage: int) -> void:
+	_enemy_hp = maxi(0, _enemy_hp - damage)
+	enemy_heart_row.set_value(_enemy_hp)
+	_speak_enemy_hurt()
+
+	# The clip and the recoil run TOGETHER, not one after the other: the recoil
+	# is the body carrying the blow the clip is drawing, so playing them in
+	# sequence would show the flinch and then, oddly, a second reaction.
+	# Started without awaiting for exactly that reason -- its tweens run
+	# alongside the frames, and the clip is the longer of the two.
+	var flinching := enemy_character.play_hit()
+	_enemy_recoil(damage)
+	if flinching:
+		await enemy_character.one_shot_finished
+	else:
+		# No flinch frames on this rival: still hold for the recoil, or the
+		# exchange would carry on over the top of it.
+		await get_tree().create_timer(RECOIL_SECONDS).timeout
+
+## Picks the register and speaks. Falls back to the shared set for any rival
+## with no voice of its own, so nobody is ever silent.
+func _speak_enemy_hurt() -> void:
+	var data: EnemyData = _enemy if _enemy != null else GameState.current_enemy()
+	if data == null:
+		Audio.play_sfx("enemy_hurt")
+		return
+	var voice := data.hurt_voice
+	# The boss stops sounding composed once the fight has turned. Measured
+	# after the damage above, so the change lands on the blow that causes it.
+	if not data.rage_voice.is_empty() and data.max_hp > 0 \
+			and float(_enemy_hp) / float(data.max_hp) <= data.rage_below:
+		voice = data.rage_voice
+	if not Audio.play_voice(voice):
+		Audio.play_sfx("enemy_hurt")
+
+## The body's own reaction: knocked back off its stance, head and shoulders
+## carried with it, then a settle back onto the floor.
+##
+## Scaled by how hard the blow was, so chip damage is a twitch and a big word
+## visibly rocks the rival. Deliberately small in absolute terms -- this plays
+## on every single exchange, and anything larger becomes exhausting by the
+## third fight.
+## Impact + recoil + recovery, in seconds. Kept as one number because the wait
+## above has to match what the tweens below actually take.
+const RECOIL_SECONDS := 0.33
+
+func _enemy_recoil(damage: int) -> void:
+	var who := enemy_character
+	if _body_home.has(who):
+		return      # already mid-choreography; two owners would fight over the transform
+	var k: float = clampf(float(damage) / 26.0, 0.35, 1.0)
+	# Away from the player, which is rightward for a rival standing on the right.
+	var back: float = 7.0 * k
+	_body_begin(who, BODY_CHEST)
+	await _body_play(who, [
+		# Impact: driven back and folded over the blow.
+		_beat(back, -2.0 * k, 5.0 * k, 1.0 - 0.04 * k, 1.0 + 0.05 * k,
+			0.07, Tween.TRANS_QUAD, Tween.EASE_OUT),
+		# Recoil: weight goes onto the back foot and the knees give a little.
+		_beat(back * 0.55, 3.0 * k, 2.0 * k, 1.0 + 0.03 * k, 1.0 - 0.05 * k,
+			0.10, Tween.TRANS_SINE, Tween.EASE_IN_OUT),
+	])
+	# Recovery: back onto the stance rather than snapped to it.
+	await _body_end(who, 0.16)
+
 ## One exchange, beat by beat: the player swings, the hit crosses the screen,
 ## the rival flinches and loses health.
 ##
@@ -2338,13 +2540,8 @@ func _play_attack_sequence(damage: int, is_answer: bool, tier: Dictionary) -> vo
 	# the right moment rather than after the animation has finished.
 	await _play_player_attack(tier)
 
-	Audio.play_sfx("enemy_hurt")
 	_shake_screen(float(tier["shake"]))
-	var enemy_flinching := enemy_character.play_hit()
-	_enemy_hp = maxi(0, _enemy_hp - damage)
-	enemy_heart_row.set_value(_enemy_hp)
-	if enemy_flinching:
-		await enemy_character.one_shot_finished
+	await _enemy_take_hit(damage)
 
 	# Only now does a melee attacker walk home. Before the win check, so a
 	# killing blow cannot leave the player stranded mid-field.
@@ -2398,6 +2595,7 @@ func _resolve_enemy_turn() -> void:
 	# preparation rather than only punishing a wrong answer.
 	if move != null and move.signature_id() == "executive_privilege" and _power_up_active:
 		_power_up_active = false
+		_refresh_damage_preview()
 		message += "  (Power Up revoked!)"
 		_fx_word("REVOKED", player_character, Color(0.96, 0.36, 0.3), 26.0, 0.0, 14)
 
@@ -2431,6 +2629,109 @@ func _speed_bonus(word_length: int) -> Dictionary:
 		if per_letter <= float(tier["seconds_per_letter"]):
 			return {"multiplier": float(tier["multiplier"]), "label": String(tier["label"])}
 	return {"multiplier": SPEED_BASE_MULTIPLIER, "label": ""}
+
+# --- potential damage -----------------------------------------------------
+
+## Slots the damage plate into the question panel, sharing one row with the
+## countdown bar.
+##
+## Inside the question panel rather than beside it, because what the badge
+## promises is a property OF THIS QUESTION -- it changes when the question
+## changes and it is meaningless without one. Putting it there also means the
+## three arrangements need no new geometry between them: every layout pass
+## already places the question panel, and the badge rides along.
+##
+## Sharing the timer's row is what keeps that free. The bar is 12 units tall in
+## a panel whose other child is a three-line prompt; a row of its own would
+## have cost twenty units of prompt on the arrangement that can least afford
+## it. Built here rather than in word_battle.tscn for the reason given on
+## _apply_panel_chrome(): the editor overwrites scene-file edits made on disk.
+func _build_damage_badge() -> void:
+	var vbox := timer_bar.get_parent() as VBoxContainer
+	if vbox == null:
+		push_warning("WordBattleController: no question VBox, skipping damage badge")
+		return
+	var timer_index := timer_bar.get_index()
+	_damage_row = HBoxContainer.new()
+	_damage_row.name = "DamageRow"
+	_damage_row.add_theme_constant_override("separation", 5)
+	_damage_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	vbox.add_child(_damage_row)
+	vbox.move_child(_damage_row, timer_index)
+
+	_damage_badge = DamageBadge.new()
+	_damage_badge.name = "DamageBadge"
+	_damage_row.add_child(_damage_badge)
+	vbox.remove_child(timer_bar)
+	_damage_row.add_child(timer_bar)
+	timer_bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	timer_bar.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+
+## How tall the badge stands, and whether it has room to spell out " DMG".
+## Called by each layout pass with what that arrangement can afford.
+func _size_damage_row(height: float, terse: bool) -> void:
+	if _damage_badge == null:
+		return
+	_damage_badge.set_terse(terse)
+	_damage_badge.custom_minimum_size.y = height
+	_damage_row.custom_minimum_size.y = height
+
+## What the question on screen is worth if it is answered correctly, as
+## {slowest, fastest}.
+##
+## A range rather than one number because the speed bonus is not settled until
+## the word is submitted: SPEED_TIERS pays up to 1.3x for assembling the answer
+## quickly, and until the player starts tapping, every tier is still on the
+## table. Printing the best case alone would over-promise and printing the base
+## alone would under-promise, so the badge prints both ends and the range
+## narrows on its own as the tiers run out -- which incidentally teaches the
+## speed bonus, a mechanic nothing else on screen mentions.
+##
+## Gold and Spark are deliberately outside the range. Both depend on which
+## tiles the player routes through, which is not knowable before they route
+## through them; they can only ever push the real hit ABOVE the top of the
+## range, never below it.
+func _potential_damage() -> Vector2i:
+	if _match_over or _question.is_empty():
+		return Vector2i.ZERO
+	var answer := String(_question.get("answer", ""))
+	if answer.is_empty():
+		return Vector2i.ZERO
+	var slow := _damage_for(answer, false, false, _power_up_active,
+		SPEED_BASE_MULTIPLIER)
+	var fast := _damage_for(answer, false, false, _power_up_active,
+		_best_speed_multiplier(answer.length()))
+	return Vector2i(mini(slow, fast), maxi(slow, fast))
+
+## The best speed multiplier still reachable for a word of this length.
+##
+## _speed_bonus() already answers exactly that: it returns the first tier the
+## player still qualifies for, and elapsed time only ever moves that answer
+## down the list. The one case it cannot speak for is "no letter has been
+## tapped yet", where its stopwatch has not started -- there the top tier is
+## still winnable, which is the honest reading.
+func _best_speed_multiplier(word_length: int) -> float:
+	if _selection_started_ms <= 0:
+		return float(SPEED_TIERS[0]["multiplier"])
+	return float(_speed_bonus(word_length)["multiplier"])
+
+## Repoints the badge at whatever the situation is now. Cheap enough to call
+## every frame -- DamageBadge.show_damage() drops a redraw that would not
+## change anything.
+func _refresh_damage_preview() -> void:
+	if _damage_badge == null:
+		return
+	var span := _potential_damage()
+	# Cleared as well as hidden, in that order. Nothing to promise means between
+	# questions or after the match is decided, and the badge is hidden there
+	# rather than showing a zero -- the timer bar beside it is blank at those
+	# moments too, and a lone "0 DMG" would read as a bug. But hiding ALONE
+	# leaves the last question's figure inside the control, so whatever made it
+	# visible again would flash a stale number before the next refresh caught
+	# up. Clearing it keeps "what the badge holds is what the badge means" true
+	# whether it is on screen or not.
+	_damage_badge.show_damage(span.x, span.y, _power_up_active and span.y > 0)
+	_damage_badge.visible = span.y > 0
 
 ## Drives a fighter toward its opponent and back. Purely additive on top of the
 ## sprite clip, and always returns the node to where it started so a swing
@@ -3298,6 +3599,75 @@ func _body_end(who: Control, secs: float = 0.18) -> void:
 	if who is AnimatedCharacter:
 		(who as AnimatedCharacter).pose_locked = false
 
+# --- the shape of a strike ------------------------------------------------
+#
+# A blow that reads as a blow has five parts, and the choreography used to have
+# one of them. Every Chapter 2 skill went straight from travelling to its impact
+# beat: no gathering beforehand, no carrying through afterwards, and a snap back
+# to the stance at the end. What movement there was came from tweening the whole
+# node -- position, scale, and a rotation applied to the ENTIRE sprite, so a
+# "spinning swing" turned the rival's legs and head with its arms. That is the
+# rigid-object look: the body never does anything, the picture is just moved.
+#
+# The fix is not more node-tweening. It is to use the two things the character
+# already has, in the two places each is actually good:
+#
+#   RIG ON   for anticipation and follow-through. These are HELD poses -- a
+#            coil, a carry-through -- and the cut-out can bend legs, turn a
+#            torso against them and let the head lead or lag. The rig freezes
+#            the sprite on one frame, which costs nothing here because a held
+#            pose is meant to be one frame.
+#   RIG OFF  for the strike itself. The hand-drawn attack clip has the actual
+#            arm swing drawn into it, and the rig hides the flat sprite, so the
+#            two can never be shown at once. The drawn frames win the moment
+#            the limb is really moving.
+#
+# So the body gathers, the drawing swings, the body carries it through. Callers
+# get that by wrapping their impact beats in _strike_windup / _strike_follow.
+
+## How far the body coils away from its target before a blow, in degrees of
+## torso turn. Read as "how much of a punch is the part before the punch".
+const WINDUP_TORSO := 13.0
+const WINDUP_LEGS := 6.0
+const WINDUP_SECS := 0.17
+const FOLLOW_SECS := 0.20
+
+## Gathers the body before a strike: weight drops onto the back leg, the torso
+## turns away from the target, the head stays looking at it.
+##
+## `facing` is -1 when the striker is moving left (a rival attacking the player)
+## and +1 for the mirror, so the coil always winds AGAINST the direction the
+## blow will travel.
+func _strike_windup(who: AnimatedCharacter, facing: float = -1.0) -> void:
+	if not is_instance_valid(who):
+		return
+	who.rig_enable()
+	# Legs and torso turn together but by different amounts, which is what
+	# makes it read as a body gathering rather than a figure leaning.
+	who.rig_pose(WINDUP_LEGS * facing, -WINDUP_TORSO * facing,
+		WINDUP_TORSO * 0.35 * facing, 2.0, -3.0 * facing, WINDUP_SECS)
+	await get_tree().create_timer(WINDUP_SECS).timeout
+	# Handed straight back: the strike that follows needs the drawn frames.
+	who.rig_disable()
+
+## Carries the blow through after impact and settles onto the stance.
+##
+## The overshoot is the point. Stopping the body at the moment of contact is
+## what made every recovery look like a reset; letting it travel past and come
+## back is the difference between a swing and a snapshot.
+func _strike_follow(who: AnimatedCharacter, facing: float = -1.0) -> void:
+	if not is_instance_valid(who):
+		return
+	who.rig_enable()
+	# Past the blow: torso has rotated through, legs trail, head last.
+	who.rig_pose(-WINDUP_LEGS * 0.8 * facing, WINDUP_TORSO * 1.15 * facing,
+		-WINDUP_TORSO * 0.5 * facing, -1.0, 4.0 * facing, FOLLOW_SECS * 0.55)
+	await get_tree().create_timer(FOLLOW_SECS * 0.55).timeout
+	# Settle: back to neutral, slower than it left, so it eases rather than snaps.
+	who.rig_pose(0.0, 0.0, 0.0, 0.0, 0.0, FOLLOW_SECS)
+	await get_tree().create_timer(FOLLOW_SECS).timeout
+	who.rig_disable()
+
 ## Fires the sprite's arm clip WITHOUT waiting for it, so it overlaps the body
 ## choreography instead of adding its full second on top. Used only on the
 ## moves where the rival actually strikes — the ones that gesture, retreat or
@@ -4019,7 +4389,21 @@ func _on_mud_detonated() -> void:
 	_pending_enemy_damage += MUD_DAMAGE_BONUS
 
 func _end_match(player_won: bool) -> void:
+	# A tutorial is a rehearsal, and every real ending writes to GameState --
+	# reset_chapter() on a loss, mark_difficulty_completed() and an encounter
+	# advance on a win. The demonstrations are sized so neither bar should reach
+	# zero, but "should" is not a guarantee when the rival's move list is data,
+	# so this refuses the ending outright and puts the health back rather than
+	# trusting the numbers.
+	if _tutorial != null:
+		_player_hp = maxi(_player_hp, roundi(GameState.player_max_hp * 0.5))
+		_enemy_hp = maxi(_enemy_hp, roundi(_enemy.max_hp * 0.5) if _enemy != null else 1)
+		player_heart_row.set_value(_player_hp)
+		enemy_heart_row.set_value(_enemy_hp)
+		_refresh_damage_preview()
+		return
 	_match_over = true
+	_refresh_damage_preview()
 	if not player_won:
 		# Losing rewinds the whole chapter, not just this fight, and wipes the
 		# potion stock back to baseline — the doc's penalty for poor resource
@@ -4250,6 +4634,8 @@ func _sig_backdoor_dash(move_id: String, tint: Color) -> void:
 	appear.tween_property(enemy_character, "modulate:a", 1.0, 0.1)
 	await appear.finished
 
+	# Gather before the blow -- see _strike_windup.
+	await _strike_windup(enemy_character)
 	_body_swing(enemy_character)
 	await _body_play(enemy_character, [
 		_beat(30, -4, -14, 1.12, 0.9, 0.1, Tween.TRANS_QUAD, Tween.EASE_IN),
@@ -4264,6 +4650,8 @@ func _sig_backdoor_dash(move_id: String, tint: Color) -> void:
 	var settle := create_tween()
 	settle.tween_property(enemy_character, "modulate:a", 1.0, 0.12)
 	await settle.finished
+	# Carry the blow through instead of stopping dead on impact.
+	await _strike_follow(enemy_character)
 	await _body_end(enemy_character)
 
 ## RANGED — three envelopes flicked like cards, bursting into loose bills.
@@ -4306,15 +4694,24 @@ func _sig_queue_skip_kick(move_id: String, tint: Color) -> void:
 		_beat(dx * 0.6, -34, 0, 0.96, 1.1, 0.2, Tween.TRANS_QUAD, Tween.EASE_OUT),
 		_beat(dx * 0.72, 0, 0, 1.02, 0.98, 0.14, Tween.TRANS_QUAD, Tween.EASE_IN),
 	])
+	# Gather before the blow -- see _strike_windup.
+	await _strike_windup(enemy_character)
 	_body_swing(enemy_character)
+	# A torso whip, not a cartwheel. This used to rotate the whole node
+	# through 360 degrees, which turned the legs and head with the arms --
+	# the clearest case of the sprite being spun rather than the body
+	# swinging. The arc now stays inside what a torso can actually do and
+	# the drawn attack frames carry the limb.
 	await _body_play(enemy_character, [
-		_beat(dx, -10, 200, 1.06, 0.94, 0.16, Tween.TRANS_QUAD, Tween.EASE_IN),
-		_beat(dx, 0, 360, 1.02, 0.98, 0.1),
+		_beat(dx, -10, -24, 1.06, 0.94, 0.16, Tween.TRANS_QUAD, Tween.EASE_IN),
+		_beat(dx, 0, 12, 1.02, 0.98, 0.1),
 	])
 	_fx_impact(move_id, 7.0, tint, 0.24)
 	# The smug point at the front of a line that is not there.
 	await _body_play(enemy_character, [_beat(dx - 10, -4, -12, 1.04, 1.0, 0.18)])
 	_fx_word("NEXT!", enemy_character, Color(tint.r, tint.g, tint.b, 1.0), 18.0, 0.0, 11)
+	# Carry the blow through instead of stopping dead on impact.
+	await _strike_follow(enemy_character)
 	await _body_play_walking(enemy_character, _melee_retreat(0.5), 11.0)
 	_body_send_back(enemy_character)
 	await _body_end(enemy_character)
@@ -4337,6 +4734,8 @@ func _sig_stamp_slam(move_id: String, tint: Color) -> void:
 		_beat(dx * 0.55, -12, 4, 0.96, 1.12, 0.16),
 		_beat(dx, -12, 8, 0.96, 1.12, 0.14),
 	], 9.0)
+	# Gather before the blow -- see _strike_windup.
+	await _strike_windup(enemy_character)
 	_body_swing(enemy_character)
 	await _body_play(enemy_character, [
 		_beat(dx, 16, 22, 1.18, 0.8, 0.1, Tween.TRANS_QUAD, Tween.EASE_IN),
@@ -4346,6 +4745,8 @@ func _sig_stamp_slam(move_id: String, tint: Color) -> void:
 	_fx_splatter(player_character, Color(0.86, 0.2, 0.16, 0.95), 9, 26.0, 0.55)
 	_fx_impact(move_id, 10.0, tint, 0.3)
 	await _body_play(enemy_character, [_beat(dx, 4, 6, 1.04, 0.96, 0.16)])
+	# Carry the blow through instead of stopping dead on impact.
+	await _strike_follow(enemy_character)
 	await _body_play_walking(enemy_character, _melee_retreat(0.56), 10.0)
 	_body_send_back(enemy_character)
 	await _body_end(enemy_character)
@@ -4380,6 +4781,8 @@ func _sig_counter_charge(move_id: String, tint: Color) -> void:
 		_beat(0, 10, 0, 1.1, 0.88, 0.16, Tween.TRANS_QUAD, Tween.EASE_OUT),
 	])
 	await _body_play_walking(enemy_character, _melee_advance("lunge", 0.6), 13.0)
+	# Gather before the blow -- see _strike_windup.
+	await _strike_windup(enemy_character)
 	_body_swing(enemy_character)
 	var dx := _melee_target_x() - _body_home_x(enemy_character)
 	await _body_play(enemy_character, [
@@ -4393,6 +4796,8 @@ func _sig_counter_charge(move_id: String, tint: Color) -> void:
 		_beat(dx - 26, 0, -3, 1.0, 1.0, 0.12),
 		_beat(dx - 26, -2, 3, 1.0, 1.0, 0.12),
 	])
+	# Carry the blow through instead of stopping dead on impact.
+	await _strike_follow(enemy_character)
 	await _body_play_walking(enemy_character, _melee_retreat(0.54), 10.0)
 	_body_send_back(enemy_character)
 	await _body_end(enemy_character)
@@ -4408,6 +4813,8 @@ func _sig_permit_board_bash(move_id: String, tint: Color) -> void:
 	])
 	_body_bring_forward(enemy_character)
 	await _body_play_walking(enemy_character, _melee_advance("charge", 0.62), 13.0)
+	# Gather before the blow -- see _strike_windup.
+	await _strike_windup(enemy_character)
 	_body_swing(enemy_character)
 	var dx := _melee_target_x() - _body_home_x(enemy_character)
 	await _body_play(enemy_character, [
@@ -4418,6 +4825,8 @@ func _sig_permit_board_bash(move_id: String, tint: Color) -> void:
 	_fx_word("APPROVED?", player_character, Color(0.92, 0.9, 0.84), 14.0, 0.0, 13)
 	await get_tree().create_timer(0.34).timeout
 	_fx_word("PEKE!", player_character, Color(0.94, 0.26, 0.22), 22.0, 0.0, 17)
+	# Carry the blow through instead of stopping dead on impact.
+	await _strike_follow(enemy_character)
 	await _body_play_walking(enemy_character, _melee_retreat(0.54), 10.0)
 	_body_send_back(enemy_character)
 	await _body_end(enemy_character)
@@ -4477,6 +4886,8 @@ func _sig_notary_stampede(move_id: String, tint: Color) -> void:
 	var dx := _melee_target_x() - _body_home_x(enemy_character)
 
 	# Left, right, then both. Each thump is its own impact so the combo reads.
+	# Gather before the blow -- see _strike_windup.
+	await _strike_windup(enemy_character)
 	_body_swing(enemy_character)
 	await _body_play(enemy_character, [
 		_beat(dx - 6, -6, -16, 1.12, 0.94, 0.08, Tween.TRANS_QUAD, Tween.EASE_IN),
@@ -4494,6 +4905,8 @@ func _sig_notary_stampede(move_id: String, tint: Color) -> void:
 	_fx_ring(player_character, Color(0.9, 0.24, 0.22, 0.95), 104.0, 0.34)
 	_fx_word("NOTARISED", player_character, Color(0.92, 0.28, 0.24), 12.0, 0.05, 14)
 	_fx_impact(move_id, 9.0, tint, 0.28)
+	# Carry the blow through instead of stopping dead on impact.
+	await _strike_follow(enemy_character)
 	await _body_play_walking(enemy_character, _melee_retreat(0.55), 11.0)
 	_body_send_back(enemy_character)
 	await _body_end(enemy_character)
@@ -4571,6 +4984,8 @@ func _sig_cash_drawer_bash(move_id: String, tint: Color) -> void:
 	])
 	_body_bring_forward(enemy_character)
 	await _body_play_walking(enemy_character, _melee_advance("charge", 0.58), 13.0)
+	# Gather before the blow -- see _strike_windup.
+	await _strike_windup(enemy_character)
 	_body_swing(enemy_character)
 	var dx := _melee_target_x() - _body_home_x(enemy_character)
 	await _body_play(enemy_character, [
@@ -4582,6 +4997,8 @@ func _sig_cash_drawer_bash(move_id: String, tint: Color) -> void:
 		_spawn_bolt(player_character, enemy_character, Color(0.98, 0.86, 0.4, 0.95),
 			8.0, 0.34, 0.02 * float(i), randf_range(-60.0, 60.0), true)
 	_fx_impact(move_id, 10.0, tint, 0.28)
+	# Carry the blow through instead of stopping dead on impact.
+	await _strike_follow(enemy_character)
 	await _body_play_walking(enemy_character, _melee_retreat(0.55), 10.0)
 	_body_send_back(enemy_character)
 	await _body_end(enemy_character)
@@ -4630,6 +5047,8 @@ func _sig_receipt_whip(move_id: String, tint: Color) -> void:
 	var lift := create_tween()
 	lift.tween_property(strip, "modulate:a", 0.0, 0.12)
 
+	# Gather before the blow -- see _strike_windup.
+	await _strike_windup(enemy_character)
 	_body_swing(enemy_character)
 	await _body_play(enemy_character, [
 		_beat(12, -4, 28, 1.14, 0.92, 0.1, Tween.TRANS_QUAD, Tween.EASE_IN),
@@ -4643,6 +5062,8 @@ func _sig_receipt_whip(move_id: String, tint: Color) -> void:
 		_fx_paper(Vector2(14, 5), Color(0.94, 0.93, 0.88, 0.95), 0.3,
 			0.02 * float(i), randf_range(-40.0, 40.0), 2.0)
 	_fx_impact(move_id, 8.0, tint, 0.24)
+	# Carry the blow through instead of stopping dead on impact.
+	await _strike_follow(enemy_character)
 	await _body_end(enemy_character)
 
 # --- Budget Bandido -------------------------------------------------------
@@ -4659,12 +5080,20 @@ func _sig_budget_bag_bash(move_id: String, tint: Color) -> void:
 	])
 	_body_bring_forward(enemy_character)
 	await _body_play_walking(enemy_character, _melee_advance("walk", 0.66), 10.0)
+	# Gather before the blow -- see _strike_windup.
+	await _strike_windup(enemy_character)
 	_body_swing(enemy_character)
 	var dx := _melee_target_x() - _body_home_x(enemy_character)
-	# One full rotation carrying the weight round with him.
+	# A torso whip, not a cartwheel. This used to rotate the whole node
+	# through 360 degrees, which turned the legs and head with the arms --
+	# the clearest case of the sprite being spun rather than the body
+	# swinging. The arc now stays inside what a torso can actually do and
+	# the drawn attack frames carry the limb.
+	# The weight still comes round with him -- in the squash, which sells a
+	# heavy bag far better than turning him upside down did.
 	await _body_play(enemy_character, [
-		_beat(dx, 4, 150, 1.06, 0.96, 0.16, Tween.TRANS_QUAD, Tween.EASE_IN),
-		_beat(dx, 0, 360, 1.16, 0.88, 0.12, Tween.TRANS_QUAD, Tween.EASE_IN),
+		_beat(dx, 4, -26, 1.06, 0.96, 0.16, Tween.TRANS_QUAD, Tween.EASE_IN),
+		_beat(dx, 0, 16, 1.16, 0.88, 0.12, Tween.TRANS_QUAD, Tween.EASE_IN),
 	])
 	for i in _fx_count(9):
 		_spawn_bolt(player_character, enemy_character, Color(0.98, 0.84, 0.34, 0.95),
@@ -4675,6 +5104,8 @@ func _sig_budget_bag_bash(move_id: String, tint: Color) -> void:
 		_beat(dx - 12, 20, 0, 1.1, 0.86, 0.2, Tween.TRANS_QUAD, Tween.EASE_OUT),
 		_beat(dx - 12, 0, 0, 1.0, 1.0, 0.14),
 	])
+	# Carry the blow through instead of stopping dead on impact.
+	await _strike_follow(enemy_character)
 	await _body_play_walking(enemy_character, _melee_retreat(0.58), 10.0)
 	_body_send_back(enemy_character)
 	await _body_end(enemy_character)
@@ -4754,14 +5185,21 @@ func _sig_briefcase_beatdown(move_id: String, tint: Color) -> void:
 	await _body_play_walking(enemy_character, _melee_advance("dash", 0.5), 15.0)
 	var dx := _melee_target_x() - _body_home_x(enemy_character)
 
+	# Gather before the blow -- see _strike_windup.
+	await _strike_windup(enemy_character)
 	_body_swing(enemy_character)
 	await _body_play(enemy_character, [        # jab
 		_beat(dx + 4, 0, -8, 1.1, 0.96, 0.08, Tween.TRANS_QUAD, Tween.EASE_IN),
 	])
 	_fx_impact(move_id, 4.0, tint, 0.12)
-	await _body_play(enemy_character, [        # spinning swing
-		_beat(dx, -4, 180, 1.06, 0.98, 0.14, Tween.TRANS_QUAD, Tween.EASE_IN),
-		_beat(dx, 0, 360, 1.1, 0.94, 0.1),
+	# A torso whip, not a cartwheel. This used to rotate the whole node
+	# through 360 degrees, which turned the legs and head with the arms --
+	# the clearest case of the sprite being spun rather than the body
+	# swinging. The arc now stays inside what a torso can actually do and
+	# the drawn attack frames carry the limb.
+	await _body_play(enemy_character, [        # the swing itself
+		_beat(dx, -4, -22, 1.06, 0.98, 0.14, Tween.TRANS_QUAD, Tween.EASE_IN),
+		_beat(dx, 0, 14, 1.1, 0.94, 0.1),
 	])
 	_fx_impact(move_id, 5.0, tint, 0.14)
 	await _body_play(enemy_character, [        # overhead smash
@@ -4773,6 +5211,8 @@ func _sig_briefcase_beatdown(move_id: String, tint: Color) -> void:
 		_fx_paper(Vector2(16, 11), Color(0.94, 0.92, 0.86, 0.95), 0.42,
 			0.02 * float(i), randf_range(-70.0, 70.0), 3.0)
 	_fx_impact(move_id, 10.0, tint, 0.3)
+	# Carry the blow through instead of stopping dead on impact.
+	await _strike_follow(enemy_character)
 	await _body_play_walking(enemy_character, _melee_retreat(0.54), 11.0)
 	_body_send_back(enemy_character)
 	await _body_end(enemy_character)
@@ -4857,6 +5297,8 @@ func _sig_codex_crusher(move_id: String, tint: Color) -> void:
 	_fx_splatter(enemy_character, Color(0.8, 0.74, 0.6, 0.8), 5, 18.0, 0.4)
 	_body_bring_forward(enemy_character)
 	await _body_play_walking(enemy_character, _melee_advance("charge", 0.66), 11.0)
+	# Gather before the blow -- see _strike_windup.
+	await _strike_windup(enemy_character)
 	_body_swing(enemy_character)
 	var dx := _melee_target_x() - _body_home_x(enemy_character)
 	await _body_play(enemy_character, [
@@ -4871,6 +5313,8 @@ func _sig_codex_crusher(move_id: String, tint: Color) -> void:
 		_fx_word(["XIV", "IX", "XXII"][i % 3], player_character,
 			Color(0.94, 0.88, 0.6), 24.0, 0.06 * float(i), 12)
 	_fx_impact(move_id, 12.0, tint, 0.3)
+	# Carry the blow through instead of stopping dead on impact.
+	await _strike_follow(enemy_character)
 	await _body_play_walking(enemy_character, _melee_retreat(0.6), 9.0)
 	_body_send_back(enemy_character)
 	await _body_end(enemy_character)
@@ -4919,6 +5363,8 @@ func _sig_session_smash(move_id: String, tint: Color) -> void:
 		_beat(dx * 0.4, -78, -6, 0.9, 1.2, 0.26, Tween.TRANS_QUAD, Tween.EASE_OUT),
 		_beat(dx, -62, 6, 0.94, 1.14, 0.14),
 	])
+	# Gather before the blow -- see _strike_windup.
+	await _strike_windup(enemy_character)
 	_body_swing(enemy_character)
 	await _body_play(enemy_character, [
 		_beat(dx, 18, 16, 1.3, 0.74, 0.1, Tween.TRANS_QUAD, Tween.EASE_IN),
@@ -4939,6 +5385,8 @@ func _sig_session_smash(move_id: String, tint: Color) -> void:
 	_shake_screen(15.0)
 	_fx_flash(Color(0.96, 0.86, 0.5), 0.4)
 	_fx_impact(move_id, 14.0, tint, 0.34)
+	# Carry the blow through instead of stopping dead on impact.
+	await _strike_follow(enemy_character)
 	await _body_play_walking(enemy_character, _melee_retreat(0.62), 9.0)
 	_body_send_back(enemy_character)
 	await _body_end(enemy_character)
@@ -4990,6 +5438,8 @@ func _sig_kaban_ng_bayan(move_id: String, tint: Color) -> void:
 	await _body_play_walking(enemy_character, [
 		_beat(dx, -2, 14, 1.08, 0.96, 0.16, Tween.TRANS_QUAD, Tween.EASE_IN),
 	], 18.0)
+	# Gather before the blow -- see _strike_windup.
+	await _strike_windup(enemy_character)
 	_body_swing(enemy_character)
 	await _body_play(enemy_character, [
 		_beat(dx, -10, -30, 1.02, 1.1, 0.1, Tween.TRANS_BACK, Tween.EASE_OUT),
@@ -5005,6 +5455,8 @@ func _sig_kaban_ng_bayan(move_id: String, tint: Color) -> void:
 		_beat(dx, 0, -3, 1.0, 1.0, 0.12),
 		_beat(dx, -2, 3, 1.0, 1.0, 0.12),
 	])
+	# Carry the blow through instead of stopping dead on impact.
+	await _strike_follow(enemy_character)
 	await _body_play_walking(enemy_character, _melee_retreat(0.62), 9.0)
 	_body_send_back(enemy_character)
 	await _body_end(enemy_character)
@@ -5125,6 +5577,8 @@ func _sig_executive_privilege(move_id: String, tint: Color) -> void:
 	# Then he comes for you himself — the only time he does.
 	_body_bring_forward(enemy_character)
 	await _body_play_walking(enemy_character, _melee_advance("dash", 0.4), 18.0)
+	# Gather before the blow -- see _strike_windup.
+	await _strike_windup(enemy_character)
 	_body_swing(enemy_character)
 	var dx := _melee_target_x() - _body_home_x(enemy_character)
 	await _body_play(enemy_character, [
@@ -5141,6 +5595,8 @@ func _sig_executive_privilege(move_id: String, tint: Color) -> void:
 	_fx_word("FOR ME.", enemy_character, Color(1.0, 0.86, 0.4), 20.0, 0.0, 18)
 	await get_tree().create_timer(0.35).timeout
 
+	# Carry the blow through instead of stopping dead on impact.
+	await _strike_follow(enemy_character)
 	await _body_play_walking(enemy_character, _melee_retreat(0.5), 12.0)
 	_body_send_back(enemy_character)
 	await _body_end(enemy_character)
@@ -5151,3 +5607,196 @@ func _sig_executive_privilege(move_id: String, tint: Color) -> void:
 		var lights_on := create_tween()
 		lights_on.tween_property(dark, "color:a", 0.0, 0.4)
 		lights_on.parallel().tween_property(spot, "modulate:a", 0.0, 0.4)
+
+
+# --- tutorial -------------------------------------------------------------
+#
+# The tutorial is not a separate screen. It is THIS scene, running for real,
+# with a coaching overlay on top of it (see TutorialDirector) and three things
+# held back: the countdown, the question bank, and any ending that would write
+# to GameState. Everything the player is shown -- the prompt, the board, the
+# badge, the swing, the floating number, the rival's hit -- is the production
+# code path executing, which is the only way an explanation can be guaranteed
+# to still be true a month from now.
+
+## The one question the tutorial ever asks. Kept here rather than in the bank so
+## it can never be dealt during a real run, and so the cards below can quote its
+## answer and its damage figure without hedging.
+##
+## MAYOR is five letters and easy-tier, which puts three of them in the prompt
+## ("M _ Y _ R") and leaves two to work out -- enough to show the mechanic
+## without turning the first thing a new player meets into a puzzle.
+const TUTORIAL_QUESTION := {
+	"prompt": "The elected head of a city is the ___.",
+	"answer": "MAYOR",
+	"category": "local government",
+	"fact": "A city or municipal mayor serves a three-year term and may be elected for no more than three consecutive terms.",
+}
+## Pause between demonstration taps. Slow enough to follow a letter at a time,
+## fast enough that spelling five of them is not a wait.
+const TUTORIAL_TAP_INTERVAL := 0.28
+
+func _begin_tutorial() -> void:
+	_tutorial = TutorialDirector.new()
+	_tutorial.name = "TutorialDirector"
+	# Added last, so it draws over the pause and result overlays as well as the
+	# board. Nothing else in this scene is added after the first layout pass.
+	add_child(_tutorial)
+	_tutorial.closed.connect(_on_tutorial_closed)
+	_tutorial.begin(_tutorial_steps())
+
+func _on_tutorial_closed(start_game: bool, completed: bool) -> void:
+	# Only reaching the last card counts. Someone who taps SKIP on step two has
+	# not been taught the game and should still be offered it next time.
+	if completed:
+		GameState.mark_tutorial_completed()
+	GameState.tutorial_mode = false
+	GameState.pending_play_request = start_game
+	_tutorial = null
+	# Both exits go through the title screen. START GAME leaves a request behind
+	# for it to act on, rather than this scene trying to pick a chapter and a
+	# character on the player's behalf.
+	get_tree().paused = false
+	get_tree().change_scene_to_file(MAIN_MENU_SCENE)
+
+## The script. Ordered as a player meets things: what the game is, what to read,
+## what to touch, what it is worth, what happens when you are right, what
+## happens when you are not, then the four things around the edge of the screen.
+##
+## Every claim below was checked against the function that implements it, and
+## several of them are not what you would guess. A wrong word does not cost you
+## health -- BoardController.is_submittable() refuses to submit anything that is
+## not the answer, so the rival's free hit comes from the CLOCK or from New
+## Question, not from being wrong. Losing does not retry the encounter, it
+## rewinds the whole chapter and wipes the potion stock (_end_match). Winning
+## does not refill your health, it refunds a share of it
+## (BETWEEN_ENCOUNTER_HEAL_FRACTION).
+func _tutorial_steps() -> Array[Dictionary]:
+	# Resolved when the step is shown rather than captured now: the compact
+	# arrangements hide the full roster and show a strip instead, and the player
+	# can rotate the device mid-tutorial.
+	var moves_target := func() -> Control:
+		return side_panel if side_panel.visible else _move_strip
+	# The board AND the chips the demonstration lifts into the tray, lit as one
+	# region. Lighting the board alone left the coach card free to sit exactly
+	# over the tray, hiding the word being spelled -- which is the one thing
+	# that step exists to show.
+	var board_target := func() -> Array:
+		var parts: Array[Control] = [board]
+		if word_tray.visible:
+			for chip in word_tray.get_children():
+				parts.append(chip as Control)
+		return parts
+	return [
+		{
+			"title": "Welcome to the fight",
+			"body": "Each encounter is a question. Spell the missing word on the letter board and your character attacks. Empty the rival's health to win and move on to the next one.",
+		},
+		{
+			"title": "1. Read the question",
+			"body": "Every question hides one word. The blank shows how long it is and gives you some of its letters. Here it reads M _ Y _ R -- the elected head of a city.",
+			"target": func() -> Control: return question_panel,
+		},
+		{
+			"title": "2. Spell it on the board",
+			"body": "Tap the letters in order to build the WHOLE word, not just the missing ones. Tap one you already picked to take it back. Watch:",
+			"target": board_target,
+			"action": _tutorial_spell_answer,
+		},
+		{
+			"title": "3. What it is worth",
+			"body": "This plate is the damage the question will do if you get it right. It is a range because spelling quickly pays a speed bonus -- the top of the range slips away the longer you take.",
+			"target": func() -> Control: return _damage_badge,
+		},
+		{
+			"title": "4. Attack",
+			"body": "ATTACK only lights up when the word you have spelled IS the answer, so a wrong word can never be fired off. Watch the damage land, and watch the rival's bar.",
+			"target": func() -> Control: return attack_button,
+			"action": _tutorial_demo_attack,
+		},
+		{
+			"title": "5. Being wrong costs time",
+			"body": "A wrong word is simply refused -- it never reaches the rival. What hurts is the clock: let this bar empty and the rival takes a free swing at you. Here is one.",
+			"target": func() -> Control: return timer_bar,
+			"action": _tutorial_demo_enemy_turn,
+		},
+		{
+			"title": "6. Your health",
+			"body": "Your hearts. Drain them and the run ends: the chapter restarts from its first encounter and your potions go back to the starting stock.",
+			"target": func() -> Control: return player_heart_row,
+		},
+		{
+			"title": "7. The rival's health",
+			"body": "Empty this to win the encounter. Your own health carries into the next fight -- winning refunds part of the bar, it does not refill it, which is what makes potions worth saving.",
+			"target": func() -> Control: return enemy_heart_row,
+		},
+		{
+			"title": "8. Potions are free",
+			"body": "Drinking one never costs your turn -- heal and still attack in the same breath. Health restores %d HP. Power Up doubles your next answer, then burns off. Neither is spent if it would do nothing." % HEALTH_POTION_HEAL,
+			"target": func() -> Control: return potion_panel,
+		},
+		{
+			"title": "9. What the rival will do",
+			"body": "Every rival works through a fixed rotation of moves. The one marked NEXT is the one that lands at the end of this exchange; once it has, the panel moves on to the following one.",
+			"target": moves_target,
+		},
+		{
+			"title": "10. New Question",
+			"body": "Rerolls the prompt, the answer and the letters together when you are stuck. It costs your turn -- the rival gets a free hit for it -- and the clock starts again.",
+			"target": func() -> Control: return shuffle_button,
+		},
+		{
+			"title": "11. Menu",
+			"body": "Pauses everything. Resume goes back in, Options has the music and sound sliders, and Title Page leaves the fight.",
+			"target": func() -> Control: return menu_button,
+		},
+		{
+			"title": "You are ready!",
+			"body": "Answer correctly, deal damage, defeat your rivals, and learn more about Philippine elections as you work through each chapter. You can open this tutorial again from the title screen any time.",
+		},
+	]
+
+## Taps the answer out on the board a letter at a time.
+##
+## Clears whatever is already selected first, so stepping BACK past this card
+## and forward into it again re-spells the word rather than appending a second
+## copy of it to the selection.
+func _tutorial_spell_answer() -> void:
+	board.deselect_from(0)
+	await get_tree().process_frame
+	var answer := String(_question.get("answer", ""))
+	for letter in answer:
+		if not board.demo_select(letter):
+			return
+		await get_tree().create_timer(TUTORIAL_TAP_INTERVAL).timeout
+
+## Fires the spelled answer through the real submit path and waits out the
+## exchange it starts -- the swing, the floating number, the rival's flinch.
+##
+## Re-spells first if the selection is not already the answer, which is what
+## makes this card survive being reached out of order.
+func _tutorial_demo_attack() -> void:
+	var answer := String(_question.get("answer", ""))
+	if _current_selection.to_upper() != answer:
+		await _tutorial_spell_answer()
+		await get_tree().create_timer(0.35).timeout
+	board.submit_word()
+	# _play_attack_sequence raises the flag before its first await, so by the
+	# time submit_word() returns this is already true if a hit was accepted.
+	while _sequence_running:
+		await get_tree().process_frame
+
+## The rival's half of an exchange, run on its own so the card about running out
+## of time can show what running out of time looks like. Mirrors _handle_timeout
+## minus the parts a tutorial must not do: no death check, and no reroll of a
+## question that is fixed anyway.
+func _tutorial_demo_enemy_turn() -> void:
+	_sequence_running = true
+	_update_action_buttons()
+	await get_tree().create_timer(BEAT_PAUSE).timeout
+	await _resolve_enemy_turn()
+	if _player_hp <= 0:
+		_player_hp = roundi(GameState.player_max_hp * 0.4)
+		player_heart_row.set_value(_player_hp)
+	_sequence_running = false
+	_update_action_buttons()

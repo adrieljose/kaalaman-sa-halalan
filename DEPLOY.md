@@ -64,6 +64,22 @@ It prints **two** URLs at the end, and the difference matters:
 **Give people the aliased one.** It never changes, so nobody ends up bookmarked
 to a stale build.
 
+**Step 3b — repoint the public link. This is the step that gets forgotten.**
+
+```powershell
+npx vercel alias set <the Production URL printed above> kaalamansahalalan.vercel.app
+```
+
+`kaalamansahalalan.vercel.app` is the link that actually gets shared, and it is
+**not** one of the two URLs above. It is a manually assigned alias, which means
+Vercel does *not* move it when a new production deploy goes out — it keeps
+serving whichever deployment it was last pointed at, indefinitely and with no
+warning. It had been stuck on an eight-day-old build for exactly this reason.
+
+`web-wheat-six-45.vercel.app` does follow production automatically. So after
+every deploy there are two links to think about: that one moves on its own, and
+this one has to be told.
+
 **Step 4 — check it's actually live.**
 
 ```powershell
@@ -91,15 +107,32 @@ GDScript, so the standard build handles it with nothing lost.
 "/d/GODOT/standard/Godot_v4.7.1-stable_win64_console.exe" --headless --path "D:/klhgamefinal" --export-release "Web" "D:/klhgamefinal/build/web/index.html"
 ```
 
-Output is ~46 MB: a 39 MB `index.wasm` (the engine) and a 7.8 MB `index.pck`
-(the game). Hosts serve these gzipped, so the real transfer is far smaller.
+Output is ~60 MB: a 37.7 MB `index.wasm` (the engine) and a 21.5 MB `index.pck`
+(the game). Hosts serve these brotli-compressed, so the real transfer is far
+smaller.
+
+The `.pck` grew from 7.8 MB as the art did. Keep `exclude_filter` in
+`export_presets.cfg` doing its job: `export_filter="all_resources"` packs
+*everything* Godot has imported, which includes every screenshot under
+`output/`, the probe scenes under `tools/`, and the loose PNGs at the repo
+root. Left unfiltered those added 17.7 MB of developer artefacts to a public
+download -- and published them.
 
 ## Deploy to Vercel
 
 ```bash
 cp vercel.json build/web/
-npx vercel deploy build/web --prod --yes
+npx vercel deploy --prod --yes --cwd build/web
+npx vercel alias set <production URL from the output> kaalamansahalalan.vercel.app
 ```
+
+**`--cwd build/web`, not a trailing path argument.** The CLI reads the project
+link from its *working directory*, and the `.vercel` folder that holds it lives
+in `build/web`, not at the repo root. `vercel deploy build/web` therefore runs
+unlinked and fails with a bare `Not authorized`, which reads like an
+authentication problem and is not one.
+
+The alias line is not optional -- see Step 3b above.
 
 **The copy is not optional.** `build/web` is deployed as the site root, so a
 `vercel.json` sitting at the repo root is outside the upload and is silently

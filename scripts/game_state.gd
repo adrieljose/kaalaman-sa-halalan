@@ -109,6 +109,28 @@ var _session_tier_progress: Dictionary = {}
 ## are not retyping it every time they come back to claim one. Empty until
 ## they claim a certificate for the first time.
 var player_name: String = ""
+
+## Whether the player has ever reached the end of the tutorial. Persisted
+## alongside the certificate flag, and for the same reason: the only thing the
+## first-time prompt must not do is ask a returning player the same question
+## every launch. On the web export user:// is backed by IndexedDB, so this
+## survives a page reload the same way it survives the desktop app closing.
+##
+## Skipping does NOT set it. Someone who skips the tutorial before they have
+## seen it has not learned the game, and being offered it once more next time
+## is a smaller cost than never offering it again. Reaching the last card does
+## set it, whichever button they leave by.
+var tutorial_completed: bool = false
+## True while the tutorial is the thing running. Never saved -- it is a mode
+## the battle scene is in, not progress. Everything that writes progress checks
+## it, so a tutorial can play a whole exchange without touching the run.
+var tutorial_mode: bool = false
+## Set by the tutorial's END card when the player leaves it by START GAME, and
+## consumed by the title screen on the very next _ready(). A request rather than
+## an action: the battle scene has no business choosing a chapter, a character
+## and a difficulty on the player's behalf, so it hands the intent back to the
+## screen that owns those choices.
+var pending_play_request: bool = false
 const PROGRESS_SAVE_PATH := "user://progress.save"
 
 func _ready() -> void:
@@ -202,6 +224,7 @@ func _save_progress() -> void:
 	file.store_string(JSON.stringify({
 		"certificate_earned": serializable,
 		"player_name": player_name,
+		"tutorial_completed": tutorial_completed,
 	}))
 
 func _load_progress() -> void:
@@ -227,6 +250,16 @@ func _load_progress() -> void:
 		if bool(data["certificate_earned"][chapter_key]):
 			certificate_earned[int(chapter_key)] = true
 	player_name = String(data.get("player_name", ""))
+	tutorial_completed = bool(data.get("tutorial_completed", false))
+
+## Remembers that the tutorial was seen through to its last card. Written
+## immediately rather than at the end of the session, so closing the tab on the
+## END card still counts.
+func mark_tutorial_completed() -> void:
+	if tutorial_completed:
+		return
+	tutorial_completed = true
+	_save_progress()
 
 ## The enemy for the encounter currently being fought, or null once the player
 ## has walked past the last one.
