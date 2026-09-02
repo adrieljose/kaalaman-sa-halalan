@@ -110,14 +110,8 @@ All enemies are fictional archetypes, not real people or parties.
 
 [color=#234c63][font_size=15][b]ASSETS / ATTRIBUTION[/b][/font_size][/color]
 [color=#8b6b2d]━━━━━━━━━━━━━━━━━━━━━━━━━━━━[/color]
-[b]Font[/b]
-Titan One — Rodrigo Fuenzalida, SIL Open Font License 1.1
-
-[b]Word Lists[/b]
-dwyl/english-words (Unlicense) · AustinZuniga/Filipino-wordlist (MIT)
-
 [b]Art[/b]
-Pixel art generated with PixelLab for this project.
+Pixel art by Adriel Jose C. Villas
 
 [b]Engine[/b]
 Godot Engine 4.7 (MIT)
