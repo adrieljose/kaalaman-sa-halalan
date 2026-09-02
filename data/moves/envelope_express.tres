@@ -6,6 +6,8 @@
 [resource]
 script = ExtResource("1")
 move_id = "envelope_express"
+attack_dir = "res://assets/images/characters/fixer_fredo_move_envelope_express_34"
+attack_count = 9
 move_name = "Envelope Express"
 description = "Envelopes flicked like cards. They burst."
 icon = ExtResource("2")

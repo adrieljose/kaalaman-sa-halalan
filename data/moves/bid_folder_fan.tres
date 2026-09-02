@@ -6,6 +6,8 @@
 [resource]
 script = ExtResource("1")
 move_id = "bid_folder_fan"
+attack_dir = "res://assets/images/characters/bidding_bandit_move_bid_folder_fan_34"
+attack_count = 9
 move_name = "Bid Folder Fan"
 description = "Folders fanned. The last one wins."
 icon = ExtResource("2")

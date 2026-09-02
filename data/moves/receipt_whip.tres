@@ -6,6 +6,8 @@
 [resource]
 script = ExtResource("1")
 move_id = "receipt_whip"
+attack_dir = "res://assets/images/characters/cashier_kaltas_move_receipt_whip_34"
+attack_count = 9
 move_name = "Receipt Whip"
 description = "It prints to the floor. Then she picks it up."
 icon = ExtResource("2")

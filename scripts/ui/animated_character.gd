@@ -119,9 +119,19 @@ func _process(delta: float) -> void:
 	if _current_frames.size() <= 1:
 		return
 	_timer += delta
-	if _timer < 1.0 / maxf(_fps, 0.1):
+	var interval: float = 1.0 / maxf(_fps, 0.1)
+	if _timer < interval:
 		return
-	_timer = 0.0
+	# Carry the remainder rather than zeroing it. Zeroing quantised every clip
+	# to a whole number of DISPLAY frames, so a 15fps clip on a 60Hz screen was
+	# exact but the same clip on a 75Hz or a stuttering one drifted, and the
+	# frame the damage is timed against arrived early or late by up to a whole
+	# display frame. Subtracting keeps the clip on its own clock.
+	_timer -= interval
+	# A long stall (a scene load, a dropped frame) must not fast-forward the
+	# whole clip in one tick trying to catch up.
+	if _timer > interval:
+		_timer = 0.0
 	_frame_index += 1
 	if _frame_index >= _current_frames.size():
 		if _one_shot:
@@ -134,11 +144,32 @@ func _process(delta: float) -> void:
 ## Returns true only when a clip actually started and is guaranteed to emit
 ## one_shot_finished. Callers check the result before awaiting, so a missing
 ## or single-frame clip can never hang the combat sequence.
+## Attack and hit clips play for a fixed DURATION rather than at a fixed frame
+## rate, so their length no longer depends on how many frames the artist or the
+## generator happened to produce.
+##
+## This matters because the rivals' clips no longer all have the same count:
+## the 3/4 combat animations come back with whatever the source template uses --
+## a cross-punch is 6 frames, a throw is 7, a jab is 3. At a fixed 15fps that
+## jab was a 0.2s twitch next to a 0.47s throw, so the same choreography read
+## as a flinch on one rival and a swing on another. Fixing the duration instead
+## makes every rival's blow occupy the same beat, which is what the body
+## choreography around it is timed against.
+const ATTACK_SECONDS := 0.42
+const HIT_SECONDS := 0.46
+
 func play_attack() -> bool:
-	return _play_once(_attack_frames)
+	return _play_once(_attack_frames, _rate_for(_attack_frames, ATTACK_SECONDS, attack_fps))
 
 func play_hit() -> bool:
-	return _play_once(_hit_frames, hit_fps)
+	return _play_once(_hit_frames, _rate_for(_hit_frames, HIT_SECONDS, hit_fps))
+
+## Frames per second that spends `seconds` on the whole clip. Falls back to the
+## authored rate for a clip too short to time meaningfully.
+func _rate_for(frames: Array[Texture2D], seconds: float, fallback: float) -> float:
+	if frames.size() < 2 or seconds <= 0.0:
+		return fallback
+	return float(frames.size()) / seconds
 
 ## Plays a one-shot clip from an arbitrary folder — the hook a skill uses to
 ## swing with its OWN animation instead of the rival's shared attack. Frames
@@ -152,7 +183,10 @@ func play_clip(dir: String, count: int) -> bool:
 	var key := "%s#%d" % [dir, count]
 	if not _clip_cache.has(key):
 		_clip_cache[key] = _load_frames(dir, count)
-	return _play_once(_clip_cache[key])
+	# A skill's own clip is an attack too, so it is timed the same way -- the
+	# per-move clips have their own frame counts as well.
+	var frames: Array[Texture2D] = _clip_cache[key]
+	return _play_once(frames, _rate_for(frames, ATTACK_SECONDS, attack_fps))
 
 ## Starts the walk loop. Unlike attack/hit this never self-terminates — the
 ## caller stops it with play_idle() when the character arrives, because the

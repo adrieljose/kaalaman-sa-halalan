@@ -75,6 +75,12 @@ func _ready() -> void:
 		player.bus = SFX_BUS
 		add_child(player)
 		_sfx_players.append(player)
+	_voice_player = AudioStreamPlayer.new()
+	_voice_player.bus = SFX_BUS
+	# A voice should sit slightly above the impact noise it arrives with,
+	# otherwise the grunt is buried under its own hit.
+	_voice_player.volume_db = 2.0
+	add_child(_voice_player)
 
 ## Music and SFX live on their own buses so the balance between them is a
 ## single volume value each, rather than a gain baked into every clip.
@@ -156,6 +162,65 @@ func play_sfx(key: String) -> void:
 	var player := _claim_sfx_player()
 	player.stream = stream
 	player.play()
+
+# --- character voices -----------------------------------------------------
+#
+# The shared "enemy_hurt" set above is three takes played by every rival in the
+# game, so an ogre and a cashier yelped in the same voice. These are per
+# character instead: assets/audio/sfx/voices/<voice>_<kind>_<n>.ogg.
+
+const VOICE_DIR := "res://assets/audio/sfx/voices"
+const VOICE_TAKES := 3
+## A rival may not grunt again inside this window.
+##
+## Multi-hit skills land four or five blows inside half a second, and one grunt
+## per blow is the machine-gun "UGH UGH UGH" that makes a fight sound cheap.
+## The window is a little longer than the longest take, so a reaction is always
+## allowed to finish rather than being retriggered over itself.
+const VOICE_COOLDOWN := 0.55
+
+## Voices get their OWN player rather than a slot in the SFX pool. Two reasons:
+## a rival must never be heard grunting in two voices at once, which pooling
+## allows; and a fresh grunt should cut the previous one rather than layer over
+## it, which a dedicated player gives for free.
+var _voice_player: AudioStreamPlayer
+var _voice_until: float = 0.0
+## Which take played last, so the same one is never heard twice running -- with
+## only three takes, plain random repeats often enough to notice.
+var _voice_last: int = -1
+
+
+## Plays one of a character's takes. Returns false if nothing played, so a
+## caller can fall back to the shared sound for a character with no voice yet.
+##
+## `kind` selects the register: "hurt" for everyone, plus "rage" for the boss,
+## whose composure is supposed to break as the fight turns.
+func play_voice(voice: String, kind: String = "hurt") -> bool:
+	if voice.is_empty():
+		return false
+	var now := float(Time.get_ticks_msec()) / 1000.0
+	if now < _voice_until:
+		return true      # deliberately suppressed, not a failure -- do not fall back
+	var take := randi() % VOICE_TAKES + 1
+	if take == _voice_last:
+		take = take % VOICE_TAKES + 1
+	var stream := _load_stream("%s/%s_%s_%d.ogg" % [VOICE_DIR, voice, kind, take])
+	if stream == null:
+		return false
+	_voice_last = take
+	_voice_until = now + VOICE_COOLDOWN
+	_voice_player.stream = stream
+	_voice_player.play()
+	return true
+
+
+## Lets a fight start clean: without this a rival could be silenced by the
+## cooldown left over from the previous encounter's last blow.
+func reset_voice() -> void:
+	_voice_until = 0.0
+	_voice_last = -1
+	if _voice_player != null:
+		_voice_player.stop()
 
 ## Per-skill audio, looked up by path rather than through the SFX table above.
 ##

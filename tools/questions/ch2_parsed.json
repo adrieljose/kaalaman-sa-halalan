@@ -1,0 +1,902 @@
+[
+  {
+    "tier": "easy",
+    "prompt": "The main government building where many city offices are located is the ___.",
+    "display": "CITY HALL",
+    "answer": "CITYHALL"
+  },
+  {
+    "tier": "easy",
+    "prompt": "The elected official who serves as the chief executive of a city is the ___.",
+    "display": "MAYOR",
+    "answer": "MAYOR"
+  },
+  {
+    "tier": "easy",
+    "prompt": "The elected official who can preside over the city council is the ___.",
+    "display": "VICE MAYOR",
+    "answer": "VICEMAYOR"
+  },
+  {
+    "tier": "easy",
+    "prompt": "The local legislative body that passes city laws is the ___.",
+    "display": "CITY COUNCIL",
+    "answer": "CITYCOUNCIL"
+  },
+  {
+    "tier": "easy",
+    "prompt": "A local law passed by the city council is called an ___.",
+    "display": "ORDINANCE",
+    "answer": "ORDINANCE"
+  },
+  {
+    "tier": "easy",
+    "prompt": "A formal expression of the city council's decision or position is called a ___.",
+    "display": "RESOLUTION",
+    "answer": "RESOLUTION"
+  },
+  {
+    "tier": "easy",
+    "prompt": "An official authorization allowing a person or business to do something is a ___.",
+    "display": "PERMIT",
+    "answer": "PERMIT"
+  },
+  {
+    "tier": "easy",
+    "prompt": "An official document granting legal permission to operate or practice is a ___.",
+    "display": "LICENSE",
+    "answer": "LICENSE"
+  },
+  {
+    "tier": "easy",
+    "prompt": "The city official responsible for collecting and managing local revenues is the ___.",
+    "display": "TREASURER",
+    "answer": "TREASURER"
+  },
+  {
+    "tier": "easy",
+    "prompt": "The city official who helps determine property values for taxation is the ___.",
+    "display": "ASSESSOR",
+    "answer": "ASSESSOR"
+  },
+  {
+    "tier": "easy",
+    "prompt": "The official who keeps and reviews the city's financial records is the ___.",
+    "display": "ACCOUNTANT",
+    "answer": "ACCOUNTANT"
+  },
+  {
+    "tier": "easy",
+    "prompt": "The city official who handles public works and technical construction matters is the ___.",
+    "display": "ENGINEER",
+    "answer": "ENGINEER"
+  },
+  {
+    "tier": "easy",
+    "prompt": "The office that handles many local public health services is the ___.",
+    "display": "HEALTH OFFICE",
+    "answer": "HEALTHOFFICE"
+  },
+  {
+    "tier": "easy",
+    "prompt": "The office that assists vulnerable families and individuals is the ___.",
+    "display": "SOCIAL WELFARE",
+    "answer": "SOCIALWELFARE"
+  },
+  {
+    "tier": "easy",
+    "prompt": "The office that records births, marriages, and deaths is the ___.",
+    "display": "CIVIL REGISTRY",
+    "answer": "CIVILREGISTRY"
+  },
+  {
+    "tier": "easy",
+    "prompt": "A document commonly required before a business can legally operate in the city is a ___.",
+    "display": "BUSINESS PERMIT",
+    "answer": "BUSINESSPERMIT"
+  },
+  {
+    "tier": "easy",
+    "prompt": "A document required before many construction projects can legally begin is a ___.",
+    "display": "BUILDING PERMIT",
+    "answer": "BUILDINGPERMIT"
+  },
+  {
+    "tier": "easy",
+    "prompt": "A document confirming that a completed building may be used is an ___.",
+    "display": "OCCUPANCY PERMIT",
+    "answer": "OCCUPANCYPERMIT"
+  },
+  {
+    "tier": "easy",
+    "prompt": "A document showing information used to assess real property is a ___.",
+    "display": "TAX DECLARATION",
+    "answer": "TAXDECLARATION"
+  },
+  {
+    "tier": "easy",
+    "prompt": "The tax imposed by the city on land and buildings is called ___.",
+    "display": "REAL PROPERTY TAX",
+    "answer": "REALPROPERTYTAX"
+  },
+  {
+    "tier": "easy",
+    "prompt": "A local tax represented by a community tax certificate is the ___.",
+    "display": "COMMUNITY TAX",
+    "answer": "COMMUNITYTAX"
+  },
+  {
+    "tier": "easy",
+    "prompt": "A paper or digital proof that a payment was made is a ___.",
+    "display": "RECEIPT",
+    "answer": "RECEIPT"
+  },
+  {
+    "tier": "easy",
+    "prompt": "A number given to a visitor so they know when it is their turn at a service counter is a ___.",
+    "display": "QUEUE NUMBER",
+    "answer": "QUEUENUMBER"
+  },
+  {
+    "tier": "easy",
+    "prompt": "The place where visitors can ask where to go inside City Hall is the ___.",
+    "display": "INFORMATION DESK",
+    "answer": "INFORMATIONDESK"
+  },
+  {
+    "tier": "easy",
+    "prompt": "Helping residents through government programs and transactions is called ___.",
+    "display": "PUBLIC SERVICE",
+    "answer": "PUBLICSERVICE"
+  },
+  {
+    "tier": "easy",
+    "prompt": "The official emblem used to represent the city government is the ___.",
+    "display": "CITY SEAL",
+    "answer": "CITYSEAL"
+  },
+  {
+    "tier": "easy",
+    "prompt": "The room where the city council formally meets is the ___.",
+    "display": "SESSION HALL",
+    "answer": "SESSIONHALL"
+  },
+  {
+    "tier": "easy",
+    "prompt": "The office where the city's chief executive works is the ___.",
+    "display": "MAYOR'S OFFICE",
+    "answer": "MAYORSOFFICE"
+  },
+  {
+    "tier": "easy",
+    "prompt": "The office where local taxes and many city payments are handled is the ___.",
+    "display": "TREASURY OFFICE",
+    "answer": "TREASURYOFFICE"
+  },
+  {
+    "tier": "easy",
+    "prompt": "The office that handles the appraisal and assessment of real property is the ___.",
+    "display": "ASSESSOR'S OFFICE",
+    "answer": "ASSESSORSOFFICE"
+  },
+  {
+    "tier": "easy",
+    "prompt": "The office that records and checks financial transactions is the ___.",
+    "display": "ACCOUNTING OFFICE",
+    "answer": "ACCOUNTINGOFFICE"
+  },
+  {
+    "tier": "easy",
+    "prompt": "The office that handles plans and technical concerns for city infrastructure is the ___.",
+    "display": "ENGINEERING OFFICE",
+    "answer": "ENGINEERINGOFFICE"
+  },
+  {
+    "tier": "easy",
+    "prompt": "The office that provides legal advice to the city government is the ___.",
+    "display": "LEGAL OFFICE",
+    "answer": "LEGALOFFICE"
+  },
+  {
+    "tier": "easy",
+    "prompt": "The office that helps prepare development plans for the city is the ___.",
+    "display": "PLANNING OFFICE",
+    "answer": "PLANNINGOFFICE"
+  },
+  {
+    "tier": "easy",
+    "prompt": "The office that prepares and monitors the city's proposed expenditures is the ___.",
+    "display": "BUDGET OFFICE",
+    "answer": "BUDGETOFFICE"
+  },
+  {
+    "tier": "easy",
+    "prompt": "The office that helps manage the city's purchasing and bidding activities is the ___.",
+    "display": "PROCUREMENT OFFICE",
+    "answer": "PROCUREMENTOFFICE"
+  },
+  {
+    "tier": "easy",
+    "prompt": "The office where official city documents are filed and stored is the ___.",
+    "display": "RECORDS OFFICE",
+    "answer": "RECORDSOFFICE"
+  },
+  {
+    "tier": "easy",
+    "prompt": "The employee or window where residents make authorized payments is the ___.",
+    "display": "CASHIER",
+    "answer": "CASHIER"
+  },
+  {
+    "tier": "easy",
+    "prompt": "The document a person fills out when requesting a service or permit is an ___.",
+    "display": "APPLICATION FORM",
+    "answer": "APPLICATIONFORM"
+  },
+  {
+    "tier": "easy",
+    "prompt": "A government-issued document commonly used to confirm a person's identity is a ___.",
+    "display": "VALID ID",
+    "answer": "VALIDID"
+  },
+  {
+    "tier": "easy",
+    "prompt": "A person's written name used to approve or certify a document is a ___.",
+    "display": "SIGNATURE",
+    "answer": "SIGNATURE"
+  },
+  {
+    "tier": "easy",
+    "prompt": "The proof of payment issued by an authorized government collecting officer is an ___.",
+    "display": "OFFICIAL RECEIPT",
+    "answer": "OFFICIALRECEIPT"
+  },
+  {
+    "tier": "easy",
+    "prompt": "A person or business that is legally required to pay taxes is a ___.",
+    "display": "TAXPAYER",
+    "answer": "TAXPAYER"
+  },
+  {
+    "tier": "easy",
+    "prompt": "A member of the public who receives local government services is a ___.",
+    "display": "CITIZEN",
+    "answer": "CITIZEN"
+  },
+  {
+    "tier": "easy",
+    "prompt": "A document from a barangay that may be requested for some City Hall transactions is a ___.",
+    "display": "BARANGAY CLEARANCE",
+    "answer": "BARANGAYCLEARANCE"
+  },
+  {
+    "tier": "easy",
+    "prompt": "A document confirming that a proposed use of land follows zoning rules is a ___.",
+    "display": "ZONING CLEARANCE",
+    "answer": "ZONINGCLEARANCE"
+  },
+  {
+    "tier": "easy",
+    "prompt": "Compliance intended to protect people from fire hazards is called ___.",
+    "display": "FIRE SAFETY",
+    "answer": "FIRESAFETY"
+  },
+  {
+    "tier": "easy",
+    "prompt": "A permit showing that certain health and sanitation requirements are met is a ___.",
+    "display": "SANITARY PERMIT",
+    "answer": "SANITARYPERMIT"
+  },
+  {
+    "tier": "easy",
+    "prompt": "The institution that manages public affairs for the entire city is the ___.",
+    "display": "CITY GOVERNMENT",
+    "answer": "CITYGOVERNMENT"
+  },
+  {
+    "tier": "easy",
+    "prompt": "A city is one type of ___ unit in the Philippines.",
+    "display": "LOCAL GOVERNMENT",
+    "answer": "LOCALGOVERNMENT"
+  },
+  {
+    "tier": "medium",
+    "prompt": "The formal legislative body of a Philippine city is the ___.",
+    "display": "SANGGUNIANG PANLUNGSOD",
+    "answer": "SANGGUNIANGPANLUNGSOD"
+  },
+  {
+    "tier": "medium",
+    "prompt": "The mayor is commonly described as the city's ___.",
+    "display": "LOCAL CHIEF EXECUTIVE",
+    "answer": "LOCALCHIEFEXECUTIVE"
+  },
+  {
+    "tier": "medium",
+    "prompt": "The official who helps coordinate the administrative operations of the city government is the ___.",
+    "display": "CITY ADMINISTRATOR",
+    "answer": "CITYADMINISTRATOR"
+  },
+  {
+    "tier": "medium",
+    "prompt": "The official who keeps the records of city council proceedings is the ___.",
+    "display": "CITY SECRETARY",
+    "answer": "CITYSECRETARY"
+  },
+  {
+    "tier": "medium",
+    "prompt": "The official who gives legal advice and represents the city in legal matters is the ___.",
+    "display": "CITY LEGAL OFFICER",
+    "answer": "CITYLEGALOFFICER"
+  },
+  {
+    "tier": "medium",
+    "prompt": "The official responsible for preparing and helping administer the city budget is the ___.",
+    "display": "CITY BUDGET OFFICER",
+    "answer": "CITYBUDGETOFFICER"
+  },
+  {
+    "tier": "medium",
+    "prompt": "The official who coordinates city planning and development work is the ___.",
+    "display": "CITY PLANNING OFFICER",
+    "answer": "CITYPLANNINGOFFICER"
+  },
+  {
+    "tier": "medium",
+    "prompt": "The official who oversees local public health programs is the ___.",
+    "display": "CITY HEALTH OFFICER",
+    "answer": "CITYHEALTHOFFICER"
+  },
+  {
+    "tier": "medium",
+    "prompt": "The official who leads local social welfare programs is the ___.",
+    "display": "CITY SOCIAL WELFARE OFFICER",
+    "answer": "CITYSOCIALWELFAREOFFICER"
+  },
+  {
+    "tier": "medium",
+    "prompt": "The official who enforces building regulations and acts on building permits is the ___.",
+    "display": "CITY BUILDING OFFICIAL",
+    "answer": "CITYBUILDINGOFFICIAL"
+  },
+  {
+    "tier": "medium",
+    "prompt": "The city law that authorizes the annual use of public funds is the ___.",
+    "display": "APPROPRIATION ORDINANCE",
+    "answer": "APPROPRIATIONORDINANCE"
+  },
+  {
+    "tier": "medium",
+    "prompt": "The document that identifies priority programs, projects, and activities for a given year is the ___.",
+    "display": "ANNUAL INVESTMENT PROGRAM",
+    "answer": "ANNUALINVESTMENTPROGRAM"
+  },
+  {
+    "tier": "medium",
+    "prompt": "A written directive issued by the city mayor to manage executive matters is an ___.",
+    "display": "EXECUTIVE ORDER",
+    "answer": "EXECUTIVEORDER"
+  },
+  {
+    "tier": "medium",
+    "prompt": "A meeting where a council committee studies a proposed measure is a ___.",
+    "display": "COMMITTEE HEARING",
+    "answer": "COMMITTEEHEARING"
+  },
+  {
+    "tier": "medium",
+    "prompt": "A process where residents are invited to give views on a proposed city policy is a ___.",
+    "display": "PUBLIC CONSULTATION",
+    "answer": "PUBLICCONSULTATION"
+  },
+  {
+    "tier": "medium",
+    "prompt": "A competitive process where suppliers submit offers for a government requirement is called ___.",
+    "display": "PUBLIC BIDDING",
+    "answer": "PUBLICBIDDING"
+  },
+  {
+    "tier": "medium",
+    "prompt": "The committee that manages many government procurement activities is the ___.",
+    "display": "BIDS AND AWARDS COMMITTEE",
+    "answer": "BIDSANDAWARDSCOMMITTEE"
+  },
+  {
+    "tier": "medium",
+    "prompt": "The document used by an office to formally ask that goods or services be procured is a ___.",
+    "display": "PURCHASE REQUEST",
+    "answer": "PURCHASEREQUEST"
+  },
+  {
+    "tier": "medium",
+    "prompt": "The document formally directing a supplier to provide approved goods is a ___.",
+    "display": "PURCHASE ORDER",
+    "answer": "PURCHASEORDER"
+  },
+  {
+    "tier": "medium",
+    "prompt": "The document informing a successful bidder that it has been selected is the ___.",
+    "display": "NOTICE OF AWARD",
+    "answer": "NOTICEOFAWARD"
+  },
+  {
+    "tier": "medium",
+    "prompt": "The document authorizing a contractor or supplier to begin approved work is the ___.",
+    "display": "NOTICE TO PROCEED",
+    "answer": "NOTICETOPROCEED"
+  },
+  {
+    "tier": "medium",
+    "prompt": "A summary showing the bids received for a procurement activity is the ___.",
+    "display": "ABSTRACT OF BIDS",
+    "answer": "ABSTRACTOFBIDS"
+  },
+  {
+    "tier": "medium",
+    "prompt": "The document that consolidates planned procurements for the year is the ___.",
+    "display": "ANNUAL PROCUREMENT PLAN",
+    "answer": "ANNUALPROCUREMENTPLAN"
+  },
+  {
+    "tier": "medium",
+    "prompt": "An additional city budget approved when the original budget needs lawful adjustment is a ___.",
+    "display": "SUPPLEMENTAL BUDGET",
+    "answer": "SUPPLEMENTALBUDGET"
+  },
+  {
+    "tier": "medium",
+    "prompt": "The main fund used for many ordinary city government operations is the ___.",
+    "display": "GENERAL FUND",
+    "answer": "GENERALFUND"
+  },
+  {
+    "tier": "medium",
+    "prompt": "A fund dedicated to eligible public education purposes is the ___.",
+    "display": "SPECIAL EDUCATION FUND",
+    "answer": "SPECIALEDUCATIONFUND"
+  },
+  {
+    "tier": "medium",
+    "prompt": "Money held by the city for a specific purpose or beneficiary may be placed in a ___.",
+    "display": "TRUST FUND",
+    "answer": "TRUSTFUND"
+  },
+  {
+    "tier": "medium",
+    "prompt": "The body that helps formulate local development plans and investment programs is the ___.",
+    "display": "LOCAL DEVELOPMENT COUNCIL",
+    "answer": "LOCALDEVELOPMENTCOUNCIL"
+  },
+  {
+    "tier": "medium",
+    "prompt": "The long-term plan that guides how land in the city should be used is the ___.",
+    "display": "COMPREHENSIVE LAND USE PLAN",
+    "answer": "COMPREHENSIVELANDUSEPLAN"
+  },
+  {
+    "tier": "medium",
+    "prompt": "The local law that sets land-use zones and their allowed uses is the ___.",
+    "display": "ZONING ORDINANCE",
+    "answer": "ZONINGORDINANCE"
+  },
+  {
+    "tier": "medium",
+    "prompt": "A document confirming that a proposed location or land use complies with applicable zoning rules is a ___.",
+    "display": "LOCATIONAL CLEARANCE",
+    "answer": "LOCATIONALCLEARANCE"
+  },
+  {
+    "tier": "medium",
+    "prompt": "A setup that brings several business registration steps together in one place is the ___.",
+    "display": "BUSINESS ONE STOP SHOP",
+    "answer": "BUSINESSONESTOPSHOP"
+  },
+  {
+    "tier": "medium",
+    "prompt": "The local authorization commonly required for a business to operate is often called the ___.",
+    "display": "MAYOR'S PERMIT",
+    "answer": "MAYORSPERMIT"
+  },
+  {
+    "tier": "medium",
+    "prompt": "The official list of taxable real properties and their assessments is the ___.",
+    "display": "ASSESSMENT ROLL",
+    "answer": "ASSESSMENTROLL"
+  },
+  {
+    "tier": "medium",
+    "prompt": "The estimated amount a property would reasonably command in an open market is its ___.",
+    "display": "MARKET VALUE",
+    "answer": "MARKETVALUE"
+  },
+  {
+    "tier": "medium",
+    "prompt": "The taxable value determined after applying the assessment level to property value is the ___.",
+    "display": "ASSESSED VALUE",
+    "answer": "ASSESSEDVALUE"
+  },
+  {
+    "tier": "medium",
+    "prompt": "The process of identifying and plotting taxable properties for assessment purposes is called ___.",
+    "display": "TAX MAPPING",
+    "answer": "TAXMAPPING"
+  },
+  {
+    "tier": "medium",
+    "prompt": "A tax that remains unpaid after its legal due date becomes a ___.",
+    "display": "DELINQUENT TAX",
+    "answer": "DELINQUENTTAX"
+  },
+  {
+    "tier": "medium",
+    "prompt": "A document showing that specified local tax obligations have been settled may be called a ___.",
+    "display": "TAX CLEARANCE",
+    "answer": "TAXCLEARANCE"
+  },
+  {
+    "tier": "medium",
+    "prompt": "The official who records vital events such as births, marriages, and deaths is the ___.",
+    "display": "CIVIL REGISTRAR",
+    "answer": "CIVILREGISTRAR"
+  },
+  {
+    "tier": "medium",
+    "prompt": "The civil registry document that records a person's birth is the ___.",
+    "display": "BIRTH CERTIFICATE",
+    "answer": "BIRTHCERTIFICATE"
+  },
+  {
+    "tier": "medium",
+    "prompt": "The document a couple generally obtains before a civil marriage may proceed is a ___.",
+    "display": "MARRIAGE LICENSE",
+    "answer": "MARRIAGELICENSE"
+  },
+  {
+    "tier": "medium",
+    "prompt": "The civil registry document that officially records a person's death is the ___.",
+    "display": "DEATH CERTIFICATE",
+    "answer": "DEATHCERTIFICATE"
+  },
+  {
+    "tier": "medium",
+    "prompt": "A written assessment prepared by a social worker about a client's circumstances is a ___.",
+    "display": "SOCIAL CASE STUDY",
+    "answer": "SOCIALCASESTUDY"
+  },
+  {
+    "tier": "medium",
+    "prompt": "A document used to show that a project has met a required environmental review or approval may be an ___.",
+    "display": "ENVIRONMENTAL CLEARANCE",
+    "answer": "ENVIRONMENTALCLEARANCE"
+  },
+  {
+    "tier": "medium",
+    "prompt": "Reducing hazards and preparing communities for disasters is called ___.",
+    "display": "DISASTER RISK REDUCTION",
+    "answer": "DISASTERRISKREDUCTION"
+  },
+  {
+    "tier": "medium",
+    "prompt": "The facility used to coordinate government response during major emergencies is the ___.",
+    "display": "EMERGENCY OPERATIONS CENTER",
+    "answer": "EMERGENCYOPERATIONSCENTER"
+  },
+  {
+    "tier": "medium",
+    "prompt": "The office that releases official city announcements and public updates is the ___.",
+    "display": "PUBLIC INFORMATION OFFICE",
+    "answer": "PUBLICINFORMATIONOFFICE"
+  },
+  {
+    "tier": "medium",
+    "prompt": "The document that lists government services, requirements, fees, and expected processing periods is the ___.",
+    "display": "CITIZEN'S CHARTER",
+    "answer": "CITIZENSCHARTER"
+  },
+  {
+    "tier": "medium",
+    "prompt": "The amount of time a service should normally take under published procedures is the ___.",
+    "display": "PROCESSING TIME",
+    "answer": "PROCESSINGTIME"
+  },
+  {
+    "tier": "hard",
+    "prompt": "The principal Philippine law that sets out the powers, responsibilities, and structure of local governments is the ___.",
+    "display": "LOCAL GOVERNMENT CODE",
+    "answer": "LOCALGOVERNMENTCODE"
+  },
+  {
+    "tier": "hard",
+    "prompt": "The Local Government Code of 1991 is formally known as ___.",
+    "display": "REPUBLIC ACT 7160",
+    "answer": "REPUBLICACT"
+  },
+  {
+    "tier": "hard",
+    "prompt": "The transfer of certain functions and responsibilities from the national government to local governments is called ___.",
+    "display": "DEVOLUTION",
+    "answer": "DEVOLUTION"
+  },
+  {
+    "tier": "hard",
+    "prompt": "The ability of a local government to manage its financial resources within legal limits reflects ___.",
+    "display": "FISCAL AUTONOMY",
+    "answer": "FISCALAUTONOMY"
+  },
+  {
+    "tier": "hard",
+    "prompt": "The share of local governments from national taxes is called the ___.",
+    "display": "NATIONAL TAX ALLOTMENT",
+    "answer": "NATIONALTAXALLOTMENT"
+  },
+  {
+    "tier": "hard",
+    "prompt": "A city law or code that organizes local taxes, fees, and charges is the ___.",
+    "display": "LOCAL REVENUE CODE",
+    "answer": "LOCALREVENUECODE"
+  },
+  {
+    "tier": "hard",
+    "prompt": "A local legislative measure that imposes or revises authorized local revenues is a ___.",
+    "display": "REVENUE ORDINANCE",
+    "answer": "REVENUEORDINANCE"
+  },
+  {
+    "tier": "hard",
+    "prompt": "The legal authorization to spend public money for a stated purpose is an ___.",
+    "display": "APPROPRIATION",
+    "answer": "APPROPRIATION"
+  },
+  {
+    "tier": "hard",
+    "prompt": "The authority to incur obligations within an approved appropriation is an ___.",
+    "display": "ALLOTMENT",
+    "answer": "ALLOTMENT"
+  },
+  {
+    "tier": "hard",
+    "prompt": "A document used to request that funds be committed for an authorized expense is an ___.",
+    "display": "OBLIGATION REQUEST",
+    "answer": "OBLIGATIONREQUEST"
+  },
+  {
+    "tier": "hard",
+    "prompt": "The document commonly used to support the payment of a government financial obligation is a ___.",
+    "display": "DISBURSEMENT VOUCHER",
+    "answer": "DISBURSEMENTVOUCHER"
+  },
+  {
+    "tier": "hard",
+    "prompt": "Before an expense is obligated, confirmation that sufficient funds exist may be shown through a ___.",
+    "display": "CERTIFICATE OF AVAILABILITY OF FUNDS",
+    "answer": "CERTIFICATEOFAVAILABILITYOFFUNDS"
+  },
+  {
+    "tier": "hard",
+    "prompt": "The group that advises the local chief executive on financial matters is the ___.",
+    "display": "LOCAL FINANCE COMMITTEE",
+    "answer": "LOCALFINANCECOMMITTEE"
+  },
+  {
+    "tier": "hard",
+    "prompt": "The local special body concerned with supporting public education is the ___.",
+    "display": "LOCAL SCHOOL BOARD",
+    "answer": "LOCALSCHOOLBOARD"
+  },
+  {
+    "tier": "hard",
+    "prompt": "The local special body that helps address community health concerns is the ___.",
+    "display": "LOCAL HEALTH BOARD",
+    "answer": "LOCALHEALTHBOARD"
+  },
+  {
+    "tier": "hard",
+    "prompt": "The council that coordinates local peace, order, and public safety concerns is the ___.",
+    "display": "LOCAL PEACE AND ORDER COUNCIL",
+    "answer": "LOCALPEACEANDORDERCOUNCIL"
+  },
+  {
+    "tier": "hard",
+    "prompt": "Boards and councils created by law to involve sectors in local governance are collectively called ___.",
+    "display": "LOCAL SPECIAL BODIES",
+    "answer": "LOCALSPECIALBODIES"
+  },
+  {
+    "tier": "hard",
+    "prompt": "The joint priority framework that aligns the mayor's executive agenda with the council's legislative work is the ___.",
+    "display": "EXECUTIVE LEGISLATIVE AGENDA",
+    "answer": "EXECUTIVELEGISLATIVEAGENDA"
+  },
+  {
+    "tier": "hard",
+    "prompt": "The multi-year document that translates local development priorities into programs and projects is the ___.",
+    "display": "LOCAL DEVELOPMENT INVESTMENT PROGRAM",
+    "answer": "LOCALDEVELOPMENTINVESTMENTPROGRAM"
+  },
+  {
+    "tier": "hard",
+    "prompt": "The stage of the budget cycle where the local legislative body approves the spending plan is ___.",
+    "display": "BUDGET AUTHORIZATION",
+    "answer": "BUDGETAUTHORIZATION"
+  },
+  {
+    "tier": "hard",
+    "prompt": "The stage where approved funds are released and used to carry out programs is ___.",
+    "display": "BUDGET EXECUTION",
+    "answer": "BUDGETEXECUTION"
+  },
+  {
+    "tier": "hard",
+    "prompt": "The stage where spending and results are reported and reviewed is ___.",
+    "display": "BUDGET ACCOUNTABILITY",
+    "answer": "BUDGETACCOUNTABILITY"
+  },
+  {
+    "tier": "hard",
+    "prompt": "Identifying what the city needs to buy, when it is needed, and how it will be sourced is called ___.",
+    "display": "PROCUREMENT PLANNING",
+    "answer": "PROCUREMENTPLANNING"
+  },
+  {
+    "tier": "hard",
+    "prompt": "The formal review and comparison of submitted offers according to stated criteria is ___.",
+    "display": "BID EVALUATION",
+    "answer": "BIDEVALUATION"
+  },
+  {
+    "tier": "hard",
+    "prompt": "The process of verifying that the apparent winning bidder actually meets the required qualifications is ___.",
+    "display": "POST QUALIFICATION",
+    "answer": "POSTQUALIFICATION"
+  },
+  {
+    "tier": "hard",
+    "prompt": "Managing the performance, delivery, and obligations after a government contract is awarded is ___.",
+    "display": "CONTRACT IMPLEMENTATION",
+    "answer": "CONTRACTIMPLEMENTATION"
+  },
+  {
+    "tier": "hard",
+    "prompt": "Tracking whether a city project is progressing according to scope, schedule, and targets is ___.",
+    "display": "PROJECT MONITORING",
+    "answer": "PROJECTMONITORING"
+  },
+  {
+    "tier": "hard",
+    "prompt": "Policies and procedures designed to safeguard assets and reduce errors or misuse are called ___.",
+    "display": "INTERNAL CONTROL",
+    "answer": "INTERNALCONTROL"
+  },
+  {
+    "tier": "hard",
+    "prompt": "Separating authorization, custody, recording, and review functions is known as ___.",
+    "display": "SEGREGATION OF DUTIES",
+    "answer": "SEGREGATIONOFDUTIES"
+  },
+  {
+    "tier": "hard",
+    "prompt": "A situation where a public official's private interest may improperly affect official judgment is a ___.",
+    "display": "CONFLICT OF INTEREST",
+    "answer": "CONFLICTOFINTEREST"
+  },
+  {
+    "tier": "hard",
+    "prompt": "Making required government information available for public scrutiny is called ___.",
+    "display": "PUBLIC DISCLOSURE",
+    "answer": "PUBLICDISCLOSURE"
+  },
+  {
+    "tier": "hard",
+    "prompt": "A formal channel where residents can submit complaints and seek action from the city is a ___.",
+    "display": "PUBLIC GRIEVANCE MECHANISM",
+    "answer": "PUBLICGRIEVANCEMECHANISM"
+  },
+  {
+    "tier": "hard",
+    "prompt": "Rules governing how long official documents must be kept are part of ___.",
+    "display": "RECORDS RETENTION",
+    "answer": "RECORDSRETENTION"
+  },
+  {
+    "tier": "hard",
+    "prompt": "Protecting personal information collected during government transactions is part of ___.",
+    "display": "DATA PRIVACY",
+    "answer": "DATAPRIVACY"
+  },
+  {
+    "tier": "hard",
+    "prompt": "A policy framework that allows access to government-held information, subject to lawful exceptions, is called ___.",
+    "display": "FREEDOM OF INFORMATION",
+    "answer": "FREEDOMOFINFORMATION"
+  },
+  {
+    "tier": "hard",
+    "prompt": "Dividing land into categories such as residential, commercial, industrial, or agricultural is ___.",
+    "display": "LAND USE CLASSIFICATION",
+    "answer": "LANDUSECLASSIFICATION"
+  },
+  {
+    "tier": "hard",
+    "prompt": "Permission to deviate from certain zoning requirements because of specific property conditions is a ___.",
+    "display": "ZONING VARIANCE",
+    "answer": "ZONINGVARIANCE"
+  },
+  {
+    "tier": "hard",
+    "prompt": "Approval allowing a land use that is conditionally permitted under zoning rules is a ___.",
+    "display": "ZONING EXCEPTION",
+    "answer": "ZONINGEXCEPTION"
+  },
+  {
+    "tier": "hard",
+    "prompt": "The use of planning rules to guide the location, form, and intensity of development is called ___.",
+    "display": "DEVELOPMENT CONTROL",
+    "answer": "DEVELOPMENTCONTROL"
+  },
+  {
+    "tier": "hard",
+    "prompt": "Grouping buildings according to how they are used for code and safety purposes is ___.",
+    "display": "OCCUPANCY CLASSIFICATION",
+    "answer": "OCCUPANCYCLASSIFICATION"
+  },
+  {
+    "tier": "hard",
+    "prompt": "Meeting legally required fire-safety standards for a building is called ___.",
+    "display": "FIRE CODE COMPLIANCE",
+    "answer": "FIRECODECOMPLIANCE"
+  },
+  {
+    "tier": "hard",
+    "prompt": "Ensuring public buildings can be used by persons with disabilities is part of ___.",
+    "display": "ACCESSIBILITY COMPLIANCE",
+    "answer": "ACCESSIBILITYCOMPLIANCE"
+  },
+  {
+    "tier": "hard",
+    "prompt": "A systematic study of the likely environmental effects of a proposed project is an ___.",
+    "display": "ENVIRONMENTAL IMPACT ASSESSMENT",
+    "answer": "ENVIRONMENTALIMPACTASSESSMENT"
+  },
+  {
+    "tier": "hard",
+    "prompt": "The organized collection, reduction, recovery, and disposal of municipal waste is ___.",
+    "display": "SOLID WASTE MANAGEMENT",
+    "answer": "SOLIDWASTEMANAGEMENT"
+  },
+  {
+    "tier": "hard",
+    "prompt": "Planning roads, signals, routes, and movement to improve urban mobility is ___.",
+    "display": "TRAFFIC MANAGEMENT",
+    "answer": "TRAFFICMANAGEMENT"
+  },
+  {
+    "tier": "hard",
+    "prompt": "Strategies that improve jobs, enterprises, and economic activity within the city support ___.",
+    "display": "LOCAL ECONOMIC DEVELOPMENT",
+    "answer": "LOCALECONOMICDEVELOPMENT"
+  },
+  {
+    "tier": "hard",
+    "prompt": "Programs designed to attract and assist businesses that may invest in the city are part of ___.",
+    "display": "INVESTMENT PROMOTION",
+    "answer": "INVESTMENTPROMOTION"
+  },
+  {
+    "tier": "hard",
+    "prompt": "Government-supported housing intended to make decent shelter more affordable is ___.",
+    "display": "SOCIALIZED HOUSING",
+    "answer": "SOCIALIZEDHOUSING"
+  },
+  {
+    "tier": "hard",
+    "prompt": "Adjusting city plans and infrastructure to reduce harm from changing climate conditions is ___.",
+    "display": "CLIMATE ADAPTATION",
+    "answer": "CLIMATEADAPTATION"
+  },
+  {
+    "tier": "hard",
+    "prompt": "A plan describing how essential city services will continue during major disruptions is a ___.",
+    "display": "BUSINESS CONTINUITY PLAN",
+    "answer": "BUSINESSCONTINUITYPLAN"
+  }
+]

@@ -1,0 +1,137 @@
+{
+  "fixer_fredo": {
+    "canvas": [
+      73,
+      180
+    ],
+    "box": [
+      13,
+      15,
+      63,
+      176
+    ],
+    "colors": 32,
+    "b64_chars": 2752,
+    "cost_8f": 1.97
+  },
+  "clerk_kurakot": {
+    "canvas": [
+      90,
+      180
+    ],
+    "box": [
+      10,
+      32,
+      81,
+      176
+    ],
+    "colors": 32,
+    "b64_chars": 3424,
+    "cost_8f": 2.5
+  },
+  "permit_peke": {
+    "canvas": [
+      86,
+      180
+    ],
+    "box": [
+      13,
+      9,
+      78,
+      176
+    ],
+    "colors": 32,
+    "b64_chars": 3560,
+    "cost_8f": 2.65
+  },
+  "notaryo_naku": {
+    "canvas": [
+      70,
+      180
+    ],
+    "box": [
+      18,
+      19,
+      61,
+      176
+    ],
+    "colors": 32,
+    "b64_chars": 2940,
+    "cost_8f": 1.65
+  },
+  "cashier_kaltas": {
+    "canvas": [
+      71,
+      180
+    ],
+    "box": [
+      10,
+      28,
+      58,
+      176
+    ],
+    "colors": 32,
+    "b64_chars": 1964,
+    "cost_8f": 1.73
+  },
+  "budget_bandido": {
+    "canvas": [
+      81,
+      180
+    ],
+    "box": [
+      10,
+      25,
+      72,
+      176
+    ],
+    "colors": 16,
+    "b64_chars": 3580,
+    "cost_8f": 2.29
+  },
+  "bidding_bandit": {
+    "canvas": [
+      69,
+      180
+    ],
+    "box": [
+      17,
+      27,
+      58,
+      176
+    ],
+    "colors": 32,
+    "b64_chars": 2216,
+    "cost_8f": 1.49
+  },
+  "ordinance_ogre": {
+    "canvas": [
+      99,
+      180
+    ],
+    "box": [
+      13,
+      7,
+      87,
+      176
+    ],
+    "colors": 24,
+    "b64_chars": 3584,
+    "cost_8f": 3.05
+  },
+  "don_eraptado": {
+    "canvas": [
+      78,
+      180
+    ],
+    "box": [
+      10,
+      44,
+      70,
+      176
+    ],
+    "colors": 32,
+    "b64_chars": 2232,
+    "cost_8f": 1.93
+  }
+}

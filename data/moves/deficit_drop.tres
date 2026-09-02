@@ -6,6 +6,8 @@
 [resource]
 script = ExtResource("1")
 move_id = "deficit_drop"
+attack_dir = "res://assets/images/characters/budget_bandido_move_deficit_drop_34"
+attack_count = 9
 move_name = "Deficit Drop"
 description = "A red figure, then the sack it belongs to."
 icon = ExtResource("2")

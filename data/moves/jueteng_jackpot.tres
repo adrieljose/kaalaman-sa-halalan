@@ -6,6 +6,8 @@
 [resource]
 script = ExtResource("1")
 move_id = "jueteng_jackpot"
+attack_dir = "res://assets/images/characters/don_eraptado_move_jueteng_jackpot_34"
+attack_count = 9
 move_name = "Jueteng Jackpot"
 description = "A number nobody chose. He collects."
 icon = ExtResource("2")

@@ -6,6 +6,8 @@
 [resource]
 script = ExtResource("1")
 move_id = "paper_cut_volley"
+attack_dir = "res://assets/images/characters/clerk_kurakot_move_paper_cut_volley_34"
+attack_count = 9
 move_name = "Paper Cut Volley"
 description = "Documents that straighten into blades."
 icon = ExtResource("2")

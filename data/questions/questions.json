@@ -1231,482 +1231,1335 @@
   {
     "chapter": 2,
     "difficulty": "easy",
-    "category": "voting",
-    "prompt": "The elected leader of a city or town is the ___.",
+    "category": "why",
+    "prompt": "The main government building where many city offices are located is the ___.",
+    "answer": "CITYHALL",
+    "display": "CITY HALL",
+    "fact": "City Hall houses the mayor's office, the city council, and the frontline service windows residents use."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "candidate",
+    "prompt": "The elected official who serves as the chief executive of a city is the ___.",
     "answer": "MAYOR",
-    "fact": "Mayors serve three-year terms under the Local Government Code."
-  },
-  {
-    "chapter": 2,
-    "difficulty": "easy",
-    "category": "voting",
-    "prompt": "The elected chief executive of a city or town is its ___.",
-    "answer": "MAYOR",
-    "fact": "Mayors serve three-year terms under the Local Government Code."
-  },
-  {
-    "chapter": 2,
-    "difficulty": "easy",
-    "category": "voting",
-    "prompt": "The second-highest city official is the ___ mayor.",
-    "answer": "VICE",
-    "fact": "The vice mayor presides over the city council."
-  },
-  {
-    "chapter": 2,
-    "difficulty": "easy",
-    "category": "voting",
-    "prompt": "Second in command at city hall is the ___ mayor.",
-    "answer": "VICE",
-    "fact": "The vice mayor presides over the city council."
-  },
-  {
-    "chapter": 2,
-    "difficulty": "easy",
-    "category": "voting",
-    "prompt": "A mayor may serve up to ___ terms in a row.",
-    "answer": "THREE",
-    "fact": "The three-consecutive-term limit applies to local elective officials generally."
-  },
-  {
-    "chapter": 2,
-    "difficulty": "easy",
-    "category": "voting",
-    "prompt": "Local officials, mayors included, are capped at ___ consecutive terms.",
-    "answer": "THREE",
-    "fact": "The three-consecutive-term limit applies to local elective officials generally."
-  },
-  {
-    "chapter": 2,
-    "difficulty": "easy",
-    "category": "voting",
-    "prompt": "The lawmaking body of a city or town is the ___.",
-    "answer": "COUNCIL",
-    "fact": "The council passes ordinances for the whole city."
-  },
-  {
-    "chapter": 2,
-    "difficulty": "easy",
-    "category": "voting",
-    "prompt": "Local ordinances for a city come from its ___.",
-    "answer": "COUNCIL",
-    "fact": "The council passes ordinances for the whole city."
-  },
-  {
-    "chapter": 2,
-    "difficulty": "easy",
-    "category": "fraud",
-    "prompt": "Padding some precinct counts while shaving others is ___-bawas.",
-    "answer": "DAGDAG",
-    "fact": "This can happen during city-level canvassing just as at other levels."
-  },
-  {
-    "chapter": 2,
-    "difficulty": "easy",
-    "category": "fraud",
-    "prompt": "City-level canvassing can still be corrupted by ___-bawas.",
-    "answer": "DAGDAG",
-    "fact": "This can happen during city-level canvassing just as at other levels."
-  },
-  {
-    "chapter": 2,
-    "difficulty": "easy",
-    "category": "fraud",
-    "prompt": "Registering to vote where you don't actually live enables ___ voting.",
-    "answer": "FLYING",
-    "fact": "It is an election offense with prison time attached."
-  },
-  {
-    "chapter": 2,
-    "difficulty": "easy",
-    "category": "fraud",
-    "prompt": "Claiming a false city address just to vote there is ___ voting.",
-    "answer": "FLYING",
-    "fact": "It is an election offense with prison time attached."
+    "fact": "A city mayor serves a three-year term and may hold no more than three consecutive terms."
   },
   {
     "chapter": 2,
     "difficulty": "easy",
     "category": "candidate",
-    "prompt": "A law passed by a city council is called an ___.",
+    "prompt": "The elected official who can preside over the city council is the ___.",
+    "answer": "VICEMAYOR",
+    "display": "VICE MAYOR",
+    "fact": "The vice mayor presides over the city council but votes only to break a tie."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "candidate",
+    "prompt": "The local legislative body that passes city laws is the ___.",
+    "answer": "CITYCOUNCIL",
+    "display": "CITY COUNCIL",
+    "fact": "A city's council is the Sangguniang Panlungsod, made up of elected councilors."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "A local law passed by the city council is called an ___.",
     "answer": "ORDINANCE",
-    "fact": "Ordinances apply only within that local government unit."
+    "fact": "An ordinance is a local law that carries penalties and stays in force until repealed."
   },
   {
     "chapter": 2,
     "difficulty": "easy",
-    "category": "candidate",
-    "prompt": "A city council's local law is formally called an ___.",
-    "answer": "ORDINANCE",
-    "fact": "Ordinances apply only within that local government unit."
-  },
-  {
-    "chapter": 2,
-    "difficulty": "easy",
-    "category": "candidate",
-    "prompt": "A candidate's application to run is a Certificate of ___.",
-    "answer": "CANDIDACY",
-    "fact": "It must be filed within the period COMELEC sets."
-  },
-  {
-    "chapter": 2,
-    "difficulty": "easy",
-    "category": "candidate",
-    "prompt": "Running for city council or mayor starts with a Certificate of ___.",
-    "answer": "CANDIDACY",
-    "fact": "It must be filed within the period COMELEC sets."
-  },
-  {
-    "chapter": 2,
-    "difficulty": "easy",
-    "category": "why",
-    "prompt": "Roads, parks, and plazas belong to everyone, so they are ___ property.",
-    "answer": "PUBLIC",
-    "fact": "Public funds may never be spent on a candidate's own campaign."
-  },
-  {
-    "chapter": 2,
-    "difficulty": "easy",
-    "category": "why",
-    "prompt": "A plaza built with city funds belongs to everyone, making it ___ property.",
-    "answer": "PUBLIC",
-    "fact": "Public funds may never be spent on a candidate's own campaign."
-  },
-  {
-    "chapter": 2,
-    "difficulty": "easy",
-    "category": "why",
-    "prompt": "A candidate's written set of proposals for the city is their ___.",
-    "answer": "PLATFORM",
-    "fact": "Comparing platforms is a better guide than comparing jingles."
-  },
-  {
-    "chapter": 2,
-    "difficulty": "easy",
-    "category": "why",
-    "prompt": "A mayoral candidate's written agenda for the city is their ___.",
-    "answer": "PLATFORM",
-    "fact": "Comparing platforms is a better guide than comparing jingles."
-  },
-  {
-    "chapter": 2,
-    "difficulty": "medium",
     "category": "voting",
-    "prompt": "The rules on what may be built where in a city are called ___.",
-    "answer": "ZONING",
-    "fact": "Zoning ordinances keep homes separated from factories."
+    "prompt": "A formal expression of the city council's decision or position is called a ___.",
+    "answer": "RESOLUTION",
+    "fact": "A resolution expresses the council's position on a matter; it is not a permanent local law."
   },
   {
     "chapter": 2,
-    "difficulty": "medium",
+    "difficulty": "easy",
     "category": "voting",
-    "prompt": "Rules about what can be built where in a city fall under ___.",
-    "answer": "ZONING",
-    "fact": "Zoning ordinances keep homes separated from factories."
+    "prompt": "An official authorization allowing a person or business to do something is a ___.",
+    "answer": "PERMIT",
+    "fact": "Permits let the city check that an activity meets safety, zoning, and health rules before it starts."
   },
   {
     "chapter": 2,
-    "difficulty": "medium",
+    "difficulty": "easy",
     "category": "voting",
-    "prompt": "Relating to a town government rather than a city is ___.",
-    "answer": "MUNICIPAL",
-    "fact": "A municipality is headed by a mayor just like a city."
+    "prompt": "An official document granting legal permission to operate or practice is a ___.",
+    "answer": "LICENSE",
+    "fact": "Licenses are issued for a fixed period and must be renewed to stay valid."
   },
   {
     "chapter": 2,
-    "difficulty": "medium",
-    "category": "voting",
-    "prompt": "A local government unit smaller and rural in character is ___ rather than a city.",
-    "answer": "MUNICIPAL",
-    "fact": "A municipality is headed by a mayor just like a city."
-  },
-  {
-    "chapter": 2,
-    "difficulty": "medium",
-    "category": "voting",
-    "prompt": "A city or town councilor in Filipino is a ___.",
-    "answer": "KONSEHAL",
-    "fact": "Konsehal is the everyday term for a city council member."
-  },
-  {
-    "chapter": 2,
-    "difficulty": "medium",
-    "category": "voting",
-    "prompt": "The Filipino word for a member of the city council is ___.",
-    "answer": "KONSEHAL",
-    "fact": "Konsehal is the everyday term for a city council member."
-  },
-  {
-    "chapter": 2,
-    "difficulty": "medium",
-    "category": "fraud",
-    "prompt": "Money given to induce a vote is the crime of vote ___.",
-    "answer": "BUYING",
-    "fact": "The penalty includes 1 to 6 years imprisonment with no probation."
-  },
-  {
-    "chapter": 2,
-    "difficulty": "medium",
-    "category": "fraud",
-    "prompt": "Handing a voter cash to influence a city race is the crime of vote ___.",
-    "answer": "BUYING",
-    "fact": "The penalty includes 1 to 6 years imprisonment with no probation."
-  },
-  {
-    "chapter": 2,
-    "difficulty": "medium",
-    "category": "fraud",
-    "prompt": "Someone who solicits payment for their vote commits vote ___.",
-    "answer": "SELLING",
-    "fact": "Both the buyer and the seller can be prosecuted."
-  },
-  {
-    "chapter": 2,
-    "difficulty": "medium",
-    "category": "fraud",
-    "prompt": "Accepting cash in exchange for a vote makes a person guilty of vote ___.",
-    "answer": "SELLING",
-    "fact": "Both the buyer and the seller can be prosecuted."
-  },
-  {
-    "chapter": 2,
-    "difficulty": "medium",
+    "difficulty": "easy",
     "category": "candidate",
-    "prompt": "A candidate filed only to confuse voters is a ___ candidate.",
-    "answer": "NUISANCE",
-    "fact": "COMELEC can cancel such a COC under Section 69 of the OEC."
+    "prompt": "The city official responsible for collecting and managing local revenues is the ___.",
+    "answer": "TREASURER",
+    "fact": "The city treasurer collects local taxes and keeps custody of city funds."
   },
   {
     "chapter": 2,
-    "difficulty": "medium",
+    "difficulty": "easy",
     "category": "candidate",
-    "prompt": "A COC filed to mock a city race can be struck down as a ___ candidacy.",
-    "answer": "NUISANCE",
-    "fact": "COMELEC can cancel such a COC under Section 69 of the OEC."
-  },
-  {
-    "chapter": 2,
-    "difficulty": "medium",
-    "category": "candidate",
-    "prompt": "A replacement for a withdrawn or disqualified candidate is a ___.",
-    "answer": "SUBSTITUTE",
-    "fact": "The substitute must run for the exact same position."
-  },
-  {
-    "chapter": 2,
-    "difficulty": "medium",
-    "category": "candidate",
-    "prompt": "Someone stepping in after a city candidate withdraws is a ___.",
-    "answer": "SUBSTITUTE",
-    "fact": "The substitute must run for the exact same position."
-  },
-  {
-    "chapter": 2,
-    "difficulty": "medium",
-    "category": "candidate",
-    "prompt": "The city official who values property for tax purposes is the ___.",
+    "prompt": "The city official who helps determine property values for taxation is the ___.",
     "answer": "ASSESSOR",
-    "fact": "The assessor's valuations decide how much property tax is owed."
+    "fact": "The assessor appraises land and buildings so property tax rests on a recorded value."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "candidate",
+    "prompt": "The official who keeps and reviews the city's financial records is the ___.",
+    "answer": "ACCOUNTANT",
+    "fact": "The city accountant keeps the books and certifies that expenses are properly recorded."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "candidate",
+    "prompt": "The city official who handles public works and technical construction matters is the ___.",
+    "answer": "ENGINEER",
+    "fact": "The city engineer reviews building plans and supervises public works projects."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "candidate",
+    "prompt": "The office that handles many local public health services is the ___.",
+    "answer": "HEALTHOFFICE",
+    "display": "HEALTH OFFICE",
+    "fact": "The city health office runs immunisation, sanitation, and other frontline health services."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "candidate",
+    "prompt": "The office that assists vulnerable families and individuals is the ___.",
+    "answer": "SOCIALWELFARE",
+    "display": "SOCIAL WELFARE",
+    "fact": "Social welfare offices assist children, senior citizens, persons with disabilities, and families in crisis."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "The office that records births, marriages, and deaths is the ___.",
+    "answer": "CIVILREGISTRY",
+    "display": "CIVIL REGISTRY",
+    "fact": "Civil registry records are the legal proof of a person's birth, marriage, and death."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "A document commonly required before a business can legally operate in the city is a ___.",
+    "answer": "BUSINESSPERMIT",
+    "display": "BUSINESS PERMIT",
+    "fact": "Business permits are renewed every January, together with the local business tax."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "A document required before many construction projects can legally begin is a ___.",
+    "answer": "BUILDINGPERMIT",
+    "display": "BUILDING PERMIT",
+    "fact": "A building permit is issued only after the plans are checked against the National Building Code."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "A document confirming that a completed building may be used is an ___.",
+    "answer": "OCCUPANCYPERMIT",
+    "display": "OCCUPANCY PERMIT",
+    "fact": "The occupancy permit certifies that the finished building is safe to be used."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "A document showing information used to assess real property is a ___.",
+    "answer": "TAXDECLARATION",
+    "display": "TAX DECLARATION",
+    "fact": "A tax declaration records a property's assessed value; it is not by itself proof of ownership."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "The tax imposed by the city on land and buildings is called ___.",
+    "answer": "REALPROPERTYTAX",
+    "display": "REAL PROPERTY TAX",
+    "fact": "Real property tax may be paid in full by January or in four quarterly instalments."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "A local tax represented by a community tax certificate is the ___.",
+    "answer": "COMMUNITYTAX",
+    "display": "COMMUNITY TAX",
+    "fact": "The community tax certificate, or cedula, is often required when signing official documents."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "A paper or digital proof that a payment was made is a ___.",
+    "answer": "RECEIPT",
+    "fact": "Always ask for a receipt: it is the only proof that a payment reached the city's funds."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "A number given to a visitor so they know when it is their turn at a service counter is a ___.",
+    "answer": "QUEUENUMBER",
+    "display": "QUEUE NUMBER",
+    "fact": "Queue numbers keep service first-come, first-served, so no one can be quietly moved ahead."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "The place where visitors can ask where to go inside City Hall is the ___.",
+    "answer": "INFORMATIONDESK",
+    "display": "INFORMATION DESK",
+    "fact": "The information desk exists so no resident has to pay a fixer to find the right window."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "Helping residents through government programs and transactions is called ___.",
+    "answer": "PUBLICSERVICE",
+    "display": "PUBLIC SERVICE",
+    "fact": "Public office is a public trust: government workers are paid from the taxes residents pay."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "The official emblem used to represent the city government is the ___.",
+    "answer": "CITYSEAL",
+    "display": "CITY SEAL",
+    "fact": "The seal makes a city document official, and forging it is a criminal offence."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "The room where the city council formally meets is the ___.",
+    "answer": "SESSIONHALL",
+    "display": "SESSION HALL",
+    "fact": "Council sessions held in the session hall are open to the public."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "candidate",
+    "prompt": "The office where the city's chief executive works is the ___.",
+    "answer": "MAYORSOFFICE",
+    "display": "MAYOR'S OFFICE",
+    "fact": "The mayor's office signs permits, issues executive orders, and heads the city's executive branch."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "The office where local taxes and many city payments are handled is the ___.",
+    "answer": "TREASURYOFFICE",
+    "display": "TREASURY OFFICE",
+    "fact": "Wherever you pay inside City Hall, the transaction should end with a treasury-issued official receipt."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "The office that handles the appraisal and assessment of real property is the ___.",
+    "answer": "ASSESSORSOFFICE",
+    "display": "ASSESSOR'S OFFICE",
+    "fact": "The assessor's office keeps the tax map and the record of every taxable property in the city."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "The office that records and checks financial transactions is the ___.",
+    "answer": "ACCOUNTINGOFFICE",
+    "display": "ACCOUNTING OFFICE",
+    "fact": "The accounting office checks that every disbursement carries complete supporting documents."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "The office that handles plans and technical concerns for city infrastructure is the ___.",
+    "answer": "ENGINEERINGOFFICE",
+    "display": "ENGINEERING OFFICE",
+    "fact": "The engineering office inspects city roads, drainage, and public buildings."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "candidate",
+    "prompt": "The office that provides legal advice to the city government is the ___.",
+    "answer": "LEGALOFFICE",
+    "display": "LEGAL OFFICE",
+    "fact": "The city legal office drafts contracts and defends the city in court."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "candidate",
+    "prompt": "The office that helps prepare development plans for the city is the ___.",
+    "answer": "PLANNINGOFFICE",
+    "display": "PLANNING OFFICE",
+    "fact": "The planning office prepares the land use plan that guides where the city may grow."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "The office that prepares and monitors the city's proposed expenditures is the ___.",
+    "answer": "BUDGETOFFICE",
+    "display": "BUDGET OFFICE",
+    "fact": "The budget office makes sure no expense is proposed without a source of funds."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "The office that helps manage the city's purchasing and bidding activities is the ___.",
+    "answer": "PROCUREMENTOFFICE",
+    "display": "PROCUREMENT OFFICE",
+    "fact": "Procurement handles bidding so city purchases stay competitive and documented."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "The office where official city documents are filed and stored is the ___.",
+    "answer": "RECORDSOFFICE",
+    "display": "RECORDS OFFICE",
+    "fact": "Records are kept for set retention periods so past decisions can still be checked."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "The employee or window where residents make authorized payments is the ___.",
+    "answer": "CASHIER",
+    "fact": "Only an authorized cashier may accept payment, and only against an official receipt."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "The document a person fills out when requesting a service or permit is an ___.",
+    "answer": "APPLICATIONFORM",
+    "display": "APPLICATION FORM",
+    "fact": "Filling in the form completely the first time is the fastest way through any City Hall transaction."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "A government-issued document commonly used to confirm a person's identity is a ___.",
+    "answer": "VALIDID",
+    "display": "VALID ID",
+    "fact": "A valid ID protects you: it stops someone else from transacting under your name."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "A person's written name used to approve or certify a document is a ___.",
+    "answer": "SIGNATURE",
+    "fact": "Signing a document means accepting responsibility for what it says."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "fraud",
+    "prompt": "The proof of payment issued by an authorized government collecting officer is an ___.",
+    "answer": "OFFICIALRECEIPT",
+    "display": "OFFICIAL RECEIPT",
+    "fact": "No official receipt, no proof of payment: the simplest defence against collection fraud."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "A person or business that is legally required to pay taxes is a ___.",
+    "answer": "TAXPAYER",
+    "fact": "Local taxes pay for the city's roads, health centres, and scholarships."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "A member of the public who receives local government services is a ___.",
+    "answer": "CITIZEN",
+    "fact": "Any resident may ask how city funds are spent, because the information is public."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "A document from a barangay that may be requested for some City Hall transactions is a ___.",
+    "answer": "BARANGAYCLEARANCE",
+    "display": "BARANGAY CLEARANCE",
+    "fact": "Barangay clearance shows the barangay has no objection to the transaction."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "A document confirming that a proposed use of land follows zoning rules is a ___.",
+    "answer": "ZONINGCLEARANCE",
+    "display": "ZONING CLEARANCE",
+    "fact": "Zoning clearance confirms the intended use is allowed in that part of the city."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "Compliance intended to protect people from fire hazards is called ___.",
+    "answer": "FIRESAFETY",
+    "display": "FIRE SAFETY",
+    "fact": "The Bureau of Fire Protection inspects a building before a fire safety certificate is issued."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "A permit showing that certain health and sanitation requirements are met is a ___.",
+    "answer": "SANITARYPERMIT",
+    "display": "SANITARY PERMIT",
+    "fact": "Food businesses need a sanitary permit and health cards for their workers."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "The institution that manages public affairs for the entire city is the ___.",
+    "answer": "CITYGOVERNMENT",
+    "display": "CITY GOVERNMENT",
+    "fact": "A city government has its own council, budget, and taxing powers under the Local Government Code."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "A city is one type of ___ unit in the Philippines.",
+    "answer": "LOCALGOVERNMENT",
+    "display": "LOCAL GOVERNMENT",
+    "fact": "Provinces, cities, municipalities, and barangays are the four local government units in the Philippines."
   },
   {
     "chapter": 2,
     "difficulty": "medium",
     "category": "candidate",
-    "prompt": "The city hall official who sets property values for taxation is the ___.",
-    "answer": "ASSESSOR",
-    "fact": "The assessor's valuations decide how much property tax is owed."
+    "prompt": "The formal legislative body of a Philippine city is the ___.",
+    "answer": "SANGGUNIANGPANLUNGSOD",
+    "display": "SANGGUNIANG PANLUNGSOD",
+    "fact": "The Sangguniang Panlungsod passes the city's ordinances and approves its annual budget."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "candidate",
+    "prompt": "The mayor is commonly described as the city's ___.",
+    "answer": "LOCALCHIEFEXECUTIVE",
+    "display": "LOCAL CHIEF EXECUTIVE",
+    "fact": "As local chief executive the mayor enforces laws, signs contracts, and supervises every city office."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "candidate",
+    "prompt": "The official who helps coordinate the administrative operations of the city government is the ___.",
+    "answer": "CITYADMINISTRATOR",
+    "display": "CITY ADMINISTRATOR",
+    "fact": "The city administrator coordinates the day-to-day work of the different city departments."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "candidate",
+    "prompt": "The official who keeps the records of city council proceedings is the ___.",
+    "answer": "CITYSECRETARY",
+    "display": "CITY SECRETARY",
+    "fact": "The secretary to the Sanggunian keeps the minutes and the official copy of every ordinance."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "candidate",
+    "prompt": "The official who gives legal advice and represents the city in legal matters is the ___.",
+    "answer": "CITYLEGALOFFICER",
+    "display": "CITY LEGAL OFFICER",
+    "fact": "The city legal officer reviews contracts before the mayor signs them."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "candidate",
+    "prompt": "The official responsible for preparing and helping administer the city budget is the ___.",
+    "answer": "CITYBUDGETOFFICER",
+    "display": "CITY BUDGET OFFICER",
+    "fact": "The budget officer prepares the annual budget the mayor submits to the council."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "candidate",
+    "prompt": "The official who coordinates city planning and development work is the ___.",
+    "answer": "CITYPLANNINGOFFICER",
+    "display": "CITY PLANNING OFFICER",
+    "fact": "The planning and development coordinator prepares the city's development plans."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "candidate",
+    "prompt": "The official who oversees local public health programs is the ___.",
+    "answer": "CITYHEALTHOFFICER",
+    "display": "CITY HEALTH OFFICER",
+    "fact": "The city health officer leads the city's health programs and its health personnel."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "candidate",
+    "prompt": "The official who leads local social welfare programs is the ___.",
+    "answer": "CITYSOCIALWELFAREOFFICER",
+    "display": "CITY SOCIAL WELFARE OFFICER",
+    "fact": "This officer runs the city's social welfare and development programs."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "candidate",
+    "prompt": "The official who enforces building regulations and acts on building permits is the ___.",
+    "answer": "CITYBUILDINGOFFICIAL",
+    "display": "CITY BUILDING OFFICIAL",
+    "fact": "The building official acts on building permits and can order unsafe work stopped."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "The city law that authorizes the annual use of public funds is the ___.",
+    "answer": "APPROPRIATIONORDINANCE",
+    "display": "APPROPRIATION ORDINANCE",
+    "fact": "The annual budget becomes spendable only once the council passes it as an appropriation ordinance."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "The document that identifies priority programs, projects, and activities for a given year is the ___.",
+    "answer": "ANNUALINVESTMENTPROGRAM",
+    "display": "ANNUAL INVESTMENT PROGRAM",
+    "fact": "The AIP lists the year's priority projects and the funds set aside for each."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "A written directive issued by the city mayor to manage executive matters is an ___.",
+    "answer": "EXECUTIVEORDER",
+    "display": "EXECUTIVE ORDER",
+    "fact": "Executive orders direct city offices; they cannot override an ordinance passed by the council."
   },
   {
     "chapter": 2,
     "difficulty": "medium",
     "category": "why",
-    "prompt": "Roads, bridges, and drainage projects together are city ___.",
-    "answer": "PROJECTS",
-    "fact": "Infrastructure projects are one of the biggest local budget items."
+    "prompt": "A meeting where a council committee studies a proposed measure is a ___.",
+    "answer": "COMMITTEEHEARING",
+    "display": "COMMITTEE HEARING",
+    "fact": "Committee hearings are where a proposed ordinance is studied before the full council votes."
   },
   {
     "chapter": 2,
     "difficulty": "medium",
     "category": "why",
-    "prompt": "Roads, bridges, and drainage a city builds are collectively its ___.",
-    "answer": "PROJECTS",
-    "fact": "Infrastructure projects are one of the biggest local budget items."
+    "prompt": "A process where residents are invited to give views on a proposed city policy is a ___.",
+    "answer": "PUBLICCONSULTATION",
+    "display": "PUBLIC CONSULTATION",
+    "fact": "Consultations let residents raise objections before a policy is final, not after."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "fraud",
+    "prompt": "A competitive process where suppliers submit offers for a government requirement is called ___.",
+    "answer": "PUBLICBIDDING",
+    "display": "PUBLIC BIDDING",
+    "fact": "Public bidding is the default rule, because competition is what keeps government prices honest."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "fraud",
+    "prompt": "The committee that manages many government procurement activities is the ___.",
+    "answer": "BIDSANDAWARDSCOMMITTEE",
+    "display": "BIDS AND AWARDS COMMITTEE",
+    "fact": "The BAC opens and evaluates bids, and observers may watch to keep the process transparent."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "The document used by an office to formally ask that goods or services be procured is a ___.",
+    "answer": "PURCHASEREQUEST",
+    "display": "PURCHASE REQUEST",
+    "fact": "A purchase request starts the buying process and states what the office actually needs."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "The document formally directing a supplier to provide approved goods is a ___.",
+    "answer": "PURCHASEORDER",
+    "display": "PURCHASE ORDER",
+    "fact": "The purchase order is the document that binds the supplier to the agreed price."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "The document informing a successful bidder that it has been selected is the ___.",
+    "answer": "NOTICEOFAWARD",
+    "display": "NOTICE OF AWARD",
+    "fact": "The notice of award tells the winning bidder it has been chosen, and is posted publicly."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "The document authorizing a contractor or supplier to begin approved work is the ___.",
+    "answer": "NOTICETOPROCEED",
+    "display": "NOTICE TO PROCEED",
+    "fact": "The notice to proceed starts the contract clock for a supplier or contractor."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "fraud",
+    "prompt": "A summary showing the bids received for a procurement activity is the ___.",
+    "answer": "ABSTRACTOFBIDS",
+    "display": "ABSTRACT OF BIDS",
+    "fact": "The abstract of bids shows every offer received, so the winning price can be compared."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "The document that consolidates planned procurements for the year is the ___.",
+    "answer": "ANNUALPROCUREMENTPLAN",
+    "display": "ANNUAL PROCUREMENT PLAN",
+    "fact": "The procurement plan is posted publicly, so residents can see what the city intends to buy."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "An additional city budget approved when the original budget needs lawful adjustment is a ___.",
+    "answer": "SUPPLEMENTALBUDGET",
+    "display": "SUPPLEMENTAL BUDGET",
+    "fact": "A supplemental budget needs a new revenue source or certified savings before it may be passed."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "The main fund used for many ordinary city government operations is the ___.",
+    "answer": "GENERALFUND",
+    "display": "GENERAL FUND",
+    "fact": "The general fund pays for salaries, services, and most ordinary city operations."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "A fund dedicated to eligible public education purposes is the ___.",
+    "answer": "SPECIALEDUCATIONFUND",
+    "display": "SPECIAL EDUCATION FUND",
+    "fact": "The SEF comes from an added tax on real property and may only be spent on public schools."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "Money held by the city for a specific purpose or beneficiary may be placed in a ___.",
+    "answer": "TRUSTFUND",
+    "display": "TRUST FUND",
+    "fact": "Money in a trust fund may only be used for the purpose it was received for."
   },
   {
     "chapter": 2,
     "difficulty": "medium",
     "category": "why",
-    "prompt": "Explaining how public money was spent is a duty of ___.",
-    "answer": "TRANSPARENCY",
-    "fact": "City budgets must be posted where residents can see them."
+    "prompt": "The body that helps formulate local development plans and investment programs is the ___.",
+    "answer": "LOCALDEVELOPMENTCOUNCIL",
+    "display": "LOCAL DEVELOPMENT COUNCIL",
+    "fact": "At least a quarter of the local development council must come from NGOs and people's organizations."
   },
   {
     "chapter": 2,
     "difficulty": "medium",
     "category": "why",
-    "prompt": "Posting the city budget where residents can see it is an act of ___.",
-    "answer": "TRANSPARENCY",
-    "fact": "City budgets must be posted where residents can see them."
+    "prompt": "The long-term plan that guides how land in the city should be used is the ___.",
+    "answer": "COMPREHENSIVELANDUSEPLAN",
+    "display": "COMPREHENSIVE LAND USE PLAN",
+    "fact": "The CLUP is enacted through a zoning ordinance and guides city growth for about ten years."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "The local law that sets land-use zones and their allowed uses is the ___.",
+    "answer": "ZONINGORDINANCE",
+    "display": "ZONING ORDINANCE",
+    "fact": "The zoning ordinance is what makes the land use plan legally enforceable."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "A document confirming that a proposed location or land use complies with applicable zoning rules is a ___.",
+    "answer": "LOCATIONALCLEARANCE",
+    "display": "LOCATIONAL CLEARANCE",
+    "fact": "Locational clearance is checked before a building permit may be issued."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "A setup that brings several business registration steps together in one place is the ___.",
+    "answer": "BUSINESSONESTOPSHOP",
+    "display": "BUSINESS ONE STOP SHOP",
+    "fact": "The one stop shop puts assessment, payment, and release in one place during the January rush."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "The local authorization commonly required for a business to operate is often called the ___.",
+    "answer": "MAYORSPERMIT",
+    "display": "MAYOR'S PERMIT",
+    "fact": "The mayor's permit must be displayed at the business premises."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "The official list of taxable real properties and their assessments is the ___.",
+    "answer": "ASSESSMENTROLL",
+    "display": "ASSESSMENT ROLL",
+    "fact": "The assessment roll lists every taxable property and is the basis of the city's tax billing."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "The estimated amount a property would reasonably command in an open market is its ___.",
+    "answer": "MARKETVALUE",
+    "display": "MARKET VALUE",
+    "fact": "Market value is set in the schedule of fair market values approved by the council."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "The taxable value determined after applying the assessment level to property value is the ___.",
+    "answer": "ASSESSEDVALUE",
+    "display": "ASSESSED VALUE",
+    "fact": "Assessed value is market value multiplied by the assessment level for that class of property."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "fraud",
+    "prompt": "The process of identifying and plotting taxable properties for assessment purposes is called ___.",
+    "answer": "TAXMAPPING",
+    "display": "TAX MAPPING",
+    "fact": "Tax mapping finds properties missing from the roll, so the tax burden is shared fairly."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "fraud",
+    "prompt": "A tax that remains unpaid after its legal due date becomes a ___.",
+    "answer": "DELINQUENTTAX",
+    "display": "DELINQUENT TAX",
+    "fact": "Delinquent real property tax earns two percent interest a month, up to thirty-six months."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "A document showing that specified local tax obligations have been settled may be called a ___.",
+    "answer": "TAXCLEARANCE",
+    "display": "TAX CLEARANCE",
+    "fact": "Tax clearance is often required before a property can be sold or transferred."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "candidate",
+    "prompt": "The official who records vital events such as births, marriages, and deaths is the ___.",
+    "answer": "CIVILREGISTRAR",
+    "display": "CIVIL REGISTRAR",
+    "fact": "The local civil registrar's records are forwarded to the Philippine Statistics Authority."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "The civil registry document that records a person's birth is the ___.",
+    "answer": "BIRTHCERTIFICATE",
+    "display": "BIRTH CERTIFICATE",
+    "fact": "A birth certificate is needed to enrol in school, get a passport, and register to vote."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "The document a couple generally obtains before a civil marriage may proceed is a ___.",
+    "answer": "MARRIAGELICENSE",
+    "display": "MARRIAGE LICENSE",
+    "fact": "A marriage license is posted for ten days and is valid for 120 days anywhere in the country."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "The civil registry document that officially records a person's death is the ___.",
+    "answer": "DEATHCERTIFICATE",
+    "display": "DEATH CERTIFICATE",
+    "fact": "A registered death certificate is required before a burial permit can be issued."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "A written assessment prepared by a social worker about a client's circumstances is a ___.",
+    "answer": "SOCIALCASESTUDY",
+    "display": "SOCIAL CASE STUDY",
+    "fact": "A social case study report supports requests for medical, burial, or educational assistance."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "A document used to show that a project has met a required environmental review or approval may be an ___.",
+    "answer": "ENVIRONMENTALCLEARANCE",
+    "display": "ENVIRONMENTAL CLEARANCE",
+    "fact": "Projects likely to affect the environment need clearance before they may begin."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "Reducing hazards and preparing communities for disasters is called ___.",
+    "answer": "DISASTERRISKREDUCTION",
+    "display": "DISASTER RISK REDUCTION",
+    "fact": "Cities set aside at least five percent of regular income for disaster risk reduction and management."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "The facility used to coordinate government response during major emergencies is the emergency ___.",
+    "answer": "OPERATIONSCENTER",
+    "display": "OPERATIONS CENTER",
+    "fact": "The emergency operations centre is where the city's response is coordinated during a disaster."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "The office that releases official city announcements and public updates is the ___.",
+    "answer": "PUBLICINFORMATIONOFFICE",
+    "display": "PUBLIC INFORMATION OFFICE",
+    "fact": "Official announcements come from the public information office, so check there before believing a rumour."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "The document that lists government services, requirements, fees, and expected processing periods is the ___.",
+    "answer": "CITIZENSCHARTER",
+    "display": "CITIZEN'S CHARTER",
+    "fact": "The Citizen's Charter is required by law and must be posted where the public can read it."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "The amount of time a service should normally take under published procedures is the ___.",
+    "answer": "PROCESSINGTIME",
+    "display": "PROCESSING TIME",
+    "fact": "Simple transactions must finish in three days and complex ones in seven, under the Ease of Doing Business Act."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "The principal Philippine law that sets out the powers, responsibilities, and structure of local governments is the ___.",
+    "answer": "LOCALGOVERNMENTCODE",
+    "display": "LOCAL GOVERNMENT CODE",
+    "fact": "The Local Government Code gives cities their powers to tax, to plan, and to legislate."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "The Local Government Code of 1991 is formally known as ___ 7160.",
+    "answer": "REPUBLICACT",
+    "display": "REPUBLIC ACT",
+    "fact": "Republic Act 7160, the Local Government Code, took effect on 1 January 1992."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "The transfer of certain functions and responsibilities from the national government to local governments is called ___.",
+    "answer": "DEVOLUTION",
+    "fact": "Devolution moved health, agriculture, and social welfare services to local governments in 1992."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "The ability of a local government to manage its financial resources within legal limits reflects ___.",
+    "answer": "FISCALAUTONOMY",
+    "display": "FISCAL AUTONOMY",
+    "fact": "Fiscal autonomy lets a city set its own spending priorities within the limits of law."
   },
   {
     "chapter": 2,
     "difficulty": "hard",
     "category": "voting",
-    "prompt": "The city council is formally the Sangguniang ___.",
-    "answer": "PANLUNGSOD",
-    "fact": "A municipality's version is the Sangguniang Bayan."
+    "prompt": "The share of local governments from national taxes is called the ___.",
+    "answer": "NATIONALTAXALLOTMENT",
+    "display": "NATIONAL TAX ALLOTMENT",
+    "fact": "The National Tax Allotment replaced the Internal Revenue Allotment after the Mandanas ruling."
   },
   {
     "chapter": 2,
     "difficulty": "hard",
     "category": "voting",
-    "prompt": "A city's lawmaking body is formally titled the Sangguniang ___.",
-    "answer": "PANLUNGSOD",
-    "fact": "A municipality's version is the Sangguniang Bayan."
+    "prompt": "A city law or code that organizes local taxes, fees, and charges is the ___.",
+    "answer": "LOCALREVENUECODE",
+    "display": "LOCAL REVENUE CODE",
+    "fact": "The local revenue code sets the rates a city may charge, within national ceilings."
   },
   {
     "chapter": 2,
     "difficulty": "hard",
     "category": "voting",
-    "prompt": "Setting aside city funds for a specific purpose is an ___.",
+    "prompt": "A local legislative measure that imposes or revises authorized local revenues is a ___.",
+    "answer": "REVENUEORDINANCE",
+    "display": "REVENUE ORDINANCE",
+    "fact": "Revenue ordinances require public hearings before the council may pass them."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "The legal authorization to spend public money for a stated purpose is an ___.",
     "answer": "APPROPRIATION",
-    "fact": "The annual budget is itself an appropriations ordinance."
+    "fact": "No public money may be spent without an appropriation; this is a constitutional rule."
   },
   {
     "chapter": 2,
     "difficulty": "hard",
     "category": "voting",
-    "prompt": "A city's annual budget is legally an ___ ordinance.",
-    "answer": "APPROPRIATION",
-    "fact": "The annual budget is itself an appropriations ordinance."
+    "prompt": "The authority to incur obligations within an approved appropriation is an ___.",
+    "answer": "ALLOTMENT",
+    "fact": "An allotment is the go-signal to commit funds that have already been appropriated."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "A document used to request that funds be committed for an authorized expense is an ___.",
+    "answer": "OBLIGATIONREQUEST",
+    "display": "OBLIGATION REQUEST",
+    "fact": "The obligation request reserves the funds, so the same money cannot be committed twice."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "The document commonly used to support the payment of a government financial obligation is a ___.",
+    "answer": "DISBURSEMENTVOUCHER",
+    "display": "DISBURSEMENT VOUCHER",
+    "fact": "A disbursement voucher must carry complete supporting documents before payment is released."
   },
   {
     "chapter": 2,
     "difficulty": "hard",
     "category": "fraud",
-    "prompt": "COMELEC Resolution 11104 extended vote-buying rules to cover digital ___.",
-    "answer": "TRANSFERS",
-    "fact": "Online bank and e-wallet transfers now count as vote buying too."
+    "prompt": "Before an expense is obligated, confirmation that sufficient funds exist is shown through a certificate of ___.",
+    "answer": "AVAILABILITYOFFUNDS",
+    "display": "AVAILABILITY OF FUNDS",
+    "fact": "The budget officer and accountant certify that funds exist; spending without it is unlawful."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "hard",
+    "category": "candidate",
+    "prompt": "The group that advises the local chief executive on financial matters is the ___.",
+    "answer": "LOCALFINANCECOMMITTEE",
+    "display": "LOCAL FINANCE COMMITTEE",
+    "fact": "The local finance committee is the budget officer, the treasurer, and the planning officer."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "hard",
+    "category": "candidate",
+    "prompt": "The local special body concerned with supporting public education is the ___.",
+    "answer": "LOCALSCHOOLBOARD",
+    "display": "LOCAL SCHOOL BOARD",
+    "fact": "The local school board decides how the Special Education Fund is spent."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "hard",
+    "category": "candidate",
+    "prompt": "The local special body that helps address community health concerns is the ___.",
+    "answer": "LOCALHEALTHBOARD",
+    "display": "LOCAL HEALTH BOARD",
+    "fact": "The local health board advises the council on health appropriations."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "hard",
+    "category": "candidate",
+    "prompt": "The body that brings police, barangays, and city officials together on community safety is the local ___.",
+    "answer": "PEACEANDORDERCOUNCIL",
+    "display": "PEACE AND ORDER COUNCIL",
+    "fact": "The peace and order council brings police, barangays, and city officials to one table."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "Boards and councils created by law to involve sectors in local governance are collectively called ___.",
+    "answer": "LOCALSPECIALBODIES",
+    "display": "LOCAL SPECIAL BODIES",
+    "fact": "Local special bodies are how citizens sit inside local decisions instead of only outside them."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "The joint priority framework that aligns the mayor's plans with the council's lawmaking is the executive ___.",
+    "answer": "LEGISLATIVEAGENDA",
+    "display": "LEGISLATIVE AGENDA",
+    "fact": "The executive-legislative agenda keeps the mayor and the council working on the same priorities."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "The multi-year document that translates local development priorities into funded programs and projects is the local development ___.",
+    "answer": "INVESTMENTPROGRAM",
+    "display": "INVESTMENT PROGRAM",
+    "fact": "The local development investment program turns the development plan into funded, scheduled projects."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "The stage of the budget cycle where the local legislative body approves the spending plan is ___.",
+    "answer": "BUDGETAUTHORIZATION",
+    "display": "BUDGET AUTHORIZATION",
+    "fact": "Budget authorization is the council's power of the purse over the city's spending plan."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "The stage where approved funds are released and used to carry out programs is ___.",
+    "answer": "BUDGETEXECUTION",
+    "display": "BUDGET EXECUTION",
+    "fact": "Budget execution is where a plan becomes actual roads, medicines, and salaries."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "The stage where spending and results are reported and reviewed is ___.",
+    "answer": "BUDGETACCOUNTABILITY",
+    "display": "BUDGET ACCOUNTABILITY",
+    "fact": "Budget accountability closes the loop: the city must report what the money actually bought."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "Identifying what the city needs to buy, when it is needed, and how it will be sourced is called ___.",
+    "answer": "PROCUREMENTPLANNING",
+    "display": "PROCUREMENT PLANNING",
+    "fact": "Good planning avoids the rushed emergency purchases where overpricing usually hides."
   },
   {
     "chapter": 2,
     "difficulty": "hard",
     "category": "fraud",
-    "prompt": "Vote-buying rules were extended to cover online bank ___ by COMELEC Resolution 11104.",
-    "answer": "TRANSFERS",
-    "fact": "Online bank and e-wallet transfers now count as vote buying too."
+    "prompt": "The formal review and comparison of submitted offers according to stated criteria is ___.",
+    "answer": "BIDEVALUATION",
+    "display": "BID EVALUATION",
+    "fact": "Bids are judged against criteria published in advance, so rules cannot be bent to fit a favourite."
   },
   {
     "chapter": 2,
     "difficulty": "hard",
     "category": "fraud",
-    "prompt": "Repeatedly voting using more than one registration is an election ___.",
-    "answer": "OFFENSE",
-    "fact": "It can lead to perpetual disqualification from public office."
+    "prompt": "The process of verifying that the apparent winning bidder actually meets the required qualifications is ___.",
+    "answer": "POSTQUALIFICATION",
+    "display": "POST QUALIFICATION",
+    "fact": "Post-qualification verifies the winning bidder can actually deliver before the award is made."
   },
   {
     "chapter": 2,
     "difficulty": "hard",
     "category": "fraud",
-    "prompt": "Voting more than once using duplicate registration is, on its own, an election ___.",
-    "answer": "OFFENSE",
-    "fact": "It can lead to perpetual disqualification from public office."
-  },
-  {
-    "chapter": 2,
-    "difficulty": "hard",
-    "category": "candidate",
-    "prompt": "COMELEC and the courts must resolve disqualification cases with legal ___.",
-    "answer": "PRIORITY",
-    "fact": "The Omnibus Election Code requires such cases to be resolved with priority."
-  },
-  {
-    "chapter": 2,
-    "difficulty": "hard",
-    "category": "candidate",
-    "prompt": "City disqualification cases are required by law to be handled with legal ___.",
-    "answer": "PRIORITY",
-    "fact": "The Omnibus Election Code requires such cases to be resolved with priority."
-  },
-  {
-    "chapter": 2,
-    "difficulty": "hard",
-    "category": "candidate",
-    "prompt": "The peso amount a candidate may spend is capped per registered ___.",
-    "answer": "VOTERS",
-    "fact": "RA 7166 sets these spending limits per voter in the constituency."
-  },
-  {
-    "chapter": 2,
-    "difficulty": "hard",
-    "category": "candidate",
-    "prompt": "A city candidate's spending cap is measured in pesos per registered ___.",
-    "answer": "VOTERS",
-    "fact": "RA 7166 sets these spending limits per voter in the constituency."
+    "prompt": "Managing the performance, delivery, and obligations after a government contract is awarded is ___.",
+    "answer": "CONTRACTIMPLEMENTATION",
+    "display": "CONTRACT IMPLEMENTATION",
+    "fact": "Most losses happen after the award, so delivery and quality are checked against the contract."
   },
   {
     "chapter": 2,
     "difficulty": "hard",
     "category": "why",
-    "prompt": "Dishonest use of entrusted public office for private gain is ___.",
-    "answer": "CORRUPTION",
-    "fact": "City procurement is a common area where it surfaces."
+    "prompt": "Tracking whether a city project is progressing according to scope, schedule, and targets is ___.",
+    "answer": "PROJECTMONITORING",
+    "display": "PROJECT MONITORING",
+    "fact": "Monitoring reports let residents see whether a project is on schedule or quietly stalled."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "hard",
+    "category": "fraud",
+    "prompt": "Policies and procedures designed to safeguard assets and reduce errors or misuse are called ___.",
+    "answer": "INTERNALCONTROL",
+    "display": "INTERNAL CONTROL",
+    "fact": "Internal controls are meant to catch errors and deter misuse before an audit ever finds them."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "hard",
+    "category": "fraud",
+    "prompt": "Separating authorization, custody, recording, and review functions is known as ___.",
+    "answer": "SEGREGATIONOFDUTIES",
+    "display": "SEGREGATION OF DUTIES",
+    "fact": "No one person should request, approve, pay, and record the same transaction."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "hard",
+    "category": "fraud",
+    "prompt": "A situation where a public official's private interest may improperly affect official judgment is a ___.",
+    "answer": "CONFLICTOFINTEREST",
+    "display": "CONFLICT OF INTEREST",
+    "fact": "Officials must disclose personal interests and step back from decisions that involve them."
   },
   {
     "chapter": 2,
     "difficulty": "hard",
     "category": "why",
-    "prompt": "Diverting entrusted city funds for private gain is ___.",
-    "answer": "CORRUPTION",
-    "fact": "City procurement is a common area where it surfaces."
+    "prompt": "Making required government information available for public scrutiny is called ___.",
+    "answer": "PUBLICDISCLOSURE",
+    "display": "PUBLIC DISCLOSURE",
+    "fact": "The full disclosure policy requires cities to post their budgets and contracts publicly."
   },
   {
     "chapter": 2,
     "difficulty": "hard",
     "category": "why",
-    "prompt": "Treating every resident the same regardless of politics is ___.",
-    "answer": "IMPARTIALITY",
-    "fact": "Officials are expected to serve supporters and critics alike."
+    "prompt": "A formal channel where residents can submit complaints and seek action from the city is a ___.",
+    "answer": "PUBLICGRIEVANCEMECHANISM",
+    "display": "PUBLIC GRIEVANCE MECHANISM",
+    "fact": "A working complaints desk turns a resident's frustration into a record the city must answer."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "hard",
+    "category": "fraud",
+    "prompt": "Rules governing how long official documents must be kept are part of ___.",
+    "answer": "RECORDSRETENTION",
+    "display": "RECORDS RETENTION",
+    "fact": "Retention rules stop inconvenient documents from being destroyed early."
   },
   {
     "chapter": 2,
     "difficulty": "hard",
     "category": "why",
-    "prompt": "Serving both allies and critics the same way in office is ___.",
-    "answer": "IMPARTIALITY",
-    "fact": "Officials are expected to serve supporters and critics alike."
+    "prompt": "Protecting personal information collected during government transactions is part of ___.",
+    "answer": "DATAPRIVACY",
+    "display": "DATA PRIVACY",
+    "fact": "The Data Privacy Act limits how government may collect, store, and share personal information."
   },
   {
     "chapter": 2,
     "difficulty": "hard",
     "category": "why",
-    "prompt": "The Commission on Audit performs a financial ___ of every city.",
-    "answer": "AUDITING",
-    "fact": "The Commission on Audit reviews every local government unit."
+    "prompt": "A policy framework that allows access to government-held information, subject to lawful exceptions, is called ___.",
+    "answer": "FREEDOMOFINFORMATION",
+    "display": "FREEDOM OF INFORMATION",
+    "fact": "Freedom of information makes disclosure the default and secrecy the exception that must be justified."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "Dividing land into categories such as residential, commercial, industrial, or agricultural is ___.",
+    "answer": "LANDUSECLASSIFICATION",
+    "display": "LAND USE CLASSIFICATION",
+    "fact": "Classifying land decides where homes, factories, and farms may legally be."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "Permission to deviate from certain zoning requirements because of specific property conditions is a ___.",
+    "answer": "ZONINGVARIANCE",
+    "display": "ZONING VARIANCE",
+    "fact": "A variance is granted only where strict zoning would cause real hardship for that property."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "Approval allowing a land use that is conditionally permitted under zoning rules is a ___.",
+    "answer": "ZONINGEXCEPTION",
+    "display": "ZONING EXCEPTION",
+    "fact": "An exception allows a use the zoning ordinance already lists as conditionally permitted."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "The use of planning rules to guide the location, form, and intensity of development is called ___.",
+    "answer": "DEVELOPMENTCONTROL",
+    "display": "DEVELOPMENT CONTROL",
+    "fact": "Development controls set building height, density, and how far a structure sits from the road."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "Grouping buildings according to how they are used for code and safety purposes is ___.",
+    "answer": "OCCUPANCYCLASSIFICATION",
+    "display": "OCCUPANCY CLASSIFICATION",
+    "fact": "Occupancy classification decides which fire and safety requirements a building must meet."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "Meeting legally required fire-safety standards for a building is called ___.",
+    "answer": "FIRECODECOMPLIANCE",
+    "display": "FIRE CODE COMPLIANCE",
+    "fact": "Fire Code compliance is checked before occupancy and again at every business renewal."
   },
   {
     "chapter": 2,
     "difficulty": "hard",
     "category": "why",
-    "prompt": "COA reviews city spending through a formal financial ___.",
-    "answer": "AUDITING",
-    "fact": "The Commission on Audit reviews every local government unit."
+    "prompt": "Ensuring public buildings can be used by persons with disabilities is part of ___.",
+    "answer": "ACCESSIBILITYCOMPLIANCE",
+    "display": "ACCESSIBILITY COMPLIANCE",
+    "fact": "Batas Pambansa 344 requires ramps, railings, and accessible toilets in public buildings."
   },
   {
     "chapter": 2,
     "difficulty": "hard",
     "category": "why",
-    "prompt": "Being honest and consistent in the use of office is ___.",
-    "answer": "INTEGRITY",
-    "fact": "Integrity is what keeps public trust in local government."
+    "prompt": "A systematic study of the likely environmental effects of a proposed project is an environmental ___.",
+    "answer": "IMPACTASSESSMENT",
+    "display": "IMPACT ASSESSMENT",
+    "fact": "An environmental impact assessment weighs a project's effects before it is approved, not after."
   },
   {
     "chapter": 2,
     "difficulty": "hard",
     "category": "why",
-    "prompt": "Consistent honesty in the use of a city post is ___.",
-    "answer": "INTEGRITY",
-    "fact": "Integrity is what keeps public trust in local government."
+    "prompt": "The organized collection, reduction, recovery, and disposal of municipal waste is ___.",
+    "answer": "SOLIDWASTEMANAGEMENT",
+    "display": "SOLID WASTE MANAGEMENT",
+    "fact": "RA 9003 requires cities to segregate waste and to close their open dumpsites."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "Planning roads, signals, routes, and movement to improve urban mobility is ___.",
+    "answer": "TRAFFICMANAGEMENT",
+    "display": "TRAFFIC MANAGEMENT",
+    "fact": "Traffic schemes need an ordinance before fines can lawfully be collected."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "Strategies that improve jobs, enterprises, and economic activity within the city support ___.",
+    "answer": "LOCALECONOMICDEVELOPMENT",
+    "display": "LOCAL ECONOMIC DEVELOPMENT",
+    "fact": "Local economic development is judged by the jobs and incomes it creates for residents."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "Programs designed to attract and assist businesses that may invest in the city are part of ___.",
+    "answer": "INVESTMENTPROMOTION",
+    "display": "INVESTMENT PROMOTION",
+    "fact": "Investment incentives are granted through an investment incentive code passed by the council."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "Government-supported housing intended to make decent shelter more affordable is ___.",
+    "answer": "SOCIALIZEDHOUSING",
+    "display": "SOCIALIZED HOUSING",
+    "fact": "The Urban Development and Housing Act requires cities to set aside land for socialized housing."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "Adjusting city plans and infrastructure to reduce harm from changing climate conditions is ___.",
+    "answer": "CLIMATEADAPTATION",
+    "display": "CLIMATE ADAPTATION",
+    "fact": "Local climate change action plans must be funded from the city's own budget."
+  },
+  {
+    "chapter": 2,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "A plan describing how essential city services will continue during major disruptions is a ___.",
+    "answer": "BUSINESSCONTINUITYPLAN",
+    "display": "BUSINESS CONTINUITY PLAN",
+    "fact": "A continuity plan keeps certificates, payments, and permits moving even after a disaster."
   },
   {
     "chapter": 3,

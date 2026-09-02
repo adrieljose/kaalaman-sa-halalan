@@ -6,6 +6,8 @@
 [resource]
 script = ExtResource("1")
 move_id = "signature_slash"
+attack_dir = "res://assets/images/characters/notaryo_naku_move_signature_slash_34"
+attack_count = 9
 move_name = "Signature Slash"
 description = "He signs the air. It keeps travelling."
 icon = ExtResource("2")

@@ -6,6 +6,8 @@
 [resource]
 script = ExtResource("1")
 move_id = "coin_flick"
+attack_dir = "res://assets/images/characters/cashier_kaltas_move_coin_flick_34"
+attack_count = 9
 move_name = "Coin Flick"
 description = "Ping. Ping. PING. The third one hurts."
 icon = ExtResource("2")

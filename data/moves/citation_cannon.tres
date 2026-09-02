@@ -6,6 +6,8 @@
 [resource]
 script = ExtResource("1")
 move_id = "citation_cannon"
+attack_dir = "res://assets/images/characters/ordinance_ogre_move_citation_cannon_34"
+attack_count = 9
 move_name = "Citation Cannon"
 description = "He points. The clause leaves the page."
 icon = ExtResource("2")

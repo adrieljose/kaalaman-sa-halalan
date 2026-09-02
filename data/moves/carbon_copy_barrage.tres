@@ -6,6 +6,8 @@
 [resource]
 script = ExtResource("1")
 move_id = "carbon_copy_barrage"
+attack_dir = "res://assets/images/characters/permit_peke_move_carbon_copy_barrage_34"
+attack_count = 9
 move_name = "Carbon Copy Barrage"
 description = "The photocopier will not stop."
 icon = ExtResource("2")

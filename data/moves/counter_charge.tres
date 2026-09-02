@@ -6,6 +6,8 @@
 [resource]
 script = ExtResource("1")
 move_id = "counter_charge"
+attack_dir = "res://assets/images/characters/clerk_kurakot_move_counter_charge_34"
+attack_count = 9
 move_name = "Counter Charge"
 description = "He vaults his own service counter."
 icon = ExtResource("2")

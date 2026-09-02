@@ -6,6 +6,8 @@
 [resource]
 script = ExtResource("1")
 move_id = "session_smash"
+attack_dir = "res://assets/images/characters/ordinance_ogre_move_session_smash_34"
+attack_count = 9
 move_name = "Session Smash"
 description = "The gavel grows. The floor regrets it."
 icon = ExtResource("2")

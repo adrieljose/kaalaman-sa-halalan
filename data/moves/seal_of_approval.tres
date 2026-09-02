@@ -6,6 +6,8 @@
 [resource]
 script = ExtResource("1")
 move_id = "seal_of_approval"
+attack_dir = "res://assets/images/characters/notaryo_naku_move_seal_of_approval_34"
+attack_count = 9
 move_name = "Seal of Approval"
 description = "A seal glows under your feet. Move."
 icon = ExtResource("2")

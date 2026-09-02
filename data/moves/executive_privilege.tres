@@ -6,6 +6,8 @@
 [resource]
 script = ExtResource("1")
 move_id = "executive_privilege"
+attack_dir = "res://assets/images/characters/don_eraptado_move_executive_privilege_34"
+attack_count = 9
 move_name = "Executive Privilege"
 description = "Lights out. He is entitled to it."
 icon = ExtResource("2")

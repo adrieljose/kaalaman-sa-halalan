@@ -6,6 +6,8 @@
 [resource]
 script = ExtResource("1")
 move_id = "plunder_supremo"
+attack_dir = "res://assets/images/characters/don_eraptado_move_plunder_supremo_34"
+attack_count = 9
 move_name = "Plunder Supremo"
 description = "He never stands. The sacks fire."
 icon = ExtResource("2")

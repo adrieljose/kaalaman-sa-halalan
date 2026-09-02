@@ -6,6 +6,8 @@
 [resource]
 script = ExtResource("1")
 move_id = "coin_burst"
+attack_dir = "res://assets/images/characters/budget_bandido_move_coin_burst_34"
+attack_count = 9
 move_name = "Coin Burst"
 description = "One coin in, far more coins out."
 icon = ExtResource("2")

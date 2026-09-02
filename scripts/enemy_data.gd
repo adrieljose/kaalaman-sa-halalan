@@ -10,6 +10,49 @@ extends Resource
 ## replaying the same room with a different opponent in it. Left null, the
 ## previous encounter's backdrop simply stays up.
 @export var background: Texture2D
+
+## Optional encounter-specific staging adjustments. Most rooms use the
+## authored battle rects unchanged; rooms whose painted furniture occupies a
+## fighter slot can move or enlarge the fighters without altering the room art.
+## Offsets are in the 640x480 design coordinate system and are scaled down on
+## compact layouts.
+@export_range(0.75, 1.5, 0.01) var battle_scale: float = 1.0
+@export var player_battle_offset: Vector2 = Vector2.ZERO
+@export var enemy_battle_offset: Vector2 = Vector2.ZERO
+
+## Where this room's WALKABLE floor sits in its backdrop, as a fraction of the
+## image height. 0.0 means "use the battle scene's authored default".
+##
+## The default assumes every room is composed like the first one: an open floor
+## running to the bottom of the frame, with the fighters standing at 0.9125 of
+## the image. That holds for the plaza, the archive and the offices, and it is
+## wrong for any room whose SIDES are furniture — the council chamber, the
+## bidding room and the service lobby all seat rows of chairs exactly where the
+## fighters stand, so a fighter placed on the shared line reads as standing in
+## the seating rather than on the floor in front of it.
+##
+## Raising the fraction slides the backdrop up behind the fighters, which puts
+## their feet nearer the bottom of the image where the near floor is painted
+## and leaves the seating above and behind them, where it belongs.
+##
+## This is per ROOM rather than a correction per fighter on purpose: the floor
+## is a property of the painting, so both fighters and both shadows derive from
+## the one number and cannot drift apart.
+@export_range(0.0, 1.0, 0.0025) var ground_fraction: float = 0.0
+
+## Which voice set this rival grunts in when a confirmed hit lands, naming
+## assets/audio/sfx/voices/<voice>_hurt_1..3.ogg.
+##
+## Empty falls back to the shared three-take "enemy_hurt" set, which is what
+## every rival used to share -- an ogre and a cashier yelping identically. The
+## fallback stays so a rival added tomorrow is never silent.
+@export var hurt_voice: String = ""
+## An angrier second register, used once the rival is badly hurt or has changed
+## phase. Only the chapter boss has one; everyone else keeps one voice, because
+## a mook whose composure breaks is not a story the fight is telling.
+@export var rage_voice: String = ""
+## Below this share of max HP, rage_voice takes over from hurt_voice.
+@export_range(0.0, 1.0, 0.05) var rage_below: float = 0.5
 @export_multiline var lore: String = ""
 ## Chapter bosses get a louder introduction and end the chapter when beaten.
 ## Flagged explicitly rather than inferred from "last in the list" so a chapter

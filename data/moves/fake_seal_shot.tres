@@ -6,6 +6,8 @@
 [resource]
 script = ExtResource("1")
 move_id = "fake_seal_shot"
+attack_dir = "res://assets/images/characters/permit_peke_move_fake_seal_shot_34"
+attack_count = 9
 move_name = "Fake Seal Shot"
 description = "Seals peel off the page and curve in."
 icon = ExtResource("2")

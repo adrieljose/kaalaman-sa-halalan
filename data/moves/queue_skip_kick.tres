@@ -6,6 +6,8 @@
 [resource]
 script = ExtResource("1")
 move_id = "queue_skip_kick"
+attack_dir = ""
+attack_count = 0
 move_name = "Queue Skip Kick"
 description = "He steps over the barrier, then kicks."
 icon = ExtResource("2")

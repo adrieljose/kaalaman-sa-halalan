@@ -6,6 +6,8 @@
 [resource]
 script = ExtResource("1")
 move_id = "contract_snare"
+attack_dir = "res://assets/images/characters/bidding_bandit_move_contract_snare_34"
+attack_count = 9
 move_name = "Contract Snare"
 description = "It finds your ankles and asks you to sign."
 icon = ExtResource("2")
