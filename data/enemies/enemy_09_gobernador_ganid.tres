@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/images/portraits/enemy_don_eraptado.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/images/backgrounds/capitol_governor_office.png" id="3"]
+[ext_resource type="Resource" path="res://data/moves/provincial_patronage.tres" id="10"]
+[ext_resource type="Resource" path="res://data/moves/endorsement_chain.tres" id="11"]
+[ext_resource type="Resource" path="res://data/moves/pork_barrel_burst.tres" id="12"]
+[ext_resource type="Resource" path="res://data/moves/emergency_powers.tres" id="13"]
+[ext_resource type="Texture2D" path="res://assets/images/backgrounds/capitol_governor_office_phase2.png" id="90"]
+
+[resource]
+script = ExtResource("1")
+enemy_name = "Gobernador Ganid"
+title = "The Provincial Patron"
+max_hp = 700
+portrait = ExtResource("2")
+background = ExtResource("3")
+lore = "Three terms, then his wife's three, then his son's. He calls it continuity. The province calls it the family."
+is_boss = true
+moves = [ExtResource("10"), ExtResource("11"), ExtResource("12"), ExtResource("13")]
+phase_thresholds = Array[float]([0.5])
+phase_backgrounds = Array[Texture2D]([ExtResource("90")])
+phase_banners = PackedStringArray("THE PROVINCE IS MINE")
+idle_dir = "res://assets/images/characters/don_eraptado_battle_idle_34"
+idle_count = 8
+attack_dir = "res://assets/images/characters/don_eraptado_battle_attack_34"
+attack_count = 7
+hit_dir = "res://assets/images/characters/don_eraptado_battle_hit_34"
+hit_count = 6

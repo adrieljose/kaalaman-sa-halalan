@@ -23,4 +23,4 @@ attack_dir = "res://assets/images/characters/kapitan_komisyon_battle_attack"
 attack_count = 6
 hit_dir = "res://assets/images/characters/kapitan_komisyon_battle_hit"
 hit_count = 6
-flip_h = true
+flip_h = false

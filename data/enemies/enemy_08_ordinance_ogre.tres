@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://scripts/enemy_data.gd" id="1"]
 [ext_resource type="Texture2D" path="res://assets/images/portraits/enemy_ordinance_ogre.png" id="2"]
-[ext_resource type="Texture2D" path="res://assets/images/backgrounds/cityhall_session_hall.png" id="3"]
+[ext_resource type="Texture2D" path="res://assets/images/backgrounds/cityhall_session_hall_floor_v2.png" id="3"]
 [ext_resource type="Resource" path="res://data/moves/codex_crusher.tres" id="10"]
 [ext_resource type="Resource" path="res://data/moves/citation_cannon.tres" id="11"]
 [ext_resource type="Resource" path="res://data/moves/session_smash.tres" id="12"]
@@ -17,7 +17,7 @@ background = ExtResource("3")
 battle_scale = 1.04
 ground_fraction = 0.97
 player_battle_offset = Vector2(12, 10)
-enemy_battle_offset = Vector2(-12, 6)
+enemy_battle_offset = Vector2(-12, 0)
 hurt_voice = "ordinance_ogre"
 lore = "He has read every ordinance in the city and remembers only the clauses that suit him. The book is heavier than you are."
 is_boss = false

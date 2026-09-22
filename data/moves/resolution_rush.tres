@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="EnemyMove" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_move.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+move_id = "resolution_rush"
+move_name = "Resolution Rush"
+description = "Second reading and third in the same breath."
+direct_damage = 24
+animation_style = "lunge"
+effect_color = Color(0.70, 0.62, 0.44, 0.95)

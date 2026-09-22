@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="EnemyMove" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_move.gd" id="1"]
+
+[ext_resource type="Texture2D" path="res://assets/images/ui/skill_icons/chapter4/secretary_sipsip/approval_jab.png" id="skill_icon"]
+
+[resource]
+script = ExtResource("1")
+icon = ExtResource("skill_icon")
+move_id = "c4combat_approval_jab"
+move_name = "Approval Jab"
+description = "Isang mabilis na tatak ng pagsang-ayon, diretso sa harap."
+direct_damage = 24
+self_heal = 0
+guard_reduction = 0.00
+animation_style = "slam"
+effect_color = Color(0.940, 0.800, 0.400, 0.95)
+attack_dir = "res://assets/images/characters/chapter4/secretary_sipsip_attack"
+attack_count = 12

@@ -31,12 +31,19 @@ func _ready() -> void:
 		# previous one's tail, and the "teleport" that showed up was two moves
 		# overlapping in the harness rather than anything the game does.
 		var samples: Array = []
-		var sampling := true
-		_sample(rival, samples, func(): return sampling)
+		# A mutable reference is used deliberately. Capturing a primitive boolean
+		# in the sampler can leave the coroutine observing the original value and
+		# running forever after the test body has finished.
+		var sampling := {"active": true}
+		_sample(rival, samples, func(): return sampling["active"])
 		await scene._play_signature_move(by_id[move_id])
-		sampling = false
+		sampling["active"] = false
 		await get_tree().process_frame
 		_report(move_id, samples)
+
+	scene.queue_free()
+	await get_tree().process_frame
+	get_tree().quit(0)
 
 func _sample(rival: Control, out: Array, still_going: Callable) -> void:
 	while still_going.call():
@@ -45,7 +52,6 @@ func _sample(rival: Control, out: Array, still_going: Callable) -> void:
 		# both every frame, and if handing the body to a skill zeroes them in
 		# one frame the sprite visibly pops even though it never moved.
 		out.append({"p": rival.position, "r": rival.rotation, "s": rival.scale})
-	get_tree().quit(0)
 
 func _report(move_id: String, s: Array) -> void:
 	var stalls := 0

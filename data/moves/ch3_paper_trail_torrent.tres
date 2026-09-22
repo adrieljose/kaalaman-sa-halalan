@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="EnemyMove" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_move.gd" id="1"]
+
+[ext_resource type="Texture2D" path="res://assets/images/ui/skill_icons/chapter3/auditor_alibi/paper_trail_storm.png" id="skill_icon"]
+
+[resource]
+script = ExtResource("1")
+icon = ExtResource("skill_icon")
+move_id = "c3combat_paper_trail_storm"
+move_name = "Paper Trail Storm"
+description = "Four reports end in DISALLOWANCE."
+direct_damage = 24
+self_heal = 0
+guard_reduction = 0.0
+animation_style = "volley"
+effect_color = Color(0.55, 0.80, 0.65, 0.95)
+attack_dir = "res://assets/images/characters/chapter3/combat/auditor_alibi/release"
+attack_count = 8

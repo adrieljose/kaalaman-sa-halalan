@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="EnemyMove" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_move.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/images/ui/skill_icons/chapter5/bicam_berto/compromise_shield.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+icon = ExtResource("2")
+move_id = "c5combat_compromise_shield"
+move_name = "Compromise Shield"
+description = "Dalawang panig, isang kasunduan, isang kalasag."
+direct_damage = 0
+self_heal = 0
+guard_reduction = 0.40
+animation_style = "curse"
+effect_color = Color(0.460, 0.620, 0.940, 0.95)
+attack_dir = "res://assets/images/characters/chapter5/bicam_berto_guard"
+attack_count = 10

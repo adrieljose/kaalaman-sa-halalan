@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/images/portraits/enemy_chairman_chika.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/images/backgrounds/chapter5/03_hearing_room.png" id="3"]
+[ext_resource type="Resource" path="res://data/moves/c5_gavel_bang.tres" id="10"]
+[ext_resource type="Resource" path="res://data/moves/c5_mic_barrage.tres" id="11"]
+[ext_resource type="Resource" path="res://data/moves/c5_committee_shield.tres" id="12"]
+
+[resource]
+script = ExtResource("1")
+enemy_name = "Chairman Chika"
+title = "The Hearing Hype"
+max_hp = 720
+portrait = ExtResource("2")
+hud_portrait = ExtResource("2")
+background = ExtResource("3")
+ground_fraction = 0.9125
+player_battle_offset = Vector2(0, 0)
+enemy_battle_offset = Vector2(-25, 0)
+enemy_battle_scale = 1.16
+lore = "The Hearing Hype. She schedules the hearing, packs the room, and makes very sure the cameras are running before the first question is asked."
+is_boss = false
+moves = [ExtResource("10"), ExtResource("11"), ExtResource("12")]
+idle_dir = "res://assets/images/characters/chapter5/chairman_chika_idle"
+idle_count = 8
+attack_dir = "res://assets/images/characters/chapter5/chairman_chika_attack"
+attack_count = 12
+hit_dir = "res://assets/images/characters/chapter5/chairman_chika_hit"
+hit_count = 8
+walk_dir = "res://assets/images/characters/chapter5/chairman_chika_walk"
+walk_count = 10
+flip_h = false

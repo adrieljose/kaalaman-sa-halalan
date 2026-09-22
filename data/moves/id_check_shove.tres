@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="EnemyMove" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_move.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+move_id = "id_check_shove"
+move_name = "ID Check Shove"
+description = "He has already decided. The card is a formality."
+direct_damage = 18
+animation_style = "lunge"
+effect_color = Color(0.78, 0.72, 0.60, 0.95)

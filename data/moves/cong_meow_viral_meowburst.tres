@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="EnemyMove" load_steps=3 format=3]
+[ext_resource type="Script" path="res://scripts/enemy_move.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/images/ui/skill_icons/chapter3/cong_meow/viral_meowburst.png" id="2"]
+[resource]
+script = ExtResource("1")
+move_id = "cong_meow_viral_meowburst"
+move_name = "Viral Meowburst"
+icon = ExtResource("2")
+description = "Phone-fired paw, cat, fast paw and MEOW! waves: 6 + 6 + 8 + 12 damage."
+direct_damage = 32
+animation_style = "volley"
+effect_color = Color(0.6, 0.92, 1, 1)
+attack_dir = "res://assets/images/characters/chapter3/cong_meow_phone"
+attack_count = 16

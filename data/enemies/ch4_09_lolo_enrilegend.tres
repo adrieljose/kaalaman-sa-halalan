@@ -1,0 +1,35 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/images/portraits/enemy_lolo_enrilegend.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/images/backgrounds/chapter4/09_grand_garden_hall.png" id="3"]
+[ext_resource type="Resource" path="res://data/moves/c4_veterans_verdict.tres" id="10"]
+[ext_resource type="Resource" path="res://data/moves/c4_history_repeats.tres" id="11"]
+[ext_resource type="Resource" path="res://data/moves/c4_eternal_resolve.tres" id="12"]
+
+[resource]
+script = ExtResource("1")
+enemy_name = "LOLO ENRILEGEND"
+title = "The Eternal Statesman"
+max_hp = 950
+portrait = ExtResource("2")
+hud_portrait = ExtResource("2")
+background = ExtResource("3")
+ground_fraction = 0.0
+player_battle_offset = Vector2(0, 0)
+enemy_battle_offset = Vector2(-26, 0)
+enemy_battle_scale = 1.20
+lore = "The Eternal Statesman. A fictional Palace fixture who has outlasted every administration, every reorganisation and every colleague who ever wrote him off. He does not shout. He simply does not leave."
+is_boss = true
+moves = [ExtResource("10"), ExtResource("11"), ExtResource("12")]
+phase_thresholds = [0.50]
+phase_banners = ["STILL STANDING"]
+idle_dir = "res://assets/images/characters/chapter4/lolo_enrilegend_idle"
+idle_count = 8
+attack_dir = "res://assets/images/characters/chapter4/lolo_enrilegend_attack"
+attack_count = 12
+hit_dir = "res://assets/images/characters/chapter4/lolo_enrilegend_hit"
+hit_count = 8
+walk_dir = "res://assets/images/characters/chapter4/lolo_enrilegend_walk"
+walk_count = 10
+flip_h = false

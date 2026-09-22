@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/images/portraits/enemy_fixer_fredo.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/images/backgrounds/capitol_gate.png" id="3"]
+[ext_resource type="Resource" path="res://data/moves/gate_bar_swing.tres" id="10"]
+[ext_resource type="Resource" path="res://data/moves/id_check_shove.tres" id="11"]
+[ext_resource type="Resource" path="res://data/moves/logbook_lash.tres" id="12"]
+
+[resource]
+script = ExtResource("1")
+enemy_name = "Guard Garapal"
+title = "The Brazen Gatekeeper"
+max_hp = 300
+portrait = ExtResource("2")
+background = ExtResource("3")
+lore = "The building is public. The lobby is public. He is the part in between, and he has decided that part is his."
+is_boss = false
+moves = [ExtResource("10"), ExtResource("11"), ExtResource("12")]
+idle_dir = "res://assets/images/characters/fixer_fredo_battle_idle_34"
+idle_count = 8
+attack_dir = "res://assets/images/characters/fixer_fredo_battle_attack_34"
+attack_count = 7
+hit_dir = "res://assets/images/characters/fixer_fredo_battle_hit_34"
+hit_count = 6

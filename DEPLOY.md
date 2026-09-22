@@ -3,7 +3,41 @@
 The game exports to HTML5 and runs in a browser. `build/web/` is a plain static
 site — any static host will serve it.
 
+## Testing-only Chapters 1–5
+
+Use the `Web Testing` export preset and `build/web-testing/` for the Wheat Six
+testing site. Its `testing_chapters` feature bypasses chapter release/progression
+locks and all difficulty locks. Production includes all five chapters but requires
+Easy → Medium → Hard wins in each chapter before the next chapter opens.
+Each difficulty win is saved across reloads. Testing uses a separate save file.
+This preset excludes developer output, chat text, and the unused editor icon library.
+
+Deploy from that linked directory with `vercel deploy --yes --scope jaysuz1s-projects`
+(preview, not `--prod`), then assign **only** `web-wheat-six-45.vercel.app` to that
+deployment with `vercel alias set`. Do not repoint `kaalamansahalalan.vercel.app`.
+The two addresses deliberately serve different snapshots. A future production
+deployment may automatically move Wheat Six again; check aliases before publishing.
+
 ## Quick deploy (Windows PowerShell)
+
+### Custom loading screen (local revision, 12 September 2026)
+
+The Web export preset now uses `res://web/loading_shell.html`. Its editable
+source is `web/loading.template.html`. Rebuild it after changing the template:
+
+```powershell
+& "C:\Users\Asus\AppData\Local\Programs\Python\Python312\python.exe" tools/web/build_loading_screen.py
+```
+
+This embeds the existing title logo and menu background without changing either
+image. It also prepares `output/loading_screen/site/` using the preserved
+Chapter 3 production build for local review; it does not export or deploy the
+current game. `preview.html` there is a mock at 38%; `index.html` runs the actual
+game. Do not upload the mock preview as a production entry point.
+
+The loading-screen revision was approved and deployed on 12 September 2026 to
+both public links. See `output/loading_screen/RELEASE.md`. Future deployments
+still require an explicit request to publish.
 
 This is the one you actually run, in your own terminal, every time you've made
 changes in the Godot editor and want the live site to show them. Copy each

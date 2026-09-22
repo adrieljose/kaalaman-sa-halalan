@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="EnemyMove" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_move.gd" id="1"]
+
+[ext_resource type="Texture2D" path="res://assets/images/ui/skill_icons/chapter3/contractor_kutsaba/contract_case_combo.png" id="skill_icon"]
+
+[resource]
+script = ExtResource("1")
+icon = ExtResource("skill_icon")
+move_id = "c3combat_contract_case_combo"
+move_name = "Contract Case Combo"
+description = "Three heavy briefcase strikes."
+direct_damage = 24
+self_heal = 0
+guard_reduction = 0.0
+animation_style = "slam"
+effect_color = Color(0.78, 0.82, 0.32, 0.95)
+attack_dir = "res://assets/images/characters/chapter3/combat/contractor_kutsaba/strike"
+attack_count = 8

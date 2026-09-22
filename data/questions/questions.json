@@ -2564,983 +2564,2202 @@
   {
     "chapter": 3,
     "difficulty": "easy",
-    "category": "voting",
-    "prompt": "The elected head of a province is the ___.",
-    "answer": "GOVERNOR",
-    "fact": "Governors serve three-year terms, same as mayors."
+    "category": "why",
+    "prompt": "The largest local government unit below the regional level in the Philippines is a ___.",
+    "answer": "PROVINCE"
   },
   {
     "chapter": 3,
     "difficulty": "easy",
-    "category": "voting",
-    "prompt": "A province's top elected executive is its ___.",
-    "answer": "GOVERNOR",
-    "fact": "Governors serve three-year terms, same as mayors."
+    "category": "why",
+    "prompt": "The main government building complex of a province is commonly called the provincial ___.",
+    "answer": "CAPITOL"
   },
   {
     "chapter": 3,
     "difficulty": "easy",
-    "category": "voting",
-    "prompt": "The second-highest provincial official is the ___ governor.",
-    "answer": "VICE",
-    "fact": "The vice governor presides over the provincial board."
+    "category": "why",
+    "prompt": "The elected chief executive of a province is the ___.",
+    "answer": "GOVERNOR"
   },
   {
     "chapter": 3,
     "difficulty": "easy",
-    "category": "voting",
-    "prompt": "The provincial board is presided over by the ___ governor.",
-    "answer": "VICE",
-    "fact": "The vice governor presides over the provincial board."
+    "category": "why",
+    "prompt": "The official who succeeds the governor when a permanent vacancy occurs is the ___.",
+    "answer": "VICEGOVERNOR",
+    "display": "VICE GOVERNOR"
   },
   {
     "chapter": 3,
     "difficulty": "easy",
-    "category": "voting",
-    "prompt": "The main town of a province, where officials work, is its ___.",
-    "answer": "CAPITAL",
-    "fact": "The provincial capitol stands in the capital town."
+    "category": "why",
+    "prompt": "The provincial legislative body is the Sangguniang ___.",
+    "answer": "PANLALAWIGAN"
   },
   {
     "chapter": 3,
     "difficulty": "easy",
-    "category": "voting",
-    "prompt": "Provincial officials work out of the capitol, located in the province's ___.",
-    "answer": "CAPITAL",
-    "fact": "The provincial capitol stands in the capital town."
+    "category": "why",
+    "prompt": "Another common English name for the Sangguniang Panlalawigan is the Provincial ___.",
+    "answer": "BOARD"
   },
   {
     "chapter": 3,
     "difficulty": "easy",
-    "category": "voting",
-    "prompt": "A governor may serve up to ___ terms in a row.",
-    "answer": "THREE",
-    "fact": "The same three-consecutive-term rule applies to governors."
+    "category": "why",
+    "prompt": "Provincial board members are commonly elected from geographic ___.",
+    "answer": "DISTRICTS"
   },
   {
     "chapter": 3,
     "difficulty": "easy",
-    "category": "voting",
-    "prompt": "Like mayors, governors are limited to ___ consecutive terms.",
-    "answer": "THREE",
-    "fact": "The same three-consecutive-term rule applies to governors."
+    "category": "why",
+    "prompt": "A local law enacted by a provincial sanggunian is called an ___.",
+    "answer": "ORDINANCE"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "A formal expression of the provincial board's decision or position may be issued as a ___.",
+    "answer": "RESOLUTION"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "The yearly financial plan showing expected income and spending is the provincial ___.",
+    "answer": "BUDGET"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "Provincial money and cash operations are handled through the provincial ___.",
+    "answer": "TREASURY"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "The provincial official responsible for treasury functions is the provincial ___.",
+    "answer": "TREASURER"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "The office that determines values of real property for local taxation is headed by the provincial ___.",
+    "answer": "ASSESSOR"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "Provincial public works and technical projects may involve the provincial ___.",
+    "answer": "ENGINEER"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "Provincial programs for crops and farmers may involve the provincial ___.",
+    "answer": "AGRICULTURIST"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "Animal health and veterinary services may be handled by the provincial ___.",
+    "answer": "VETERINARIAN"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "A province may operate or support a provincial ___ to provide medical services.",
+    "answer": "HOSPITAL"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "A province may construct and maintain a provincial ___ connecting communities.",
+    "answer": "ROAD"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "Programs for farmers, crops, and food production belong to the field of ___.",
+    "answer": "AGRICULTURE"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "Promoting destinations and local attractions is part of provincial ___.",
+    "answer": "TOURISM"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "Protecting natural resources is part of provincial ___ management.",
+    "answer": "ENVIRONMENT"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "Preparedness for typhoons, floods, and earthquakes is part of ___ risk reduction.",
+    "answer": "DISASTER"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "Provincial medical programs are part of public ___.",
+    "answer": "HEALTH"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "Programs for vulnerable families may be handled through social ___ services.",
+    "answer": "WELFARE"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "Money collected by the provincial government from lawful sources forms part of its ___.",
+    "answer": "REVENUE"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "A compulsory charge imposed under lawful local taxing powers is a ___.",
+    "answer": "TAX"
   },
   {
     "chapter": 3,
     "difficulty": "easy",
     "category": "fraud",
-    "prompt": "A voter falsely registered outside their real home enables ___ voting.",
-    "answer": "FLYING",
-    "fact": "It is prosecuted the same way at the provincial level as anywhere else."
+    "prompt": "Checking government financial records for legality and accuracy is an ___.",
+    "answer": "AUDIT"
   },
   {
     "chapter": 3,
     "difficulty": "easy",
     "category": "fraud",
-    "prompt": "A voter falsely claiming provincial residency to vote is guilty of ___ voting.",
-    "answer": "FLYING",
-    "fact": "It is prosecuted the same way at the provincial level as anywhere else."
+    "prompt": "The government process of acquiring goods, services, and infrastructure is called ___.",
+    "answer": "PROCUREMENT"
   },
   {
     "chapter": 3,
     "difficulty": "easy",
     "category": "fraud",
-    "prompt": "Offering payment for a vote in a governor's race is vote ___.",
-    "answer": "BUYING",
-    "fact": "The Omnibus Election Code treats it as a serious election offense."
+    "prompt": "Competitive submission of offers for government projects is commonly called ___.",
+    "answer": "BIDDING"
   },
   {
     "chapter": 3,
     "difficulty": "easy",
     "category": "fraud",
-    "prompt": "Cash offered for a vote in a governor's race is still vote ___.",
-    "answer": "BUYING",
-    "fact": "The Omnibus Election Code treats it as a serious election offense."
-  },
-  {
-    "chapter": 3,
-    "difficulty": "easy",
-    "category": "candidate",
-    "prompt": "A group of towns and cities that share one province forms its ___.",
-    "answer": "TERRITORY",
-    "fact": "A province's territory covers every town and city inside it."
-  },
-  {
-    "chapter": 3,
-    "difficulty": "easy",
-    "category": "candidate",
-    "prompt": "Every town and city that shares a province forms its ___.",
-    "answer": "TERRITORY",
-    "fact": "A province's territory covers every town and city inside it."
-  },
-  {
-    "chapter": 3,
-    "difficulty": "easy",
-    "category": "candidate",
-    "prompt": "A candidate's official filing to run is a Certificate of ___.",
-    "answer": "CANDIDACY",
-    "fact": "Provincial candidates file this with the COMELEC provincial office."
-  },
-  {
-    "chapter": 3,
-    "difficulty": "easy",
-    "category": "candidate",
-    "prompt": "Provincial candidates file their Certificate of ___ with the COMELEC provincial office.",
-    "answer": "CANDIDACY",
-    "fact": "Provincial candidates file this with the COMELEC provincial office."
+    "prompt": "A legally binding agreement for a provincial project is a ___.",
+    "answer": "CONTRACT"
   },
   {
     "chapter": 3,
     "difficulty": "easy",
     "category": "why",
-    "prompt": "The right guaranteed to every qualified citizen to vote is ___.",
-    "answer": "SUFFRAGE",
-    "fact": "It cannot be taken away by a literacy or property test."
+    "prompt": "A specific undertaking such as building a bridge or health center is a provincial ___.",
+    "answer": "PROJECT"
   },
   {
     "chapter": 3,
     "difficulty": "easy",
     "category": "why",
-    "prompt": "No literacy or property test can take away a citizen's ___.",
-    "answer": "SUFFRAGE",
-    "fact": "It cannot be taken away by a literacy or property test."
+    "prompt": "Roads, bridges, and public facilities are examples of ___.",
+    "answer": "INFRASTRUCTURE"
   },
   {
     "chapter": 3,
     "difficulty": "easy",
     "category": "why",
-    "prompt": "Adding up results from every town in a province is called ___.",
-    "answer": "TALLYING",
-    "fact": "The provincial board of canvassers tallies every town's results."
+    "prompt": "A local government unit within a province that is not a city is a ___.",
+    "answer": "MUNICIPALITY"
   },
   {
     "chapter": 3,
     "difficulty": "easy",
     "category": "why",
-    "prompt": "Adding up every town's results into one provincial total is called ___.",
-    "answer": "TALLYING",
-    "fact": "The provincial board of canvassers tallies every town's results."
+    "prompt": "A city that remains under the administrative framework of a province is a ___ city.",
+    "answer": "COMPONENT"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "An urban local government unit that may be located within a province is a ___.",
+    "answer": "CITY"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "The smallest local government unit found within provinces is the ___.",
+    "answer": "BARANGAY"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "A citizen who is qualified and registered to vote is a ___.",
+    "answer": "VOTER"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "easy",
+    "category": "candidate",
+    "prompt": "The formal act of seeking an elective provincial office begins with a certificate of ___.",
+    "answer": "CANDIDACY"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "The democratic process used to choose provincial officials is an ___.",
+    "answer": "ELECTION"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "The paper or official voting instrument used to record choices is the ___.",
+    "answer": "BALLOT"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "The Philippine agency that administers elections is the ___.",
+    "answer": "COMELEC"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "easy",
+    "category": "candidate",
+    "prompt": "A candidate for governor, vice-governor, or Sangguniang Panlalawigan must be at least ___ years old on election day.",
+    "answer": "TWENTYTHREE",
+    "display": "23"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "easy",
+    "category": "candidate",
+    "prompt": "The regular term of provincial elective officials such as the governor is ___.",
+    "answer": "THREEYEARS",
+    "display": "THREE YEARS"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "easy",
+    "category": "candidate",
+    "prompt": "A local elective official may not serve more than three ___ terms in the same position.",
+    "answer": "CONSECUTIVE"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "easy",
+    "category": "candidate",
+    "prompt": "A candidate for provincial office must meet the required period of ___ in the locality before the election.",
+    "answer": "RESIDENCY"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "easy",
+    "category": "candidate",
+    "prompt": "A local candidate must be able to read and write ___ or another local language or dialect.",
+    "answer": "FILIPINO"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "easy",
+    "category": "candidate",
+    "prompt": "Being able to read and write is a basic form of ___ required of local candidates.",
+    "answer": "LITERACY"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "The place designated as the seat of provincial government is the provincial ___.",
+    "answer": "CAPITAL"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "A province is a type of ___ government unit.",
+    "answer": "LOCAL"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "Health, agriculture, roads, and social welfare are examples of provincial public ___.",
+    "answer": "SERVICES"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "The governor serves as the chief ___ of the provincial government.",
+    "answer": "EXECUTIVE"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "The Sangguniang Panlalawigan performs the province's local ___ function.",
+    "answer": "LEGISLATIVE"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "The vice-governor normally serves as the ___ officer of the Sangguniang Panlalawigan.",
+    "answer": "PRESIDING"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "A member who sits on a body because of another office held is described as ___.",
+    "answer": "EXOFFICIO",
+    "display": "EX OFFICIO"
   },
   {
     "chapter": 3,
     "difficulty": "medium",
     "category": "voting",
-    "prompt": "The provincial council is formally the Sangguniang ___.",
-    "answer": "PANLALAWIGAN",
-    "fact": "It passes ordinances covering the whole province."
+    "prompt": "The legal process determining who assumes an office after a vacancy is called ___.",
+    "answer": "SUCCESSION"
   },
   {
     "chapter": 3,
     "difficulty": "medium",
     "category": "voting",
-    "prompt": "A province's legislative body is formally the Sangguniang ___.",
-    "answer": "PANLALAWIGAN",
-    "fact": "It passes ordinances covering the whole province."
+    "prompt": "When an elected provincial office becomes unoccupied, a ___ exists.",
+    "answer": "VACANCY"
   },
   {
     "chapter": 3,
     "difficulty": "medium",
     "category": "voting",
-    "prompt": "A member of the provincial council is a board ___.",
-    "answer": "MEMBER",
-    "fact": "Board members are elected per legislative district within the province."
+    "prompt": "If both governor and vice-governor offices become permanently vacant, sanggunian member ___ helps determine succession.",
+    "answer": "RANKING"
   },
   {
     "chapter": 3,
     "difficulty": "medium",
     "category": "voting",
-    "prompt": "An elected seat on the provincial council belongs to a board ___.",
-    "answer": "MEMBER",
-    "fact": "Board members are elected per legislative district within the province."
+    "prompt": "Many actions of a legislative body are decided by a required ___ vote.",
+    "answer": "MAJORITY"
   },
   {
     "chapter": 3,
     "difficulty": "medium",
     "category": "voting",
-    "prompt": "An official currently holding a post seeking re-election is the ___.",
-    "answer": "INCUMBENT",
-    "fact": "Incumbent governors usually have strong name recognition."
+    "prompt": "The minimum number of members needed to transact official business is a ___.",
+    "answer": "QUORUM"
   },
   {
     "chapter": 3,
     "difficulty": "medium",
-    "category": "voting",
-    "prompt": "A governor already holding office and seeking re-election is the ___.",
-    "answer": "INCUMBENT",
-    "fact": "Incumbent governors usually have strong name recognition."
+    "category": "why",
+    "prompt": "An authorization to spend public money for a lawful purpose is an ___.",
+    "answer": "APPROPRIATION"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "An additional spending measure passed after the annual budget is a ___ appropriation.",
+    "answer": "SUPPLEMENTAL"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "A province may be authorized under law to negotiate certain ___ for development financing.",
+    "answer": "LOANS"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "Debt instruments that may be used to raise funds for development projects are called ___.",
+    "answer": "BONDS"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "Amounts collected for certain government services may be called ___.",
+    "answer": "FEES"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "Local governments may impose lawful fees and other ___.",
+    "answer": "CHARGES"
   },
   {
     "chapter": 3,
     "difficulty": "medium",
     "category": "fraud",
-    "prompt": "Vote counts padded in one place and cut in another describe ___-bawas.",
-    "answer": "DAGDAG",
-    "fact": "It is the classic manual-era manipulation, still alleged today."
+    "prompt": "A lawful release from a tax obligation may be called an ___.",
+    "answer": "EXEMPTION"
   },
   {
     "chapter": 3,
     "difficulty": "medium",
     "category": "fraud",
-    "prompt": "Provincial canvassing isn't immune to the padding-and-shaving scheme called ___-bawas.",
-    "answer": "DAGDAG",
-    "fact": "It is the classic manual-era manipulation, still alleged today."
+    "prompt": "Benefits granted to encourage desired economic activity may be called tax ___.",
+    "answer": "INCENTIVES"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "A reduction or easing of a tax burden may be described as tax ___.",
+    "answer": "RELIEF"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "Determining the worth of real property for assessment purposes involves ___.",
+    "answer": "VALUATION"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "The process of determining taxable real-property value is called ___.",
+    "answer": "ASSESSMENT"
   },
   {
     "chapter": 3,
     "difficulty": "medium",
     "category": "fraud",
-    "prompt": "A person who receives payment for their vote commits vote ___.",
-    "answer": "SELLING",
-    "fact": "Both parties to the transaction can face prosecution."
+    "prompt": "Receiving taxes, fees, and other lawful provincial income is revenue ___.",
+    "answer": "COLLECTION"
   },
   {
     "chapter": 3,
     "difficulty": "medium",
     "category": "fraud",
-    "prompt": "Taking payment in exchange for a provincial vote is vote ___.",
-    "answer": "SELLING",
-    "fact": "Both parties to the transaction can face prosecution."
+    "prompt": "The release of public funds for authorized expenses is a ___.",
+    "answer": "DISBURSEMENT"
   },
   {
     "chapter": 3,
     "difficulty": "medium",
-    "category": "candidate",
-    "prompt": "A candidate with no genuine intent to run may be ruled a ___.",
-    "answer": "NUISANCE",
-    "fact": "COMELEC may cancel that candidacy under Section 69."
+    "category": "fraud",
+    "prompt": "Documents authorizing payment from a government treasury may be called ___.",
+    "answer": "WARRANTS"
   },
   {
     "chapter": 3,
     "difficulty": "medium",
-    "category": "candidate",
-    "prompt": "A gubernatorial hopeful with no genuine intent to run may be ruled a ___.",
-    "answer": "NUISANCE",
-    "fact": "COMELEC may cancel that candidacy under Section 69."
+    "category": "fraud",
+    "prompt": "Money spent by the provincial government for authorized purposes is recorded as ___.",
+    "answer": "EXPENDITURES"
   },
   {
     "chapter": 3,
     "difficulty": "medium",
-    "category": "candidate",
-    "prompt": "Replacing a disqualified candidate with one from the same party is a ___.",
-    "answer": "SUBSTITUTION",
-    "fact": "The replacement must run for the identical position."
+    "category": "fraud",
+    "prompt": "Pay and other lawful remuneration received by officials may be called ___.",
+    "answer": "COMPENSATION"
   },
   {
     "chapter": 3,
     "difficulty": "medium",
-    "category": "candidate",
-    "prompt": "Filling a vacated candidacy with a same-party pick is called ___.",
-    "answer": "SUBSTITUTION",
-    "fact": "The replacement must run for the identical position."
-  },
-  {
-    "chapter": 3,
-    "difficulty": "medium",
-    "category": "candidate",
-    "prompt": "Parties running together to support each other's candidates form a ___.",
-    "answer": "COALITION",
-    "fact": "Provincial coalitions commonly form after, not before, the filing period."
-  },
-  {
-    "chapter": 3,
-    "difficulty": "medium",
-    "category": "candidate",
-    "prompt": "Two or more parties teaming up to back each other's local candidates form a ___.",
-    "answer": "COALITION",
-    "fact": "Provincial coalitions commonly form after, not before, the filing period."
+    "category": "fraud",
+    "prompt": "Additional authorized amounts received apart from basic salary may be called ___.",
+    "answer": "ALLOWANCES"
   },
   {
     "chapter": 3,
     "difficulty": "medium",
     "category": "why",
-    "prompt": "The body of registered voters across a whole province is its ___.",
-    "answer": "ELECTORATE",
-    "fact": "A province's electorate can number well over a million people."
+    "prompt": "The provincial officer responsible for government accounting functions is the provincial ___.",
+    "answer": "ACCOUNTANT"
   },
   {
     "chapter": 3,
     "difficulty": "medium",
     "category": "why",
-    "prompt": "A province's full body of registered voters is its ___.",
-    "answer": "ELECTORATE",
-    "fact": "A province's electorate can number well over a million people."
+    "prompt": "The official who assists in coordinating administrative operations may be the provincial ___.",
+    "answer": "ADMINISTRATOR"
   },
   {
     "chapter": 3,
     "difficulty": "medium",
     "category": "why",
-    "prompt": "One family holding elected posts across generations is a political ___.",
-    "answer": "DYNASTY",
-    "fact": "The Constitution discourages dynasties, though no enabling law yet defines them."
+    "prompt": "The provincial legal office may be headed by the provincial ___.",
+    "answer": "ATTORNEY"
   },
   {
     "chapter": 3,
     "difficulty": "medium",
     "category": "why",
-    "prompt": "One family repeatedly winning provincial posts describes a political ___.",
-    "answer": "DYNASTY",
-    "fact": "The Constitution discourages dynasties, though no enabling law yet defines them."
+    "prompt": "Development and land-use coordination may involve the provincial ___.",
+    "answer": "PLANNER"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "Provincial programs involving demographic information may concern the ___.",
+    "answer": "POPULATION"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "Long-term improvement of the province is commonly described as provincial ___.",
+    "answer": "DEVELOPMENT"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "The body that helps formulate development directions at the provincial level is a development ___.",
+    "answer": "COUNCIL"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "The governor exercises general ___ over provincial programs, projects, services, and activities.",
+    "answer": "SUPERVISION"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "The governor also exercises general supervision and ___ over provincial programs and services.",
+    "answer": "CONTROL"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "A guiding rule or direction adopted by government is a ___.",
+    "answer": "POLICY"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "A coordinated set of government actions designed to achieve a goal is a ___.",
+    "answer": "PROGRAM"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "Programs, projects, services, and government ___ are supervised by the provincial governor.",
+    "answer": "ACTIVITIES"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "Preparing development priorities for the province is part of provincial ___.",
+    "answer": "PLANNING"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "The constitutional principle allowing local governments meaningful self-rule is local ___.",
+    "answer": "AUTONOMY"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "Transferring decision-making closer to local governments is associated with ___.",
+    "answer": "DECENTRALIZATION"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "The transfer of functions and responsibilities from national to local government is called ___.",
+    "answer": "DEVOLUTION"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "The geographic or legal area where a province may exercise authority is its ___.",
+    "answer": "JURISDICTION"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "medium",
+    "category": "candidate",
+    "prompt": "A provincial candidate must be a ___ voter in the locality or district where required by law.",
+    "answer": "REGISTERED"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "medium",
+    "category": "candidate",
+    "prompt": "A local candidate generally must have lived in the locality for at least ___ immediately before election day.",
+    "answer": "ONEYEAR",
+    "display": "ONE YEAR"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "medium",
+    "category": "candidate",
+    "prompt": "The minimum-age requirement for governor, vice-governor, and provincial board member is measured on ___.",
+    "answer": "ELECTIONDAY",
+    "display": "ELECTION DAY"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "medium",
+    "category": "candidate",
+    "prompt": "A fixed period during which an elected official holds office is called a ___.",
+    "answer": "TERM"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "medium",
+    "category": "candidate",
+    "prompt": "Voluntarily giving up office is called voluntary ___, which does not by itself interrupt the full-term continuity rule.",
+    "answer": "RENUNCIATION"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "A vacancy caused by death, resignation, removal, or other lasting cause may be considered ___.",
+    "answer": "PERMANENT"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "A short-term absence or inability to perform duties may create a ___ incapacity rather than a permanent vacancy.",
+    "answer": "TEMPORARY"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "The Local Government Code repeatedly requires provincial powers to be exercised for the ___ of the province and its inhabitants.",
+    "answer": "GENERALWELFARE",
+    "display": "GENERAL WELFARE"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "A local sanggunian may exercise not only legislative but also certain ___ functions in administrative cases.",
+    "answer": "QUASIJUDICIAL",
+    "display": "QUASI-JUDICIAL"
   },
   {
     "chapter": 3,
     "difficulty": "hard",
     "category": "voting",
-    "prompt": "Dividing legislative seats among areas by population is ___.",
-    "answer": "APPORTIONMENT",
-    "fact": "It is meant to keep representation proportional to population."
+    "prompt": "Some appointments made by the governor are subject to sanggunian ___ when required by law.",
+    "answer": "CONFIRMATION"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "hard",
+    "category": "candidate",
+    "prompt": "Selecting a qualified person to an appointive provincial position is an ___.",
+    "answer": "APPOINTMENT"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "The main spending measure enacted for each fiscal year is the ___ appropriations measure.",
+    "answer": "ANNUAL"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "Provincial local laws passed by the sanggunian are collectively called ___.",
+    "answer": "ORDINANCES"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "Formal policy expressions or decisions of the sanggunian may be adopted as ___.",
+    "answer": "RESOLUTIONS"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "hard",
+    "category": "fraud",
+    "prompt": "Loans, bonds, and similar obligations are forms of public ___.",
+    "answer": "INDEBTEDNESS"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "hard",
+    "category": "fraud",
+    "prompt": "Legal limits on how much an LGU may spend for certain purposes are examples of ___ limitations.",
+    "answer": "BUDGETARY"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "The Sangguniang Panlalawigan may prescribe reasonable limits on the use of ___ within provincial jurisdiction, subject to law.",
+    "answer": "PROPERTY"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "A government asset held in a business-like capacity may be described as ___.",
+    "answer": "PROPRIETARY"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "Allowing another party to use provincial property for agreed payment may involve a ___.",
+    "answer": "LEASE"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "The governor directs formulation of the provincial ___ with assistance from the provincial development council.",
+    "answer": "DEVELOPMENTPLAN",
+    "display": "DEVELOPMENT PLAN"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "Elective and appointive provincial officials generally hold office in the provincial ___.",
+    "answer": "PROVINCIALCAPITAL",
+    "display": "PROVINCIAL CAPITAL"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "A city that remains politically connected to a province is known as a ___.",
+    "answer": "COMPONENTCITY",
+    "display": "COMPONENT CITY"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "A city classified with greater administrative independence may be ___.",
+    "answer": "HIGHLYURBANIZED",
+    "display": "HIGHLY URBANIZED"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "An independent component city is described in law as ___ from the province for certain political purposes.",
+    "answer": "INDEPENDENT"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "hard",
+    "category": "candidate",
+    "prompt": "A provincial official chosen directly by voters holds an ___ office.",
+    "answer": "ELECTIVE"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "hard",
+    "category": "candidate",
+    "prompt": "A provincial official selected through appointment rather than election is ___.",
+    "answer": "APPOINTIVE"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "hard",
+    "category": "candidate",
+    "prompt": "Government personnel rules for many appointive officials are governed by the ___.",
+    "answer": "CIVILSERVICE",
+    "display": "CIVIL SERVICE"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "The officer who keeps records and minutes of the provincial sanggunian serves as its ___.",
+    "answer": "SECRETARY"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "The collective Filipino term for a local legislative council is ___.",
+    "answer": "SANGGUNIAN"
   },
   {
     "chapter": 3,
     "difficulty": "hard",
     "category": "voting",
-    "prompt": "Seats are divided among areas by population through ___.",
-    "answer": "APPORTIONMENT",
-    "fact": "It is meant to keep representation proportional to population."
+    "prompt": "Examining local enactments for legality or consistency is a form of legislative ___.",
+    "answer": "REVIEW"
   },
   {
     "chapter": 3,
     "difficulty": "hard",
     "category": "voting",
-    "prompt": "A formal re-examination of contested ballots is a ___.",
-    "answer": "RECOUNT",
-    "fact": "A recount only proceeds if a proper election protest was filed."
+    "prompt": "Changing an existing ordinance to correct or improve it is to ___ it.",
+    "answer": "AMEND"
   },
   {
     "chapter": 3,
     "difficulty": "hard",
     "category": "voting",
-    "prompt": "Disputed ballots can be formally re-examined through a ___.",
-    "answer": "RECOUNT",
-    "fact": "A recount only proceeds if a proper election protest was filed."
+    "prompt": "The governor's formal rejection of an ordinance or item may be called a ___.",
+    "answer": "VETO"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "A sanggunian may, when legal requirements are met, ___ a governor's veto.",
+    "answer": "OVERRIDE"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "A veto override generally requires a qualified supermajority such as ___ of all sanggunian members where the law so provides.",
+    "answer": "TWOTHIRDS",
+    "display": "TWO-THIRDS"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "Provincial officials may, upon proper sanggunian resolution, hold office in a component city or municipality for not more than ___ in a given month.",
+    "answer": "SEVENDAYS",
+    "display": "SEVEN DAYS"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "When the law gives the sanggunian fifteen days to act on certain appointments, that period may be written as ___.",
+    "answer": "FIFTEENDAYS",
+    "display": "FIFTEEN DAYS"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "Provincial spending for ordinary government operations may draw from the province's ___.",
+    "answer": "GENERALFUND",
+    "display": "GENERAL FUND"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "Paying salaries and wages of government workers is commonly categorized under personal ___.",
+    "answer": "SERVICES"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "The legal authority of a province to impose certain local taxes is part of local ___.",
+    "answer": "TAXATION"
   },
   {
     "chapter": 3,
     "difficulty": "hard",
     "category": "fraud",
-    "prompt": "Redrawing district lines to favor one side unfairly is ___.",
-    "answer": "GERRYMANDERING",
-    "fact": "It distorts who actually holds representative power."
+    "prompt": "Obtaining authorized loans or other debt financing for projects is a form of public ___.",
+    "answer": "BORROWING"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "A development plan formulated by the governor takes effect after required sanggunian ___.",
+    "answer": "APPROVAL"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "Carrying out an approved provincial development plan is its ___.",
+    "answer": "IMPLEMENTATION"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "Tracking whether provincial projects are progressing as intended is called ___.",
+    "answer": "MONITORING"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "Different provincial offices working together toward one program requires ___.",
+    "answer": "COORDINATION"
   },
   {
     "chapter": 3,
     "difficulty": "hard",
     "category": "fraud",
-    "prompt": "Redrawing boundaries to favor one side is the practice known as ___.",
-    "answer": "GERRYMANDERING",
-    "fact": "It distorts who actually holds representative power."
+    "prompt": "The duty of public officials to answer for their decisions and use of funds is ___.",
+    "answer": "ACCOUNTABILITY"
   },
   {
     "chapter": 3,
     "difficulty": "hard",
     "category": "fraud",
-    "prompt": "Depriving eligible people of their right to vote is to ___ them.",
-    "answer": "DISENFRANCHISE",
-    "fact": "Missing records or long lines can disenfranchise voters in practice."
+    "prompt": "Making government information and processes open to public scrutiny supports ___.",
+    "answer": "TRANSPARENCY"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "Involving citizens and stakeholders in local decision-making promotes public ___.",
+    "answer": "PARTICIPATION"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "People represented and served by elected provincial officials are their ___.",
+    "answer": "CONSTITUENTS"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "The Local Government Code often refers to the people living in a province as its ___.",
+    "answer": "INHABITANTS"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "Cooperation between provincial, municipal, city, and national agencies is ___ coordination.",
+    "answer": "INTERGOVERNMENTAL"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "The province's ability to raise and manage lawful income sources concerns its fiscal ___.",
+    "answer": "RESOURCES"
+  },
+  {
+    "chapter": 3,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "The official act of representing the province in lawful business transactions is provincial ___.",
+    "answer": "REPRESENTATION"
   },
   {
     "chapter": 3,
     "difficulty": "hard",
     "category": "fraud",
-    "prompt": "Missing records or long lines can effectively ___ eligible voters.",
-    "answer": "DISENFRANCHISE",
-    "fact": "Missing records or long lines can disenfranchise voters in practice."
-  },
-  {
-    "chapter": 3,
-    "difficulty": "hard",
-    "category": "candidate",
-    "prompt": "COMELEC and the courts must decide disqualification cases with legal ___.",
-    "answer": "PRIORITY",
-    "fact": "The law requires speedy resolution before election day where possible."
-  },
-  {
-    "chapter": 3,
-    "difficulty": "hard",
-    "category": "candidate",
-    "prompt": "Provincial disqualification suits must be resolved with legal ___ before election day.",
-    "answer": "PRIORITY",
-    "fact": "The law requires speedy resolution before election day where possible."
-  },
-  {
-    "chapter": 3,
-    "difficulty": "hard",
-    "category": "candidate",
-    "prompt": "A candidate withdrawing after the filing deadline generally cannot be ___.",
-    "answer": "SUBSTITUTED",
-    "fact": "COMELEC bars most substitutions based on late withdrawal."
-  },
-  {
-    "chapter": 3,
-    "difficulty": "hard",
-    "category": "candidate",
-    "prompt": "A candidate who waits until after the filing deadline to withdraw generally cannot be ___.",
-    "answer": "SUBSTITUTED",
-    "fact": "COMELEC bars most substitutions based on late withdrawal."
+    "prompt": "A legally enforceable duty created by a provincial contract may be an ___.",
+    "answer": "OBLIGATION"
   },
   {
     "chapter": 3,
     "difficulty": "hard",
     "category": "why",
-    "prompt": "A province's freedom to manage its own local affairs is local ___.",
-    "answer": "AUTONOMY",
-    "fact": "Local autonomy is guaranteed in the 1987 Constitution."
+    "prompt": "The official seat from which provincial government exercises its functions may be called its administrative ___.",
+    "answer": "CENTER"
   },
   {
     "chapter": 3,
     "difficulty": "hard",
     "category": "why",
-    "prompt": "A province's freedom over its own local affairs is called local ___.",
-    "answer": "AUTONOMY",
-    "fact": "Local autonomy is guaranteed in the 1987 Constitution."
+    "prompt": "Provincial programs designed to improve agriculture, industry, and economic activity support local ___.",
+    "answer": "GROWTH"
   },
   {
     "chapter": 3,
     "difficulty": "hard",
     "category": "why",
-    "prompt": "Organized effort to influence provincial officials is called ___.",
-    "answer": "LOBBYING",
-    "fact": "Lobbying is legal, but undisclosed lobbying undermines transparency."
+    "prompt": "A provincial measure that allocates funds to a specific purpose is a fiscal ___.",
+    "answer": "MEASURE"
   },
   {
     "chapter": 3,
     "difficulty": "hard",
-    "category": "why",
-    "prompt": "Organized efforts to influence provincial officials are known as ___.",
-    "answer": "LOBBYING",
-    "fact": "Lobbying is legal, but undisclosed lobbying undermines transparency."
-  },
-  {
-    "chapter": 3,
-    "difficulty": "hard",
-    "category": "why",
-    "prompt": "Government controlled by a small, entrenched group is called an ___.",
-    "answer": "OLIGARCHY",
-    "fact": "Concentrated local wealth can turn politics into an oligarchy in practice."
-  },
-  {
-    "chapter": 3,
-    "difficulty": "hard",
-    "category": "why",
-    "prompt": "Local politics dominated by a small, entrenched group is called an ___.",
-    "answer": "OLIGARCHY",
-    "fact": "Concentrated local wealth can turn politics into an oligarchy in practice."
-  },
-  {
-    "chapter": 3,
-    "difficulty": "hard",
-    "category": "why",
-    "prompt": "Supreme authority that the Constitution says rests in the people is ___.",
-    "answer": "SOVEREIGNTY",
-    "fact": "Clean elections are the clearest expression of that sovereignty."
-  },
-  {
-    "chapter": 3,
-    "difficulty": "hard",
-    "category": "why",
-    "prompt": "The Constitution states that supreme authority, or ___, rests in the people.",
-    "answer": "SOVEREIGNTY",
-    "fact": "Clean elections are the clearest expression of that sovereignty."
+    "category": "fraud",
+    "prompt": "The principle that public money must be spent only for lawful purposes is fiscal ___.",
+    "answer": "RESPONSIBILITY"
   },
   {
     "chapter": 4,
     "difficulty": "easy",
-    "category": "voting",
-    "prompt": "The highest elected official of the country is the ___.",
-    "answer": "PRESIDENT",
-    "fact": "The President heads the executive branch of government."
-  },
-  {
-    "chapter": 4,
-    "difficulty": "easy",
-    "category": "voting",
-    "prompt": "The single highest elected office in the country is the ___.",
-    "answer": "PRESIDENT",
-    "fact": "The President heads the executive branch of government."
-  },
-  {
-    "chapter": 4,
-    "difficulty": "easy",
-    "category": "voting",
-    "prompt": "A President serves a single term of ___ years.",
-    "answer": "SIX",
-    "fact": "Six years, with no re-election allowed under the 1987 Constitution."
-  },
-  {
-    "chapter": 4,
-    "difficulty": "easy",
-    "category": "voting",
-    "prompt": "A single presidential term under the Constitution lasts ___ years.",
-    "answer": "SIX",
-    "fact": "Six years, with no re-election allowed under the 1987 Constitution."
-  },
-  {
-    "chapter": 4,
-    "difficulty": "easy",
-    "category": "voting",
-    "prompt": "The President's elected successor-in-waiting is the ___ President.",
-    "answer": "VICE",
-    "fact": "The Vice President is voted for in a separate race."
-  },
-  {
-    "chapter": 4,
-    "difficulty": "easy",
-    "category": "voting",
-    "prompt": "Chosen in a separate race, the President's running mate-in-waiting is the ___ President.",
-    "answer": "VICE",
-    "fact": "The Vice President is voted for in a separate race."
-  },
-  {
-    "chapter": 4,
-    "difficulty": "easy",
-    "category": "voting",
-    "prompt": "The official residence of the President is Malacañang ___.",
+    "category": "why",
+    "prompt": "The home and workplace associated with the President of the Philippines is Malacañang ___.",
     "answer": "PALACE",
     "fact": "It has served as the seat of the presidency since the Spanish era."
   },
   {
     "chapter": 4,
     "difficulty": "easy",
+    "category": "why",
+    "prompt": "The national official most closely associated with Malacañang Palace is the ___.",
+    "answer": "PRESIDENT",
+    "fact": "The President heads the executive branch of government."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "Malacañang Palace is located in the city of ___.",
+    "answer": "MANILA"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "Malacañang Palace is in the Manila district of ___.",
+    "answer": "SANMIGUEL",
+    "display": "SAN MIGUEL"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "Malacañang Palace is found in the ___.",
+    "answer": "PHILIPPINES"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "The President belongs to the ___ branch of government.",
+    "answer": "EXECUTIVE",
+    "fact": "The President leads the executive branch."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "Malacañang Palace is a national government ___.",
+    "answer": "OFFICE"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "The Philippine ___ may be seen at official events in Malacañang.",
+    "answer": "FLAG"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "The President is a national ___ of the Philippines.",
+    "answer": "LEADER"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "The Philippines is the ___ led by the President.",
+    "answer": "COUNTRY"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "Malacañang is connected with the ___ government.",
+    "answer": "NATIONAL"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "Manila, where Malacañang is located, is the country's ___ city.",
+    "answer": "CAPITAL"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "Malacañang Palace is a government ___.",
+    "answer": "BUILDING"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "The Constitution says the President shall have an official ___.",
+    "answer": "RESIDENCE"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "Malacañang is also an important presidential ___.",
+    "answer": "WORKPLACE"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "The group of department secretaries who advise the President is the ___.",
+    "answer": "CABINET"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
     "category": "voting",
-    "prompt": "The President's official home and workplace is Malacañang ___.",
-    "answer": "PALACE",
-    "fact": "It has served as the seat of the presidency since the Spanish era."
-  },
-  {
-    "chapter": 4,
-    "difficulty": "easy",
-    "category": "fraud",
-    "prompt": "Offering money for a vote in a presidential race is vote ___.",
-    "answer": "BUYING",
-    "fact": "It remains an election offense no matter which office is contested."
-  },
-  {
-    "chapter": 4,
-    "difficulty": "easy",
-    "category": "fraud",
-    "prompt": "Paying for votes in a presidential race is still vote ___, a crime.",
-    "answer": "BUYING",
-    "fact": "It remains an election offense no matter which office is contested."
-  },
-  {
-    "chapter": 4,
-    "difficulty": "easy",
-    "category": "fraud",
-    "prompt": "A voter registered in two places to vote twice is a ___ voter.",
-    "answer": "FLYING",
-    "fact": "The offense carries the same penalties nationwide."
-  },
-  {
-    "chapter": 4,
-    "difficulty": "easy",
-    "category": "fraud",
-    "prompt": "Fraudulently registering in two places to vote twice for President is being a ___ voter.",
-    "answer": "FLYING",
-    "fact": "The offense carries the same penalties nationwide."
-  },
-  {
-    "chapter": 4,
-    "difficulty": "easy",
-    "category": "candidate",
-    "prompt": "A presidential hopeful's official filing to run is a Certificate of ___.",
-    "answer": "CANDIDACY",
-    "fact": "It must be filed within the period COMELEC fixes for that election."
-  },
-  {
-    "chapter": 4,
-    "difficulty": "easy",
-    "category": "candidate",
-    "prompt": "A presidential run begins with filing a Certificate of ___.",
-    "answer": "CANDIDACY",
-    "fact": "It must be filed within the period COMELEC fixes for that election."
-  },
-  {
-    "chapter": 4,
-    "difficulty": "easy",
-    "category": "candidate",
-    "prompt": "A candidate's written plan for governing the country is their ___.",
-    "answer": "PLATFORM",
-    "fact": "Comparing platforms matters more than comparing campaign jingles."
-  },
-  {
-    "chapter": 4,
-    "difficulty": "easy",
-    "category": "candidate",
-    "prompt": "A presidential candidate's written governing agenda is their ___.",
-    "answer": "PLATFORM",
-    "fact": "Comparing platforms matters more than comparing campaign jingles."
+    "prompt": "The official elected together with the President is the ___.",
+    "answer": "VICEPRESIDENT",
+    "display": "VICE PRESIDENT"
   },
   {
     "chapter": 4,
     "difficulty": "easy",
     "category": "why",
-    "prompt": "A citizen's constitutionally protected right to vote is called ___.",
-    "answer": "SUFFRAGE",
-    "fact": "It applies equally in choosing the President as in any other race."
+    "prompt": "The highest basic law that describes presidential powers is the ___.",
+    "answer": "CONSTITUTION",
+    "fact": "The current Constitution was ratified in 1987."
   },
   {
     "chapter": 4,
     "difficulty": "easy",
-    "category": "why",
-    "prompt": "The constitutional right exercised by choosing a President is called ___.",
-    "answer": "SUFFRAGE",
-    "fact": "It applies equally in choosing the President as in any other race."
+    "category": "candidate",
+    "prompt": "A presidential candidate must be at least ___ years old on election day.",
+    "answer": "FORTY"
   },
   {
     "chapter": 4,
     "difficulty": "easy",
-    "category": "why",
-    "prompt": "The authority voters hand a winning candidate is called a ___.",
-    "answer": "MANDATE",
-    "fact": "A wide winning margin is often described as a strong mandate."
+    "category": "candidate",
+    "prompt": "The President is elected for a term of ___.",
+    "answer": "SIXYEARS",
+    "display": "SIX YEARS"
   },
   {
     "chapter": 4,
     "difficulty": "easy",
-    "category": "why",
-    "prompt": "A big winning margin gives a new President a strong ___.",
-    "answer": "MANDATE",
-    "fact": "A wide winning margin is often described as a strong mandate."
-  },
-  {
-    "chapter": 4,
-    "difficulty": "medium",
     "category": "voting",
-    "prompt": "A person appointed to head an executive department is a ___.",
+    "prompt": "People choose the President through an ___.",
+    "answer": "ELECTION"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "Registered citizens who cast ballots are called ___.",
+    "answer": "VOTERS"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "candidate",
+    "prompt": "A person seeking the presidency must be a Philippine ___.",
+    "answer": "CITIZEN"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "candidate",
+    "prompt": "A presidential candidate must be a ___ citizen of the Philippines.",
+    "answer": "NATURALBORN",
+    "display": "NATURAL-BORN"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "candidate",
+    "prompt": "A presidential candidate must be a ___ voter.",
+    "answer": "REGISTERED"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "candidate",
+    "prompt": "A presidential candidate must be able to ___.",
+    "answer": "READ"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "candidate",
+    "prompt": "A presidential candidate must also be able to ___.",
+    "answer": "WRITE"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "candidate",
+    "prompt": "A presidential candidate must have lived in the Philippines for at least ___ before the election.",
+    "answer": "TENYEARS",
+    "display": "TEN YEARS"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "candidate",
+    "prompt": "The fixed period a President serves in office is called a ___.",
+    "answer": "TERM"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "candidate",
+    "prompt": "A presidential term begins on the thirtieth day of ___.",
+    "answer": "JUNE"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "candidate",
+    "prompt": "The President's term begins at ___ on June 30.",
+    "answer": "NOON"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "candidate",
+    "prompt": "Before serving, the President takes an ___ of office.",
+    "answer": "OATH"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "A President may deliver an official ___ to explain plans or policies.",
+    "answer": "SPEECH"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "The President may hold a ___ with officials at Malacañang.",
+    "answer": "MEETING"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "Foreign and local ___ may be received at Malacañang.",
+    "answer": "GUESTS"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "Foreign representatives received by the President may include ___.",
+    "answer": "DIPLOMATS"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "fraud",
+    "prompt": "Official presidential papers are government ___.",
+    "answer": "DOCUMENTS"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "fraud",
+    "prompt": "Malacañang has personnel responsible for presidential ___.",
+    "answer": "SECURITY"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "Malacañang Palace has an important place in Philippine ___.",
+    "answer": "HISTORY"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "Malacañang Palace is recognized as a national historical ___.",
+    "answer": "LANDMARK"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "Malacañang stands near the Pasig ___.",
+    "answer": "RIVER"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "J.P. Laurel is the name of the ___ where the Malacañang Complex is located.",
+    "answer": "STREET"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "The road address of the Malacañang Complex includes ___.",
+    "answer": "JPLAUREL",
+    "display": "J.P. LAUREL"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "The name of the presidential complex is ___.",
+    "answer": "MALACANANG"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "The Filipino word commonly used for a palace is ___.",
+    "answer": "PALASYO"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "Malacañang Palace contains many official ___.",
+    "answer": "ROOMS"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "People who work for the Office of the President are part of its ___.",
+    "answer": "STAFF"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "A top official who assists the President in managing executive affairs is the Executive ___.",
     "answer": "SECRETARY",
     "fact": "Cabinet secretaries serve at the President's pleasure."
   },
   {
     "chapter": 4,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "The President is the head of the Philippine ___.",
+    "answer": "STATE"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "Official ceremonies at Malacañang are part of presidential ___.",
+    "answer": "DUTIES"
+  },
+  {
+    "chapter": 4,
     "difficulty": "medium",
-    "category": "voting",
-    "prompt": "A department head appointed by the President is called a ___.",
-    "answer": "SECRETARY",
-    "fact": "Cabinet secretaries serve at the President's pleasure."
+    "category": "why",
+    "prompt": "The first Filipino chief executive to occupy Malacañang Palace was Manuel L. ___.",
+    "answer": "QUEZON"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "The Malacañang property was once owned by Luis ___.",
+    "answer": "ROCHA"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "Colonel Miguel Jose ___ purchased the property from Luis Rocha in 1802.",
+    "answer": "FORMENTO"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "The property was sold to the ___ government in 1825.",
+    "answer": "SPANISH"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "The year Colonel Formento purchased the property was ___.",
+    "answer": "EIGHTEENOHTWO",
+    "display": "1802"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "The year the property was sold to the Spanish government was ___.",
+    "answer": "EIGHTEENTWENTYFIVE",
+    "display": "1825"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "Royal decrees set aside the property as a summer residence in ___.",
+    "answer": "EIGHTEENFORTYSEVEN",
+    "display": "1847"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "Before becoming a permanent residence, Malacañang served as a ___ residence for the Governor-General.",
+    "answer": "SUMMER"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "During Spanish rule, Malacañang became associated with the ___.",
+    "answer": "GOVERNORGENERAL",
+    "display": "GOVERNOR-GENERAL"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "The Governor-General moved to Malacañang after the palace in ___ was destroyed.",
+    "answer": "INTRAMUROS"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "A major ___ in 1863 destroyed the old Governor-General's palace in Intramuros.",
+    "answer": "EARTHQUAKE"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "The old palace in Intramuros was destroyed in the year ___.",
+    "answer": "EIGHTEENSIXTYTHREE",
+    "display": "1863"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "After the 1863 disaster, Malacañang became the more ___ seat of the Governor-General.",
+    "answer": "PERMANENT"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "Manuel L. Quezon occupied Malacañang during the Philippine ___ period.",
+    "answer": "COMMONWEALTH"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "An adjoining government structure completed in 1939 was the Executive ___.",
+    "answer": "EXECUTIVEBUILDING",
+    "display": "EXECUTIVE BUILDING"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "The adjoining Executive Building was completed in ___.",
+    "answer": "NINETEENTHIRTYNINE",
+    "display": "1939"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "Malacañang Palace was declared a National Historical ___ in 1998.",
+    "answer": "NATIONALLANDMARK",
+    "display": "NATIONAL LANDMARK"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "The year Malacañang was declared a National Historical Landmark was ___.",
+    "answer": "NINETEENNINETYEIGHT",
+    "display": "1998"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "The government office headquartered in the Malacañang Complex is the ___.",
+    "answer": "OFFICEOFPRESIDENT",
+    "display": "OFFICE OF THE PRESIDENT"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "Under the Constitution, national executive authority is called ___.",
+    "answer": "EXECUTIVEPOWER",
+    "display": "EXECUTIVE POWER"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "The President serves as ___ of the Armed Forces of the Philippines.",
+    "answer": "COMMANDERINCHIEF",
+    "display": "COMMANDER-IN-CHIEF"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "The military institution under the President's commander-in-chief role is the ___.",
+    "answer": "ARMEDFORCES",
+    "display": "ARMED FORCES"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "Choosing people for certain government posts involves presidential ___.",
+    "answer": "APPOINTMENTS"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "The President may appoint Philippine ___ with the required constitutional consent.",
+    "answer": "AMBASSADORS"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "Other foreign-service officials the President may appoint include ___.",
+    "answer": "CONSULS"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "After final conviction, the President may grant certain ___.",
+    "answer": "PARDONS"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "A temporary postponement of punishment that the President may grant is a ___.",
+    "answer": "REPRIEVE"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "Reducing a criminal sentence through presidential clemency is called ___.",
+    "answer": "COMMUTATION"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "The President may grant ___ with the concurrence required from Congress.",
+    "answer": "AMNESTY"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "Formal agreements with other countries may take the form of ___.",
+    "answer": "TREATIES"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "Certain international agreements require concurrence from the ___.",
+    "answer": "SENATE",
+    "fact": "Senate concurrence is required before a treaty takes effect."
+  },
+  {
+    "chapter": 4,
+    "difficulty": "medium",
+    "category": "fraud",
+    "prompt": "The President submits a national ___ to Congress for government spending and financing.",
+    "answer": "BUDGET"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "The President works with the national legislature called the ___.",
+    "answer": "CONGRESS"
   },
   {
     "chapter": 4,
     "difficulty": "medium",
     "category": "voting",
-    "prompt": "The President's power to reject a bill from Congress is the ___.",
+    "prompt": "The President may reject a bill by using the power of ___.",
     "answer": "VETO",
     "fact": "Congress can override a presidential veto by a two-thirds vote."
   },
   {
     "chapter": 4,
     "difficulty": "medium",
+    "category": "why",
+    "prompt": "A presidential issuance commonly used to direct executive administration is an ___.",
+    "answer": "EXECUTIVEORDER",
+    "display": "EXECUTIVE ORDER"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "Another type of presidential issuance is a ___.",
+    "answer": "PROCLAMATION"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "The President has ___ over executive departments, bureaus, and offices.",
+    "answer": "CONTROL"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "The President must ensure that the ___ are faithfully executed.",
+    "answer": "LAWS"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "medium",
+    "category": "candidate",
+    "prompt": "Age, citizenship, voter status, literacy, and residency are presidential ___.",
+    "answer": "QUALIFICATIONS"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "medium",
+    "category": "candidate",
+    "prompt": "Under the Constitution, a President is not eligible for presidential ___.",
+    "answer": "REELECTION"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "medium",
     "category": "voting",
-    "prompt": "The President's power to reject a bill outright is the ___.",
-    "answer": "VETO",
-    "fact": "Congress can override a presidential veto by a two-thirds vote."
+    "prompt": "The President and Vice-President are chosen by ___ of the people.",
+    "answer": "DIRECTVOTE",
+    "display": "DIRECT VOTE"
   },
   {
     "chapter": 4,
     "difficulty": "medium",
     "category": "voting",
-    "prompt": "The President's yearly address to Congress is the State of the ___.",
-    "answer": "NATION",
-    "fact": "The State of the Nation Address opens the regular session."
+    "prompt": "The regular presidential election is generally held in the month of ___.",
+    "answer": "MAY"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "medium",
+    "category": "candidate",
+    "prompt": "The President's six-year term begins on June ___.",
+    "answer": "THIRTIETH"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "medium",
+    "category": "candidate",
+    "prompt": "A person who wins the presidency but has not yet assumed office is the ___.",
+    "answer": "PRESIDENTELECT",
+    "display": "PRESIDENT-ELECT"
   },
   {
     "chapter": 4,
     "difficulty": "medium",
     "category": "voting",
-    "prompt": "The President's yearly address opening Congress is the State of the ___.",
-    "answer": "NATION",
-    "fact": "The State of the Nation Address opens the regular session."
+    "prompt": "The Vice-President may temporarily serve as ___ when constitutional conditions are met.",
+    "answer": "ACTINGPRESIDENT",
+    "display": "ACTING PRESIDENT"
   },
   {
     "chapter": 4,
     "difficulty": "medium",
-    "category": "fraud",
-    "prompt": "Manipulating a national canvass total is a form of ___-bawas.",
-    "answer": "DAGDAG",
-    "fact": "It refers to padding some totals while shaving others."
+    "category": "voting",
+    "prompt": "The constitutional process for replacing a President is presidential ___.",
+    "answer": "SUCCESSION"
   },
   {
     "chapter": 4,
     "difficulty": "medium",
-    "category": "fraud",
-    "prompt": "A padded-and-shaved national tally describes ___-bawas at the presidential level.",
-    "answer": "DAGDAG",
-    "fact": "It refers to padding some totals while shaving others."
+    "category": "voting",
+    "prompt": "When the presidency becomes empty because of death, resignation, removal, or disability, there is a ___.",
+    "answer": "VACANCY"
   },
   {
     "chapter": 4,
     "difficulty": "medium",
-    "category": "fraud",
-    "prompt": "COMELEC Resolution 11104 covers vote buying done through digital ___.",
-    "answer": "WALLETS",
-    "fact": "Mobile wallet and online transfers now count as vote buying too."
-  },
-  {
-    "chapter": 4,
-    "difficulty": "medium",
-    "category": "fraud",
-    "prompt": "COMELEC Resolution 11104 treats digital ___ transfers as vote buying too.",
-    "answer": "WALLETS",
-    "fact": "Mobile wallet and online transfers now count as vote buying too."
-  },
-  {
-    "chapter": 4,
-    "difficulty": "medium",
-    "category": "candidate",
-    "prompt": "A candidacy filed only to mock the process may be ruled a ___.",
-    "answer": "NUISANCE",
-    "fact": "This applies to presidential races the same as any other."
-  },
-  {
-    "chapter": 4,
-    "difficulty": "medium",
-    "category": "candidate",
-    "prompt": "A presidential COC filed only to mock the race can be ruled a ___ candidacy.",
-    "answer": "NUISANCE",
-    "fact": "This applies to presidential races the same as any other."
-  },
-  {
-    "chapter": 4,
-    "difficulty": "medium",
-    "category": "candidate",
-    "prompt": "A President may pardon a convicted person using the power of ___.",
-    "answer": "PARDON",
-    "fact": "The pardoning power belongs solely to the President."
-  },
-  {
-    "chapter": 4,
-    "difficulty": "medium",
-    "category": "candidate",
-    "prompt": "The power to forgive a convicted person's sentence is the President's power of ___.",
-    "answer": "PARDON",
-    "fact": "The pardoning power belongs solely to the President."
-  },
-  {
-    "chapter": 4,
-    "difficulty": "medium",
-    "category": "candidate",
-    "prompt": "A presidential candidate may spend up to ten pesos per registered ___.",
-    "answer": "VOTERS",
-    "fact": "That original 1991 cap under RA 7166 is still the standing legal limit."
-  },
-  {
-    "chapter": 4,
-    "difficulty": "medium",
-    "category": "candidate",
-    "prompt": "A presidential campaign's legal spending ceiling is pegged to the number of registered ___.",
-    "answer": "VOTERS",
-    "fact": "That original 1991 cap under RA 7166 is still the standing legal limit."
+    "category": "voting",
+    "prompt": "Many constitutional decisions involving Congress require a ___ vote.",
+    "answer": "MAJORITY"
   },
   {
     "chapter": 4,
     "difficulty": "medium",
     "category": "why",
-    "prompt": "The branch of government that carries out the laws is the ___ branch.",
-    "answer": "EXECUTIVE",
-    "fact": "The President leads the executive branch."
+    "prompt": "Formal state events at Malacañang may be described as ___ functions.",
+    "answer": "CEREMONIAL"
   },
   {
     "chapter": 4,
     "difficulty": "medium",
-    "category": "why",
-    "prompt": "Carrying out the laws Congress passes is the job of the ___ branch.",
-    "answer": "EXECUTIVE",
-    "fact": "The President leads the executive branch."
+    "category": "fraud",
+    "prompt": "Official presidential files are preserved through government ___.",
+    "answer": "RECORDS"
   },
   {
     "chapter": 4,
-    "difficulty": "medium",
+    "difficulty": "hard",
     "category": "why",
-    "prompt": "Dividing power among three branches so none dominates is ___ of powers.",
-    "answer": "SEPARATION",
-    "fact": "It is one of the core structures of the 1987 Constitution."
-  },
-  {
-    "chapter": 4,
-    "difficulty": "medium",
-    "category": "why",
-    "prompt": "No single branch dominates thanks to the principle of ___ of powers.",
-    "answer": "SEPARATION",
-    "fact": "It is one of the core structures of the 1987 Constitution."
+    "prompt": "The constitutional article that contains the main provisions on the President is Article ___.",
+    "answer": "ARTICLEVII",
+    "display": "ARTICLE VII"
   },
   {
     "chapter": 4,
     "difficulty": "hard",
     "category": "voting",
-    "prompt": "Charging a high official with wrongdoing in office is to ___ them.",
-    "answer": "IMPEACH",
-    "fact": "The House impeaches; the Senate then tries the case."
+    "prompt": "The Supreme Court sits ___ when acting as sole judge of presidential election contests.",
+    "answer": "ENBANC",
+    "display": "EN BANC"
   },
   {
     "chapter": 4,
     "difficulty": "hard",
     "category": "voting",
-    "prompt": "Formally accusing a sitting official of serious wrongdoing is to ___ them.",
-    "answer": "IMPEACH",
-    "fact": "The House impeaches; the Senate then tries the case."
+    "prompt": "Presidential election contests may involve the election, ___, and qualifications of the President or Vice-President.",
+    "answer": "ELECTIONRETURNS",
+    "display": "ELECTION RETURNS"
   },
   {
     "chapter": 4,
     "difficulty": "hard",
     "category": "voting",
-    "prompt": "The peaceful handover of power after an election is the ___.",
-    "answer": "TRANSITION",
-    "fact": "A peaceful transition is a clear sign a democracy is functioning."
+    "prompt": "Congress formally counts presidential votes through a process called the ___.",
+    "answer": "CANVASS"
   },
   {
     "chapter": 4,
     "difficulty": "hard",
     "category": "voting",
-    "prompt": "A peaceful handover of the presidency after an election is called a ___.",
-    "answer": "TRANSITION",
-    "fact": "A peaceful transition is a clear sign a democracy is functioning."
+    "prompt": "Provincial and city boards transmit official election ___ for the presidential canvass.",
+    "answer": "CERTIFICATES"
   },
   {
     "chapter": 4,
     "difficulty": "hard",
-    "category": "fraud",
-    "prompt": "Buying votes through instant online transfers now falls under updated ___.",
-    "answer": "GUIDELINES",
-    "fact": "COMELEC issued new guidelines covering digital vote-buying methods."
+    "category": "voting",
+    "prompt": "The presidential canvass takes place with the Senate and House meeting in a ___.",
+    "answer": "JOINTSESSION",
+    "display": "JOINT SESSION"
   },
   {
     "chapter": 4,
     "difficulty": "hard",
-    "category": "fraud",
-    "prompt": "Buying votes via instant transfer is now addressed by COMELEC's updated ___.",
-    "answer": "GUIDELINES",
-    "fact": "COMELEC issued new guidelines covering digital vote-buying methods."
-  },
-  {
-    "chapter": 4,
-    "difficulty": "hard",
-    "category": "fraud",
-    "prompt": "A scheme to inflate one candidate's national tally is vote ___.",
-    "answer": "TAMPERING",
-    "fact": "It can be challenged through an election protest after proclamation."
-  },
-  {
-    "chapter": 4,
-    "difficulty": "hard",
-    "category": "fraud",
-    "prompt": "Inflating a candidate's national tally through manipulation is vote ___.",
-    "answer": "TAMPERING",
-    "fact": "It can be challenged through an election protest after proclamation."
+    "category": "voting",
+    "prompt": "If two presidential candidates have an equal highest number of votes, the Constitution provides a rule for resolving the ___.",
+    "answer": "TIE"
   },
   {
     "chapter": 4,
     "difficulty": "hard",
     "category": "candidate",
-    "prompt": "Formal approval of a treaty needs a two-thirds vote of the ___.",
-    "answer": "SENATE",
-    "fact": "Senate concurrence is required before a treaty takes effect."
+    "prompt": "Instead of swearing a religious oath, an incoming President may make an ___.",
+    "answer": "AFFIRMATION"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "hard",
+    "category": "fraud",
+    "prompt": "The Constitution bars the President from receiving another government ___ during tenure.",
+    "answer": "EMOLUMENT"
   },
   {
     "chapter": 4,
     "difficulty": "hard",
     "category": "candidate",
-    "prompt": "A treaty only takes effect once it wins a two-thirds vote of the ___.",
-    "answer": "SENATE",
-    "fact": "Senate concurrence is required before a treaty takes effect."
+    "prompt": "The winner of the vice-presidential election before taking office is called the ___.",
+    "answer": "VICEPRESIDENTELECT",
+    "display": "VICE-PRESIDENT-ELECT"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "If both top executive offices cannot be filled, one constitutional successor is the ___.",
+    "answer": "SENATEPRESIDENT",
+    "display": "SENATE PRESIDENT"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "After the Senate President in the constitutional line comes the House ___.",
+    "answer": "SPEAKER"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "When both the presidency and vice-presidency become vacant under qualifying conditions, Congress may call a ___.",
+    "answer": "SPECIALELECTION",
+    "display": "SPECIAL ELECTION"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "After a double vacancy, Congress must enact the special-election law within ___.",
+    "answer": "SEVENDAYS",
+    "display": "SEVEN DAYS"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "A special presidential election after a qualifying double vacancy cannot be held earlier than ___ after the call.",
+    "answer": "FORTYFIVEDAYS",
+    "display": "FORTY-FIVE DAYS"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "The same special election cannot be held later than ___ from the call.",
+    "answer": "SIXTYDAYS",
+    "display": "SIXTY DAYS"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "No special presidential election is called if the vacancy occurs within ___ before the next presidential election.",
+    "answer": "EIGHTEENMONTHS",
+    "display": "EIGHTEEN MONTHS"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "A constitutional condition that may cause the Vice-President to act as President is presidential ___.",
+    "answer": "INABILITY"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "A written declaration of presidential inability may initially come from a ___ of all Cabinet members.",
+    "answer": "CABINETMAJORITY",
+    "display": "CABINET MAJORITY"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "After the President says no inability exists, the Cabinet has ___ to send another contrary declaration.",
+    "answer": "FIVEDAYS",
+    "display": "FIVE DAYS"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "If Congress is not in session during an inability dispute, it must convene within ___.",
+    "answer": "FORTYEIGHTHOURS",
+    "display": "FORTY-EIGHT HOURS"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "Congress may determine presidential inability by a ___ vote of both Houses, voting separately.",
+    "answer": "TWOTHIRDS",
+    "display": "TWO-THIRDS"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "The Constitution requires the public to be informed when the President has a ___.",
+    "answer": "SERIOUSILLNESS",
+    "display": "SERIOUS ILLNESS"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "hard",
+    "category": "fraud",
+    "prompt": "The President and Cabinet must strictly avoid a ___ in conducting public office.",
+    "answer": "CONFLICTOFINTEREST",
+    "display": "CONFLICT OF INTEREST"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "hard",
+    "category": "fraud",
+    "prompt": "Certain presidential relatives within the ___ cannot be appointed to specified offices during the President's tenure.",
+    "answer": "FOURTHDEGREE",
+    "display": "FOURTH DEGREE"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "hard",
+    "category": "fraud",
+    "prompt": "Appointments by an Acting President may be revoked by the elected President within ___.",
+    "answer": "NINETYDAYS",
+    "display": "NINETY DAYS"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "hard",
+    "category": "fraud",
+    "prompt": "The constitutional restriction on certain appointments shortly before a presidential election is an ___.",
+    "answer": "APPOINTMENTBAN",
+    "display": "APPOINTMENT BAN"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "Many high presidential appointments require the consent of the ___.",
+    "answer": "COMMISSIONONAPPOINTMENTS",
+    "display": "COMMISSION ON APPOINTMENTS"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "hard",
+    "category": "fraud",
+    "prompt": "Appointments made while Congress is in recess are called ___.",
+    "answer": "RECESSAPPOINTMENTS",
+    "display": "RECESS APPOINTMENTS"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "hard",
+    "category": "fraud",
+    "prompt": "The President's duty to ensure laws are carried out is often described as ___.",
+    "answer": "FAITHFULEXECUTION",
+    "display": "FAITHFUL EXECUTION"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "The President may call out the Armed Forces to prevent or suppress ___.",
+    "answer": "LAWLESSVIOLENCE",
+    "display": "LAWLESS VIOLENCE"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "One constitutional ground connected with emergency military powers is ___.",
+    "answer": "INVASION"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "Another constitutional ground connected with emergency military powers is ___.",
+    "answer": "REBELLION"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "Under strict constitutional conditions, the President may proclaim ___.",
+    "answer": "MARTIALLAW",
+    "display": "MARTIAL LAW"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "The privilege that may be suspended under strict conditions is the writ of ___.",
+    "answer": "HABEASCORPUS",
+    "display": "HABEAS CORPUS"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "If Congress is not in session after a martial-law proclamation or writ suspension, it must convene within ___.",
+    "answer": "TWENTYFOURHOURS",
+    "display": "TWENTY-FOUR HOURS"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "A person detained under a suspension of the writ must be judicially charged within ___ or released.",
+    "answer": "THREEDAYS",
+    "display": "THREE DAYS"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "Presidential pardons generally come after conviction by ___.",
+    "answer": "FINALJUDGMENT",
+    "display": "FINAL JUDGMENT"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "hard",
+    "category": "fraud",
+    "prompt": "The President needs prior concurrence of the ___ to contract or guarantee certain foreign loans.",
+    "answer": "MONETARYBOARD",
+    "display": "MONETARY BOARD"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "hard",
+    "category": "fraud",
+    "prompt": "Loans contracted or guaranteed by the President on behalf of the Republic may be ___.",
+    "answer": "FOREIGNLOANS",
+    "display": "FOREIGN LOANS"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "A treaty or ___ generally requires the constitutional Senate concurrence specified in Article VII.",
+    "answer": "INTERNATIONALAGREEMENT",
+    "display": "INTERNATIONAL AGREEMENT"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "hard",
+    "category": "fraud",
+    "prompt": "The President must make a constitutional ___ to Congress within thirty days from the opening of every regular session.",
+    "answer": "BUDGETSUBMISSION",
+    "display": "BUDGET SUBMISSION"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "The presidential budget submission is tied to the opening of Congress's ___.",
+    "answer": "REGULARSESSION",
+    "display": "REGULAR SESSION"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "The President's constitutionally required address at the opening of Congress is commonly called the ___.",
+    "answer": "STATEOFNATION",
+    "display": "STATE OF THE NATION"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "The Constitution expressly provides that the President shall have an ___.",
+    "answer": "OFFICIALRESIDENCE",
+    "display": "OFFICIAL RESIDENCE"
+  },
+  {
+    "chapter": 4,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "A dispute over the election, returns, or qualifications of a President may be called a ___.",
+    "answer": "PRESIDENTIALCONTEST",
+    "display": "PRESIDENTIAL CONTEST"
   },
   {
     "chapter": 4,
     "difficulty": "hard",
     "category": "candidate",
-    "prompt": "A rule barring endless re-election to the presidency is a term ___.",
-    "answer": "RESTRICTION",
-    "fact": "The single six-year presidential term is meant to prevent entrenchment."
-  },
-  {
-    "chapter": 4,
-    "difficulty": "hard",
-    "category": "candidate",
-    "prompt": "Barring endless presidential re-election is the point of the term ___.",
-    "answer": "RESTRICTION",
-    "fact": "The single six-year presidential term is meant to prevent entrenchment."
+    "prompt": "When the Vice-President succeeds after the President leaves office permanently, the successor serves the ___.",
+    "answer": "UNEXPIREDTERM",
+    "display": "UNEXPIRED TERM"
   },
   {
     "chapter": 4,
     "difficulty": "hard",
     "category": "why",
-    "prompt": "The supreme law every official, including the President, must obey is the ___.",
-    "answer": "CONSTITUTION",
-    "fact": "The current Constitution was ratified in 1987."
+    "prompt": "During serious presidential illness, officials responsible for ___ must not be denied access to the President.",
+    "answer": "NATIONALSECURITY",
+    "display": "NATIONAL SECURITY"
   },
   {
     "chapter": 4,
     "difficulty": "hard",
     "category": "why",
-    "prompt": "Even the President must obey the supreme law, the ___.",
-    "answer": "CONSTITUTION",
-    "fact": "The current Constitution was ratified in 1987."
+    "prompt": "During serious presidential illness, the Cabinet member responsible for ___ must not be denied access to the President.",
+    "answer": "FOREIGNRELATIONS",
+    "display": "FOREIGN RELATIONS"
   },
   {
     "chapter": 4,
     "difficulty": "hard",
     "category": "why",
-    "prompt": "Rule by one person holding total, unchecked power is a ___.",
-    "answer": "DICTATORSHIP",
-    "fact": "The 1987 Constitution was written partly to guard against its return."
-  },
-  {
-    "chapter": 4,
-    "difficulty": "hard",
-    "category": "why",
-    "prompt": "Total, unchecked power held by one person describes a ___.",
-    "answer": "DICTATORSHIP",
-    "fact": "The 1987 Constitution was written partly to guard against its return."
-  },
-  {
-    "chapter": 4,
-    "difficulty": "hard",
-    "category": "why",
-    "prompt": "Being answerable to the public for official acts is ___.",
-    "answer": "ACCOUNTABILITY",
-    "fact": "Public office, even the presidency, is a public trust under the Constitution."
-  },
-  {
-    "chapter": 4,
-    "difficulty": "hard",
-    "category": "why",
-    "prompt": "Even the presidency is bound by the duty of public ___.",
-    "answer": "ACCOUNTABILITY",
-    "fact": "Public office, even the presidency, is a public trust under the Constitution."
-  },
-  {
-    "chapter": 4,
-    "difficulty": "hard",
-    "category": "why",
-    "prompt": "A system where governing power ultimately rests with the people is a ___.",
-    "answer": "DEMOCRACY",
-    "fact": "Democracy depends on regular, genuine, competitive elections."
-  },
-  {
-    "chapter": 4,
-    "difficulty": "hard",
-    "category": "why",
-    "prompt": "A government where power ultimately rests with the people is a ___.",
-    "answer": "DEMOCRACY",
-    "fact": "Democracy depends on regular, genuine, competitive elections."
+    "prompt": "The President may address Congress at other times in addition to the opening of its regular session; this reflects presidential ___.",
+    "answer": "COMMUNICATION"
   },
   {
     "chapter": 5,
     "difficulty": "easy",
-    "category": "voting",
-    "prompt": "The lawmaking branch of the Philippine government is ___.",
+    "category": "why",
+    "prompt": "The national lawmaking body of the Philippines is called ___.",
     "answer": "CONGRESS",
     "fact": "Congress is made up of the Senate and the House of Representatives."
   },
   {
     "chapter": 5,
     "difficulty": "easy",
-    "category": "voting",
-    "prompt": "The Philippines' national lawmaking body is called ___.",
-    "answer": "CONGRESS",
-    "fact": "Congress is made up of the Senate and the House of Representatives."
-  },
-  {
-    "chapter": 5,
-    "difficulty": "easy",
-    "category": "voting",
+    "category": "why",
     "prompt": "The upper chamber of Congress is the ___.",
     "answer": "SENATE",
     "fact": "The Senate has 24 members elected by the whole country."
@@ -3548,160 +4767,464 @@
   {
     "chapter": 5,
     "difficulty": "easy",
-    "category": "voting",
-    "prompt": "Twenty-four members elected nationwide sit in the ___.",
-    "answer": "SENATE",
-    "fact": "The Senate has 24 members elected by the whole country."
+    "category": "why",
+    "prompt": "The lower chamber of Congress is the House of ___.",
+    "answer": "REPRESENTATIVES"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "Congress has ___ chambers.",
+    "answer": "TWO"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "The power mainly exercised by Congress is ___ power.",
+    "answer": "LEGISLATIVE"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "Members of the Senate are called ___.",
+    "answer": "SENATORS"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "A member of the House is called a ___.",
+    "answer": "REPRESENTATIVE"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "The Senate has ___ members under the Constitution.",
+    "answer": "TWENTYFOUR",
+    "display": "TWENTY-FOUR"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "easy",
+    "category": "candidate",
+    "prompt": "A person must be at least ___ years old to run for Senator.",
+    "answer": "THIRTYFIVE",
+    "display": "THIRTY-FIVE"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "easy",
+    "category": "candidate",
+    "prompt": "A person must be at least ___ years old to run for the House of Representatives.",
+    "answer": "TWENTYFIVE",
+    "display": "TWENTY-FIVE"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "easy",
+    "category": "candidate",
+    "prompt": "A Senator serves a regular term of ___.",
+    "answer": "SIXYEARS",
+    "display": "SIX YEARS"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "easy",
+    "category": "candidate",
+    "prompt": "A House member serves a regular term of ___.",
+    "answer": "THREEYEARS",
+    "display": "THREE YEARS"
   },
   {
     "chapter": 5,
     "difficulty": "easy",
     "category": "voting",
-    "prompt": "The lower chamber of Congress is the ___ of Representatives.",
-    "answer": "HOUSE",
-    "fact": "The House holds both district and party-list members."
+    "prompt": "Senators are elected by voters across the whole country, or ___.",
+    "answer": "ATLARGE",
+    "display": "AT LARGE"
   },
   {
     "chapter": 5,
     "difficulty": "easy",
     "category": "voting",
-    "prompt": "District and party-list members together fill the ___ of Representatives.",
-    "answer": "HOUSE",
-    "fact": "The House holds both district and party-list members."
+    "prompt": "Many House members are elected from legislative ___.",
+    "answer": "DISTRICTS"
   },
   {
     "chapter": 5,
     "difficulty": "easy",
     "category": "voting",
-    "prompt": "A proposed law being debated in Congress is a ___.",
+    "prompt": "Some House members are elected through the ___ system.",
+    "answer": "PARTYLIST",
+    "display": "PARTY-LIST",
+    "fact": "Party-list groups represent sectors rather than geographic areas."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "The officer who presides over the Senate is the Senate ___.",
+    "answer": "PRESIDENT"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "The officer who presides over the House is the ___.",
+    "answer": "SPEAKER",
+    "fact": "The Speaker is elected by the members of the House itself."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "A proposed law introduced in Congress is called a ___.",
     "answer": "BILL",
     "fact": "A bill becomes law once signed, or once a veto is overridden."
   },
   {
     "chapter": 5,
     "difficulty": "easy",
+    "category": "why",
+    "prompt": "When a bill is properly enacted, it may become a ___.",
+    "answer": "LAW"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "The basic charter that creates Congress is the Philippine ___.",
+    "answer": "CONSTITUTION"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "Congress is discussed mainly in Article ___ of the 1987 Constitution.",
+    "answer": "SIX"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "A formal meeting period of Congress is called a ___.",
+    "answer": "SESSION"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "A smaller group of lawmakers that studies specific issues is a ___.",
+    "answer": "COMMITTEE"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "Lawmakers discuss arguments for and against a measure during a ___.",
+    "answer": "DEBATE"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "easy",
     "category": "voting",
-    "prompt": "A proposed law still being debated in Congress is a ___.",
-    "answer": "BILL",
-    "fact": "A bill becomes law once signed, or once a veto is overridden."
+    "prompt": "Lawmakers decide on many measures by taking a ___.",
+    "answer": "VOTE"
   },
   {
     "chapter": 5,
     "difficulty": "easy",
-    "category": "fraud",
-    "prompt": "Paying someone for their vote in a congressional race is vote ___.",
-    "answer": "BUYING",
-    "fact": "It is prosecuted the same as vote buying in any other election."
-  },
-  {
-    "chapter": 5,
-    "difficulty": "easy",
-    "category": "fraud",
-    "prompt": "Even a Senate race isn't exempt from the crime of vote ___.",
-    "answer": "BUYING",
-    "fact": "It is prosecuted the same as vote buying in any other election."
-  },
-  {
-    "chapter": 5,
-    "difficulty": "easy",
-    "category": "fraud",
-    "prompt": "A voter registered in more than one district is a ___ voter.",
-    "answer": "FLYING",
-    "fact": "It carries prison time and loss of voting rights under the law."
-  },
-  {
-    "chapter": 5,
-    "difficulty": "easy",
-    "category": "fraud",
-    "prompt": "Registering in more than one district to vote twice makes someone a ___ voter.",
-    "answer": "FLYING",
-    "fact": "It carries prison time and loss of voting rights under the law."
-  },
-  {
-    "chapter": 5,
-    "difficulty": "easy",
-    "category": "candidate",
-    "prompt": "A senatorial hopeful's filing to run is a Certificate of ___.",
-    "answer": "CANDIDACY",
-    "fact": "Senators are elected nationwide, so it is filed with COMELEC en banc."
-  },
-  {
-    "chapter": 5,
-    "difficulty": "easy",
-    "category": "candidate",
-    "prompt": "Because senators run nationwide, their Certificate of ___ is filed with COMELEC en banc.",
-    "answer": "CANDIDACY",
-    "fact": "Senators are elected nationwide, so it is filed with COMELEC en banc."
-  },
-  {
-    "chapter": 5,
-    "difficulty": "easy",
-    "category": "candidate",
-    "prompt": "A candidate's outline of what they will push for in Congress is their ___.",
-    "answer": "PLATFORM",
-    "fact": "Voters can compare platforms across the 12 Senate seats up for election."
-  },
-  {
-    "chapter": 5,
-    "difficulty": "easy",
-    "category": "candidate",
-    "prompt": "A congressional candidate's written agenda for Congress is their ___.",
-    "answer": "PLATFORM",
-    "fact": "Voters can compare platforms across the 12 Senate seats up for election."
+    "category": "voting",
+    "prompt": "The minimum number of members needed to conduct official business is a ___.",
+    "answer": "QUORUM"
   },
   {
     "chapter": 5,
     "difficulty": "easy",
     "category": "why",
-    "prompt": "Each national election fills ___ of the Senate's 24 seats.",
-    "answer": "TWELVE",
-    "fact": "Senate terms are staggered so half the chamber turns over each time."
+    "prompt": "The official record of a chamber's proceedings is called its ___.",
+    "answer": "JOURNAL",
+    "fact": "The journal and minutes together form the official record."
   },
   {
     "chapter": 5,
     "difficulty": "easy",
     "category": "why",
-    "prompt": "___ of the Senate's 24 seats are contested in each national election.",
-    "answer": "TWELVE",
-    "fact": "Senate terms are staggered so half the chamber turns over each time."
+    "prompt": "A meeting where a committee listens to testimony is a ___.",
+    "answer": "HEARING"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "The first formal stage of reading a bill is the ___.",
+    "answer": "FIRSTREADING",
+    "display": "FIRST READING"
   },
   {
     "chapter": 5,
     "difficulty": "easy",
     "category": "why",
-    "prompt": "A senator serves a term of ___ years.",
-    "answer": "SIX",
-    "fact": "Senators may serve at most two consecutive six-year terms."
+    "prompt": "The stage where a bill is debated and amended is usually the ___.",
+    "answer": "SECONDREADING",
+    "display": "SECOND READING"
   },
   {
     "chapter": 5,
     "difficulty": "easy",
     "category": "why",
-    "prompt": "A senator's single term of office runs ___ years.",
-    "answer": "SIX",
-    "fact": "Senators may serve at most two consecutive six-year terms."
+    "prompt": "The final voting stage on a bill is the ___.",
+    "answer": "THIRDREADING",
+    "display": "THIRD READING"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "A change proposed to the text of a bill is an ___.",
+    "answer": "AMENDMENT"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "A general term for a bill or resolution being considered is a ___.",
+    "answer": "MEASURE"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "A vote in favor may be called an ___.",
+    "answer": "AYE"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "A vote against may be called a ___.",
+    "answer": "NAY"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "The people who choose lawmakers in elections are the ___.",
+    "answer": "VOTERS"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "The process of choosing Senators and Representatives is an ___.",
+    "answer": "ELECTION"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "easy",
+    "category": "voting",
+    "prompt": "The territory represented by a district lawmaker is a ___.",
+    "answer": "CONSTITUENCY",
+    "fact": "A lawmaker is expected to answer to that whole constituency."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "The person who leads the larger voting bloc may be called the ___.",
+    "answer": "MAJORITYLEADER",
+    "display": "MAJORITY LEADER"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "The person who leads the smaller opposition bloc may be called the ___.",
+    "answer": "MINORITYLEADER",
+    "display": "MINORITY LEADER"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "Congress is a ___ legislature because it has two chambers.",
+    "answer": "BICAMERAL",
+    "fact": "The Senate and House together form a bicameral Congress."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "Either the Senate or the House may be called a legislative ___.",
+    "answer": "CHAMBER"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "The House of Representatives is commonly called the ___ chamber.",
+    "answer": "LOWER"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "The Senate is commonly called the ___ chamber.",
+    "answer": "UPPER"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "The lawmaking process is also called ___.",
+    "answer": "LEGISLATION",
+    "fact": "All legislation begins as a bill introduced in either chamber."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "The House meets at the Batasang Pambansa Complex in ___ City.",
+    "answer": "QUEZON"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "The neighborhood where the House complex is located is Batasan ___.",
+    "answer": "HILLS"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "A formal proposal expressing a chamber's position may be a ___.",
+    "answer": "RESOLUTION"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "A law enacted by Congress may also be called a ___.",
+    "answer": "STATUTE"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "easy",
+    "category": "why",
+    "prompt": "Congressional investigations connected to making laws are held in aid of ___.",
+    "answer": "LEGISLATIONINQUIRY",
+    "display": "LEGISLATION (IN AID OF)"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "medium",
+    "category": "fraud",
+    "prompt": "Bills that raise government income through taxes are called ___ bills.",
+    "answer": "REVENUE"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "medium",
+    "category": "fraud",
+    "prompt": "Bills authorizing government spending are called ___ bills.",
+    "answer": "APPROPRIATION",
+    "fact": "The national budget is itself an appropriations law passed by Congress."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "medium",
+    "category": "fraud",
+    "prompt": "Bills dealing with customs duties may be called ___ bills.",
+    "answer": "TARIFF"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "medium",
+    "category": "fraud",
+    "prompt": "Revenue, appropriation, tariff, local, and private bills must originate in the ___.",
+    "answer": "HOUSE",
+    "fact": "The House holds both district and party-list members."
+  },
+  {
+    "chapter": 5,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "After a House-originated bill reaches the Senate, the Senate may propose ___.",
+    "answer": "SENATEAMENDMENTS",
+    "display": "SENATE AMENDMENTS"
   },
   {
     "chapter": 5,
     "difficulty": "medium",
     "category": "voting",
-    "prompt": "Seats reserved for under-represented sectors come from the ___ system.",
-    "answer": "PARTYLIST",
-    "fact": "Party-list groups represent sectors rather than geographic areas."
+    "prompt": "The constitutional share reserved for party-list representatives is ___ of the House total.",
+    "answer": "TWENTYPERCENT",
+    "display": "TWENTY PERCENT"
   },
   {
     "chapter": 5,
     "difficulty": "medium",
-    "category": "voting",
-    "prompt": "Seats set aside for under-represented sectors come through the ___ system.",
-    "answer": "PARTYLIST",
-    "fact": "Party-list groups represent sectors rather than geographic areas."
+    "category": "candidate",
+    "prompt": "A Senator may serve no more than ___ consecutive regular terms.",
+    "answer": "TWOCONSECUTIVE",
+    "display": "TWO CONSECUTIVE"
   },
   {
     "chapter": 5,
     "difficulty": "medium",
-    "category": "voting",
-    "prompt": "A House member represents a specific area called a ___.",
+    "category": "candidate",
+    "prompt": "A House member may serve no more than ___ consecutive regular terms.",
+    "answer": "THREECONSECUTIVE",
+    "display": "THREE CONSECUTIVE"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "medium",
+    "category": "candidate",
+    "prompt": "A Senator must have lived in the Philippines for at least ___ before election day.",
+    "answer": "TWOYEARS",
+    "display": "TWO YEARS"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "medium",
+    "category": "candidate",
+    "prompt": "Except for party-list representatives, a House candidate must generally have lived in the district for at least ___.",
+    "answer": "ONEYEAR",
+    "display": "ONE YEAR"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "medium",
+    "category": "candidate",
+    "prompt": "A Senator must be a ___ citizen of the Philippines.",
+    "answer": "NATURALBORN",
+    "display": "NATURAL-BORN"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "medium",
+    "category": "candidate",
+    "prompt": "A Senator must be a ___ voter.",
+    "answer": "REGISTERED"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "medium",
+    "category": "candidate",
+    "prompt": "A candidate for Congress must be able to read and ___.",
+    "answer": "WRITE"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "A House district member represents a legislative ___.",
     "answer": "DISTRICT",
     "fact": "The House has both district seats and party-list seats."
   },
@@ -3709,296 +5232,637 @@
     "chapter": 5,
     "difficulty": "medium",
     "category": "voting",
-    "prompt": "A House seat tied to a specific geographic area is a ___ seat.",
-    "answer": "DISTRICT",
-    "fact": "The House has both district seats and party-list seats."
+    "prompt": "Each province is constitutionally entitled to at least one House ___.",
+    "answer": "SEAT"
   },
   {
     "chapter": 5,
     "difficulty": "medium",
     "category": "voting",
-    "prompt": "A House member serves a term of ___ years.",
-    "answer": "THREE",
-    "fact": "House members may serve up to three consecutive terms."
+    "prompt": "A city with at least the constitutional population threshold may have its own ___.",
+    "answer": "REPRESENTATION"
   },
   {
     "chapter": 5,
     "difficulty": "medium",
     "category": "voting",
-    "prompt": "A House member's term of office lasts ___ years before re-election is needed.",
-    "answer": "THREE",
-    "fact": "House members may serve up to three consecutive terms."
+    "prompt": "The constitutional population threshold for a city to have at least one Representative is ___.",
+    "answer": "TWOHUNDREDFIFTYTHOUSAND",
+    "display": "250,000"
   },
   {
     "chapter": 5,
     "difficulty": "medium",
-    "category": "fraud",
-    "prompt": "Manipulating district-level results is a form of ___-bawas.",
-    "answer": "DAGDAG",
-    "fact": "It refers to padding some counts while shaving others."
+    "category": "voting",
+    "prompt": "The periodic counting of population used in districting is the ___.",
+    "answer": "CENSUS"
   },
   {
     "chapter": 5,
     "difficulty": "medium",
-    "category": "fraud",
-    "prompt": "District-level results aren't immune to the padding scheme called ___-bawas.",
-    "answer": "DAGDAG",
-    "fact": "It refers to padding some counts while shaving others."
-  },
-  {
-    "chapter": 5,
-    "difficulty": "medium",
-    "category": "fraud",
-    "prompt": "Repeated multiple registration to enable double voting is an election ___.",
-    "answer": "OFFENSE",
-    "fact": "It can lead to perpetual disqualification from holding public office."
-  },
-  {
-    "chapter": 5,
-    "difficulty": "medium",
-    "category": "fraud",
-    "prompt": "Repeated multiple registration to enable double voting is itself an election ___.",
-    "answer": "OFFENSE",
-    "fact": "It can lead to perpetual disqualification from holding public office."
-  },
-  {
-    "chapter": 5,
-    "difficulty": "medium",
-    "category": "candidate",
-    "prompt": "A candidate named to replace a withdrawn or disqualified nominee is a ___.",
-    "answer": "SUBSTITUTE",
-    "fact": "The substitute must belong to the same party as the original."
-  },
-  {
-    "chapter": 5,
-    "difficulty": "medium",
-    "category": "candidate",
-    "prompt": "A replacement for a withdrawn or disqualified congressional nominee must share the original's party, as a ___.",
-    "answer": "SUBSTITUTE",
-    "fact": "The substitute must belong to the same party as the original."
-  },
-  {
-    "chapter": 5,
-    "difficulty": "medium",
-    "category": "candidate",
-    "prompt": "A person nominated by a party-list group to take its seat is a ___.",
-    "answer": "NOMINEE",
-    "fact": "Each group submits a ranked list of nominees before the election."
-  },
-  {
-    "chapter": 5,
-    "difficulty": "medium",
-    "category": "candidate",
-    "prompt": "A party-list group's ranked list of seat-fillers is made up of its ___s.",
-    "answer": "NOMINEE",
-    "fact": "Each group submits a ranked list of nominees before the election."
-  },
-  {
-    "chapter": 5,
-    "difficulty": "medium",
-    "category": "candidate",
-    "prompt": "A candidacy filed only to confuse voters may be ruled a ___.",
-    "answer": "NUISANCE",
-    "fact": "COMELEC can cancel it under Section 69 of the Omnibus Election Code."
-  },
-  {
-    "chapter": 5,
-    "difficulty": "medium",
-    "category": "candidate",
-    "prompt": "A congressional candidacy filed only to confuse voters may be tagged ___.",
-    "answer": "NUISANCE",
-    "fact": "COMELEC can cancel it under Section 69 of the Omnibus Election Code."
+    "category": "voting",
+    "prompt": "Revising legislative districts after population changes is called ___.",
+    "answer": "REAPPORTIONMENT"
   },
   {
     "chapter": 5,
     "difficulty": "medium",
     "category": "why",
-    "prompt": "Talking a bill to a standstill to block a vote is a ___.",
-    "answer": "FILIBUSTER",
-    "fact": "A filibuster delays action rather than losing an actual vote."
+    "prompt": "Congress normally convenes its regular session on the fourth Monday of ___.",
+    "answer": "JULY"
   },
   {
     "chapter": 5,
     "difficulty": "medium",
     "category": "why",
-    "prompt": "Talking a bill to a standstill without an actual vote is a ___.",
-    "answer": "FILIBUSTER",
-    "fact": "A filibuster delays action rather than losing an actual vote."
+    "prompt": "Each chamber may determine its own rules of ___.",
+    "answer": "PROCEEDINGS"
   },
   {
     "chapter": 5,
     "difficulty": "medium",
-    "category": "why",
-    "prompt": "The written record of an official session of Congress is the ___.",
-    "answer": "JOURNAL",
-    "fact": "The journal and minutes together form the official record."
-  },
-  {
-    "chapter": 5,
-    "difficulty": "medium",
-    "category": "why",
-    "prompt": "An official session's written record is kept as the ___.",
-    "answer": "JOURNAL",
-    "fact": "The journal and minutes together form the official record."
-  },
-  {
-    "chapter": 5,
-    "difficulty": "hard",
-    "category": "voting",
-    "prompt": "A legislature made up of two separate chambers is called ___.",
-    "answer": "BICAMERAL",
-    "fact": "The Senate and House together form a bicameral Congress."
-  },
-  {
-    "chapter": 5,
-    "difficulty": "hard",
-    "category": "voting",
-    "prompt": "A legislature split into two separate chambers is called ___.",
-    "answer": "BICAMERAL",
-    "fact": "The Senate and House together form a bicameral Congress."
-  },
-  {
-    "chapter": 5,
-    "difficulty": "hard",
-    "category": "voting",
-    "prompt": "The head of the House of Representatives is the ___.",
-    "answer": "SPEAKER",
-    "fact": "The Speaker is elected by the members of the House itself."
-  },
-  {
-    "chapter": 5,
-    "difficulty": "hard",
-    "category": "voting",
-    "prompt": "The House chooses its own presiding officer, called the ___.",
-    "answer": "SPEAKER",
-    "fact": "The Speaker is elected by the members of the House itself."
-  },
-  {
-    "chapter": 5,
-    "difficulty": "hard",
     "category": "fraud",
-    "prompt": "A body that resolves disputes over a lawmaker's seat is a ___.",
+    "prompt": "A chamber may punish a member for disorderly ___.",
+    "answer": "BEHAVIOR"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "medium",
+    "category": "fraud",
+    "prompt": "A temporary punishment that bars a member from attending may be a ___.",
+    "answer": "SUSPENSION"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "medium",
+    "category": "fraud",
+    "prompt": "Permanent removal of a member by the chamber is called ___.",
+    "answer": "EXPULSION"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "The body that decides contests involving Senate membership is the Senate Electoral ___.",
     "answer": "TRIBUNAL",
     "fact": "Separate electoral tribunals exist for the Senate and the House."
   },
   {
     "chapter": 5,
-    "difficulty": "hard",
-    "category": "fraud",
-    "prompt": "Disputes over a lawmaker's seat go before an electoral ___.",
-    "answer": "TRIBUNAL",
-    "fact": "Separate electoral tribunals exist for the Senate and the House."
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "The House has its own House of Representatives Electoral ___.",
+    "answer": "HRET"
   },
   {
     "chapter": 5,
-    "difficulty": "hard",
-    "category": "fraud",
-    "prompt": "Barring an already-elected lawmaker from taking their seat is to ___ them.",
-    "answer": "DISQUALIFY",
-    "fact": "An electoral tribunal can disqualify a winner after the fact."
-  },
-  {
-    "chapter": 5,
-    "difficulty": "hard",
-    "category": "fraud",
-    "prompt": "Removing an already-elected lawmaker from their seat is to ___ them.",
-    "answer": "DISQUALIFY",
-    "fact": "An electoral tribunal can disqualify a winner after the fact."
-  },
-  {
-    "chapter": 5,
-    "difficulty": "hard",
-    "category": "candidate",
-    "prompt": "Term limits for party-list nominees apply to the person, not the ___.",
-    "answer": "ORGANIZATION",
-    "fact": "A party-list group cannot rotate nominees to dodge term limits."
-  },
-  {
-    "chapter": 5,
-    "difficulty": "hard",
-    "category": "candidate",
-    "prompt": "Party-list term limits bind the individual nominee, not the ___.",
-    "answer": "ORGANIZATION",
-    "fact": "A party-list group cannot rotate nominees to dodge term limits."
-  },
-  {
-    "chapter": 5,
-    "difficulty": "hard",
-    "category": "candidate",
-    "prompt": "Setting aside money for a specific national purpose is an ___.",
-    "answer": "APPROPRIATION",
-    "fact": "The national budget is itself an appropriations law passed by Congress."
-  },
-  {
-    "chapter": 5,
-    "difficulty": "hard",
-    "category": "candidate",
-    "prompt": "Setting aside national funds for a specific purpose is an ___.",
-    "answer": "APPROPRIATION",
-    "fact": "The national budget is itself an appropriations law passed by Congress."
-  },
-  {
-    "chapter": 5,
-    "difficulty": "hard",
+    "difficulty": "medium",
     "category": "why",
-    "prompt": "Awarding seats in proportion to votes won describes ___ representation.",
-    "answer": "PROPORTIONAL",
-    "fact": "The party-list system is the proportional element of Congress."
+    "prompt": "The congressional body that acts on many presidential appointments is the Commission on ___.",
+    "answer": "APPOINTMENTS"
   },
   {
     "chapter": 5,
-    "difficulty": "hard",
+    "difficulty": "medium",
     "category": "why",
-    "prompt": "Seats awarded roughly in line with votes won describes ___ representation.",
-    "answer": "PROPORTIONAL",
-    "fact": "The party-list system is the proportional element of Congress."
+    "prompt": "The Senate President serves as the ex officio ___ of the Commission on Appointments.",
+    "answer": "CHAIRMAN"
   },
   {
     "chapter": 5,
-    "difficulty": "hard",
+    "difficulty": "medium",
     "category": "why",
-    "prompt": "The body of voters that elected a particular lawmaker is their ___.",
-    "answer": "CONSTITUENCY",
-    "fact": "A lawmaker is expected to answer to that whole constituency."
+    "prompt": "A bill approved in identical form by both chambers may be prepared as an ___ bill.",
+    "answer": "ENROLLED"
   },
   {
     "chapter": 5,
-    "difficulty": "hard",
+    "difficulty": "medium",
     "category": "why",
-    "prompt": "The voters who elected a specific lawmaker form that lawmaker's ___.",
-    "answer": "CONSTITUENCY",
-    "fact": "A lawmaker is expected to answer to that whole constituency."
+    "prompt": "When the two chambers disagree on a bill, they may use a bicameral ___ committee.",
+    "answer": "CONFERENCE"
   },
   {
     "chapter": 5,
-    "difficulty": "hard",
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "The President may reject a bill through a ___.",
+    "answer": "VETO"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "Congress may overcome a presidential veto through an ___.",
+    "answer": "OVERRIDE"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "A veto override generally requires a ___ vote in each chamber.",
+    "answer": "TWOTHIRDS",
+    "display": "TWO-THIRDS"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "The House has the exclusive power to initiate cases of ___.",
+    "answer": "IMPEACHMENT"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "The Senate has the sole power to ___ impeachment cases.",
+    "answer": "TRY"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "medium",
     "category": "why",
-    "prompt": "Careful, unhurried discussion of a bill before a vote is ___.",
+    "prompt": "When the President is tried in impeachment, the ___ presides over the Senate trial.",
+    "answer": "CHIEFJUSTICE",
+    "display": "CHIEF JUSTICE"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "A Senate conviction in impeachment requires a ___ vote of all Senators.",
+    "answer": "TWOTHIRDSCONVICTION",
+    "display": "TWO-THIRDS (CONVICTION)"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "medium",
+    "category": "voting",
+    "prompt": "The official record showing who voted yes or no is the list of ___.",
+    "answer": "YEASNAYS",
+    "display": "YEAS AND NAYS"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "A written record of committee findings may be called a committee ___.",
+    "answer": "REPORT"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "A bill's stated name is commonly called its ___.",
+    "answer": "TITLE"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "Every bill should embrace only one main ___.",
+    "answer": "SUBJECT"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "A lawmaker who formally introduces a bill is its ___.",
+    "answer": "AUTHOR"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "A lawmaker who supports another member's bill may be called a ___.",
+    "answer": "COAUTHOR"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "A measure sent from one chamber to the other is formally ___.",
+    "answer": "TRANSMITTED"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "A bill may be sent to a committee for study through a ___.",
+    "answer": "REFERRAL"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "A legislative proposal may be examined section by section during ___.",
+    "answer": "CONSIDERATION"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "medium",
+    "category": "why",
+    "prompt": "Members may speak for or against a proposal during legislative ___.",
     "answer": "DELIBERATION",
     "fact": "Committee hearings exist mainly to allow this deliberation."
   },
   {
     "chapter": 5,
-    "difficulty": "hard",
+    "difficulty": "medium",
+    "category": "fraud",
+    "prompt": "The President's proposed spending plan submitted to Congress is the national ___.",
+    "answer": "BUDGET"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "medium",
+    "category": "fraud",
+    "prompt": "The yearly law funding national government operations is the General ___ Act.",
+    "answer": "APPROPRIATIONS"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "medium",
     "category": "why",
-    "prompt": "Unhurried discussion of a bill before a final vote is ___.",
-    "answer": "DELIBERATION",
-    "fact": "Committee hearings exist mainly to allow this deliberation."
+    "prompt": "A formal inquiry by Congress connected with lawmaking is an investigation in aid of ___.",
+    "answer": "LAWMAKING"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "A quorum in either chamber consists of a ___ of all its members.",
+    "answer": "MAJORITY"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "Each chamber may compel the attendance of ___ members in the manner its rules provide.",
+    "answer": "ABSENT"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "Suspension imposed by a chamber on one of its members cannot exceed ___.",
+    "answer": "SIXTYDAYS",
+    "display": "SIXTY DAYS"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "Expelling a member requires the concurrence of ___ of all members of the chamber.",
+    "answer": "TWOTHIRDSMEMBERS",
+    "display": "TWO-THIRDS OF MEMBERS"
   },
   {
     "chapter": 5,
     "difficulty": "hard",
     "category": "why",
-    "prompt": "The formal act of writing and passing laws is called ___.",
-    "answer": "LEGISLATION",
-    "fact": "All legislation begins as a bill introduced in either chamber."
+    "prompt": "Neither chamber may adjourn for more than ___ without the consent of the other.",
+    "answer": "THREEDAYS",
+    "display": "THREE DAYS"
   },
   {
     "chapter": 5,
     "difficulty": "hard",
     "category": "why",
-    "prompt": "Writing and passing laws is the formal activity called ___.",
-    "answer": "LEGISLATION",
-    "fact": "All legislation begins as a bill introduced in either chamber."
+    "prompt": "During a congressional session, neither chamber may move to another ___ without the other's consent.",
+    "answer": "PLACE"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "At the request of one-fifth of members present, the yeas and nays must be entered in the ___.",
+    "answer": "JOURNALRECORD",
+    "display": "JOURNAL RECORD"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "fraud",
+    "prompt": "Parts of a congressional journal affecting national security may be withheld from ___.",
+    "answer": "PUBLICATION"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "The Senate Electoral Tribunal is composed of a total of ___ members.",
+    "answer": "NINEMEMBERS",
+    "display": "NINE MEMBERS"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "Each Electoral Tribunal includes ___ Supreme Court justices.",
+    "answer": "THREEJUSTICES",
+    "display": "THREE JUSTICES"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "Each Electoral Tribunal also includes ___ legislators from the relevant chamber.",
+    "answer": "SIXLEGISLATORS",
+    "display": "SIX LEGISLATORS"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "The senior Supreme Court justice in an Electoral Tribunal serves as its ___.",
+    "answer": "CHAIRPERSON"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "The Commission on Appointments includes ___ Senators in addition to its ex officio chair.",
+    "answer": "TWELVESENATORS",
+    "display": "TWELVE SENATORS"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "The Commission on Appointments also includes ___ House members.",
+    "answer": "TWELVEREPRESENTATIVES",
+    "display": "TWELVE REPRESENTATIVES"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "The Commission on Appointments must act on submitted appointments within ___.",
+    "answer": "THIRTYSESSIONDAYS",
+    "display": "THIRTY SESSION DAYS"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "A decision of the Commission on Appointments requires a majority vote of ___.",
+    "answer": "ALLMEMBERS",
+    "display": "ALL MEMBERS"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "fraud",
+    "prompt": "Members of Congress are privileged from arrest during session for offenses punishable by not more than ___.",
+    "answer": "SIXYEARSIMPRISONMENT",
+    "display": "SIX YEARS OF IMPRISONMENT"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "A member cannot be questioned elsewhere for a speech or debate made in Congress or its ___.",
+    "answer": "COMMITTEES"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "fraud",
+    "prompt": "A member of Congress may not personally appear as counsel before a court or Electoral ___.",
+    "answer": "TRIBUNALBODY",
+    "display": "TRIBUNAL"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "fraud",
+    "prompt": "Members may not have a direct or indirect financial interest in a government ___.",
+    "answer": "CONTRACT"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "fraud",
+    "prompt": "Members may not intervene in a government matter for their own pecuniary ___.",
+    "answer": "BENEFIT"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "fraud",
+    "prompt": "Congressional members must disclose financial and business ___.",
+    "answer": "INTERESTS"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "fraud",
+    "prompt": "A member must notify the chamber of a potential conflict arising from a proposed ___.",
+    "answer": "LEGISLATIONCONFLICT",
+    "display": "LEGISLATION (CONFLICT)"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "candidate",
+    "prompt": "An increase in congressional compensation cannot take effect until after the full term of all members who approved the increase has ___.",
+    "answer": "EXPIRED"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "candidate",
+    "prompt": "A member who accepts another government office during the term generally forfeits the congressional ___.",
+    "answer": "SEATFORFEITURE",
+    "display": "SEAT FORFEITURE"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "candidate",
+    "prompt": "A member cannot be appointed during the term to an office that was created or whose emoluments were increased during that ___.",
+    "answer": "TERMRESTRICTION",
+    "display": "TERM RESTRICTION"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "After second reading approval, printed final copies of a bill generally must be distributed at least ___ before passage.",
+    "answer": "THREEDAYSBEFORE",
+    "display": "THREE DAYS BEFORE"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "A bill generally must pass three readings on ___.",
+    "answer": "SEPARATEDAYS",
+    "display": "SEPARATE DAYS"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "The President may certify immediate enactment of a bill because of a public calamity or ___.",
+    "answer": "EMERGENCY"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "On the final reading of a bill, no further ___ is allowed.",
+    "answer": "AMENDMENTFINAL",
+    "display": "AMENDMENT (NO FURTHER)"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "After final reading, the vote is taken immediately and the yeas and nays are entered in the ___.",
+    "answer": "CONGRESSIONALJOURNAL",
+    "display": "CONGRESSIONAL JOURNAL"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "fraud",
+    "prompt": "If the President does not communicate a veto within the constitutional period, a bill becomes law after ___.",
+    "answer": "THIRTYDAYS",
+    "display": "THIRTY DAYS"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "fraud",
+    "prompt": "The President may veto particular items in an appropriation, revenue, or ___ bill.",
+    "answer": "TARIFFBILL",
+    "display": "TARIFF BILL"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "fraud",
+    "prompt": "A special appropriation law must specify the ___ for which the money is intended.",
+    "answer": "PURPOSE"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "fraud",
+    "prompt": "A special appropriation must be supported by available funds or a corresponding revenue ___.",
+    "answer": "PROPOSAL"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "fraud",
+    "prompt": "The Constitution generally prohibits transfer of appropriations, subject to authorized augmentation from ___.",
+    "answer": "SAVINGS"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "fraud",
+    "prompt": "The previous year's appropriations law may remain in force when Congress fails to pass a new one through automatic ___.",
+    "answer": "REENACTMENT",
+    "display": "RE-ENACTMENT"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "fraud",
+    "prompt": "Congress may not increase the appropriations recommended by the President for government ___.",
+    "answer": "OPERATIONS"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "fraud",
+    "prompt": "A general appropriations provision must relate specifically to a particular ___.",
+    "answer": "APPROPRIATIONITEM",
+    "display": "APPROPRIATION ITEM"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "fraud",
+    "prompt": "Discretionary funds appropriated for particular officials must be spent only for ___ purposes.",
+    "answer": "PUBLIC"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "fraud",
+    "prompt": "Government spending of discretionary funds must be supported by appropriate ___.",
+    "answer": "VOUCHERS"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "fraud",
+    "prompt": "Tax exemptions generally require the concurrence of a majority of ___.",
+    "answer": "ALLCONGRESSMEMBERS",
+    "display": "ALL MEMBERS OF CONGRESS"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "Congress may declare the existence of a state of war by a ___ vote of both Houses in joint session, voting separately.",
+    "answer": "TWOTHIRDSWAR",
+    "display": "TWO-THIRDS (WAR)"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "During war or national emergency, Congress may authorize the President to exercise temporary emergency ___.",
+    "answer": "POWERS"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "Any emergency powers delegated by Congress must be for a limited ___.",
+    "answer": "PERIOD"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "Congress may revoke delegated emergency powers by ___.",
+    "answer": "RESOLUTIONREVOCATION",
+    "display": "RESOLUTION (REVOCATION)"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "fraud",
+    "prompt": "No law may grant a title of royalty or ___.",
+    "answer": "NOBILITY"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "The Senate and House must vote separately when deciding certain matters in a ___.",
+    "answer": "JOINTSESSION",
+    "display": "JOINT SESSION"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "voting",
+    "prompt": "The chamber where a bill constitutionally must begin is called its house of ___.",
+    "answer": "ORIGIN"
+  },
+  {
+    "chapter": 5,
+    "difficulty": "hard",
+    "category": "why",
+    "prompt": "The process of reconciling Senate and House versions before final approval is called bicameral ___.",
+    "answer": "RECONCILIATION"
   }
 ]

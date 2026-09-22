@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/images/portraits/enemy_protocol_porma.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/images/backgrounds/chapter4/02_ceremonial_terrace.png" id="3"]
+[ext_resource type="Resource" path="res://data/moves/c4_red_carpet_sweep.tres" id="10"]
+[ext_resource type="Resource" path="res://data/moves/c4_velvet_rope_snare.tres" id="11"]
+[ext_resource type="Resource" path="res://data/moves/c4_formal_formation.tres" id="12"]
+
+[resource]
+script = ExtResource("1")
+enemy_name = "Protocol Porma"
+title = "The Ceremony Controller"
+max_hp = 480
+portrait = ExtResource("2")
+hud_portrait = ExtResource("2")
+background = ExtResource("3")
+ground_fraction = 0.0
+player_battle_offset = Vector2(0, 0)
+enemy_battle_offset = Vector2(-25, 0)
+enemy_battle_scale = 1.15
+lore = "The Ceremony Controller. Nothing in the Palace begins until she says the line is straight, and nothing crooked has ever been her department."
+is_boss = false
+moves = [ExtResource("10"), ExtResource("11"), ExtResource("12")]
+idle_dir = "res://assets/images/characters/chapter4/protocol_porma_idle"
+idle_count = 8
+attack_dir = "res://assets/images/characters/chapter4/protocol_porma_attack"
+attack_count = 12
+hit_dir = "res://assets/images/characters/chapter4/protocol_porma_hit"
+hit_count = 8
+walk_dir = "res://assets/images/characters/chapter4/protocol_porma_walk"
+walk_count = 10
+flip_h = false

@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="EnemyMove" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_move.gd" id="1"]
+
+[ext_resource type="Texture2D" path="res://assets/images/ui/skill_icons/chapter3/engineer_eskandalo/concrete_chuck.png" id="skill_icon"]
+
+[resource]
+script = ExtResource("1")
+icon = ExtResource("skill_icon")
+move_id = "c3combat_concrete_chuck"
+move_name = "Concrete Chuck"
+description = "Throw, brick kick, sidearm throw."
+direct_damage = 26
+self_heal = 0
+guard_reduction = 0.0
+animation_style = "volley"
+effect_color = Color(0.90, 0.48, 0.22, 0.95)
+attack_dir = "res://assets/images/characters/chapter3/combat/engineer_eskandalo/release"
+attack_count = 8

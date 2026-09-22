@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "project": {
+    "name": "klhgamefinal",
+    "productType": null,
+    "stack": []
+  },
+  "sources": {
+    "tokens": [],
+    "components": [],
+    "assets": [
+      "assets"
+    ],
+    "instructions": []
+  },
+  "design": {
+    "colorMode": "unknown",
+    "colors": {},
+    "typography": {},
+    "spacing": {},
+    "radius": {},
+    "shadows": {},
+    "motion": {},
+    "density": "unknown"
+  },
+  "components": {
+    "installed": [],
+    "preferredPrimitives": [],
+    "patterns": []
+  },
+  "constraints": {
+    "must": [],
+    "avoid": []
+  },
+  "decisions": ["Web loading screen reuses title_logo.png byte-for-byte, without redesign, tinting, cropping or distortion. Reuse menu_updated.png behind a warm dark scrim; gold frame, burgundy progress, responsive layout. Local preview before any deployment."],
+  "evidence": [],
+  "generatedAt": "2026-09-12T05:05:29.733Z"
+}

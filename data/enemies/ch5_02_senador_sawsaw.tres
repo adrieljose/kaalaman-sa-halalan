@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/images/portraits/enemy_senador_sawsaw.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/images/backgrounds/chapter5/02_senate_floor.png" id="3"]
+[ext_resource type="Resource" path="res://data/moves/c5_interpellation_jab.tres" id="10"]
+[ext_resource type="Resource" path="res://data/moves/c5_floor_hirit.tres" id="11"]
+[ext_resource type="Resource" path="res://data/moves/c5_point_of_order.tres" id="12"]
+
+[resource]
+script = ExtResource("1")
+enemy_name = "Senador Sawsaw"
+title = "The Floor Interrupter"
+max_hp = 690
+portrait = ExtResource("2")
+hud_portrait = ExtResource("2")
+background = ExtResource("3")
+ground_fraction = 0.9125
+player_battle_offset = Vector2(0, 0)
+enemy_battle_offset = Vector2(-27, 0)
+enemy_battle_scale = 1.15
+lore = "The Floor Interrupter. He has never once let a sentence finish. Whatever the topic, he has a point of order about it."
+is_boss = false
+moves = [ExtResource("10"), ExtResource("11"), ExtResource("12")]
+idle_dir = "res://assets/images/characters/chapter5/senador_sawsaw_idle"
+idle_count = 8
+attack_dir = "res://assets/images/characters/chapter5/senador_sawsaw_attack"
+attack_count = 12
+hit_dir = "res://assets/images/characters/chapter5/senador_sawsaw_hit"
+hit_count = 8
+walk_dir = "res://assets/images/characters/chapter5/senador_sawsaw_walk"
+walk_count = 10
+flip_h = false

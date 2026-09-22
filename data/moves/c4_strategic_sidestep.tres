@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="EnemyMove" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_move.gd" id="1"]
+
+[ext_resource type="Texture2D" path="res://assets/images/ui/skill_icons/chapter4/adviser_areglo/strategic_sidestep.png" id="skill_icon"]
+
+[resource]
+script = ExtResource("1")
+icon = ExtResource("skill_icon")
+move_id = "c4combat_strategic_sidestep"
+move_name = "Strategic Sidestep"
+description = "Wala siya sa kinatatayuan mo noong tumingin ka."
+direct_damage = 0
+self_heal = 0
+guard_reduction = 0.40
+animation_style = "curse"
+effect_color = Color(0.580, 0.440, 0.820, 0.95)
+attack_dir = "res://assets/images/characters/chapter4/adviser_areglo_guard"
+attack_count = 10

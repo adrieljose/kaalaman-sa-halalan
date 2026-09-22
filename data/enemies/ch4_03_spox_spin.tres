@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/images/portraits/enemy_spox_spin.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/images/backgrounds/chapter4/03_press_room.png" id="3"]
+[ext_resource type="Resource" path="res://data/moves/c4_mic_check_bash.tres" id="10"]
+[ext_resource type="Resource" path="res://data/moves/c4_press_release_barrage.tres" id="11"]
+[ext_resource type="Resource" path="res://data/moves/c4_narrative_redirect.tres" id="12"]
+
+[resource]
+script = ExtResource("1")
+enemy_name = "Spox Spin"
+title = "The Narrative Twister"
+max_hp = 500
+portrait = ExtResource("2")
+hud_portrait = ExtResource("2")
+background = ExtResource("3")
+ground_fraction = 0.0
+player_battle_offset = Vector2(0, 0)
+enemy_battle_offset = Vector2(-28, 0)
+enemy_battle_scale = 1.12
+lore = "The Narrative Twister. He never lies outright. He simply answers a better question than the one he was asked."
+is_boss = false
+moves = [ExtResource("10"), ExtResource("11"), ExtResource("12")]
+idle_dir = "res://assets/images/characters/chapter4/spox_spin_idle"
+idle_count = 8
+attack_dir = "res://assets/images/characters/chapter4/spox_spin_attack"
+attack_count = 12
+hit_dir = "res://assets/images/characters/chapter4/spox_spin_hit"
+hit_count = 8
+walk_dir = "res://assets/images/characters/chapter4/spox_spin_walk"
+walk_count = 10
+flip_h = false

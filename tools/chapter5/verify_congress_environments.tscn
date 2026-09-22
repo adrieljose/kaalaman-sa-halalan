@@ -1,0 +1,4 @@
+[gd_scene load_steps=2 format=3]
+[ext_resource type="Script" path="res://tools/chapter5/verify_congress_environments.gd" id="1"]
+[node name="VerifyCongressEnvironments" type="Node"]
+script = ExtResource("1")

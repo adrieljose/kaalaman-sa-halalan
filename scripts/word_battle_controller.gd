@@ -60,6 +60,24 @@ const BANNER_TIME := 1.6
 ## this is aimed at, so surviving an encounter refunds part of the bar.
 ## Tune this: 0.0 is strict Bookworm, 1.0 heals fully between fights.
 const BETWEEN_ENCOUNTER_HEAL_FRACTION := 0.35
+## How much of the Chapter 4 boss's health his one-time last stand gives back.
+## Low enough that the fight is nearly over, high enough that "NOT YET." is a
+## real second act rather than a formality.
+const CH4_LAST_STAND_FRACTION := 0.22
+## Phase 2 of the Chapter 4 boss. "Slightly" is the brief's own word: a sixth
+## more damage and a sixth quicker, which is felt without being a different
+## fight.
+const CH4_PHASE2_DAMAGE_GAIN := 1.16
+const CH4_PHASE2_PACE := 0.84
+## Chapter 5's boss. HOUSE IN SESSION at half health, then FINAL READING in the
+## last quarter -- and the two stack, so the closing stage of the last fight in
+## the game is the hardest the game ever gets while still being only a fifth
+## above phase 2.
+const CH5_PHASE2_DAMAGE_GAIN := 1.15
+const CH5_PHASE2_PACE := 0.85
+const CH5_FINAL_READING_AT := 0.22
+const CH5_FINAL_READING_GAIN := 1.20
+const CH5_FINAL_READING_PACE := 0.76
 const LETTER_TILE_SCENE := preload("res://scenes/ui/letter_tile.tscn")
 
 ## The player's swing scales with the length of the word. There is only one
@@ -118,7 +136,7 @@ const MOVE_DESC_COLOR := Color(0.86, 0.80, 0.68)
 ## them does the telegraphing rather than the highlight alone.
 const MOVE_ACTIVE_NAME_COLOR := Color(1, 0.93, 0.66)
 const MOVE_IDLE_NAME_COLOR := Color(0.62, 0.53, 0.38)
-const MOVE_IDLE_DESC_COLOR := Color(0.52, 0.48, 0.40)
+const MOVE_IDLE_DESC_COLOR := Color(0.60, 0.56, 0.48)
 ## Warning orange, distinct from the gold used everywhere else in the UI so a
 ## lit move cannot be mistaken for ordinary trim.
 const MOVE_ALERT_COLOR := Color(0.98, 0.62, 0.24)
@@ -312,6 +330,9 @@ var _damage_row: HBoxContainer
 ## "is there a director on screen" must be the same question.
 var _tutorial: TutorialDirector
 
+func _exit_tree() -> void:
+	Audio.reset_voice()
+
 func _ready() -> void:
 	# Re-applied on every load rather than only when the menu sets it, so the
 	# pool is correct after Try Again and when this scene is booted directly.
@@ -433,8 +454,61 @@ func _apply_layout(profile: LayoutProfile) -> void:
 		_fit_move_overlay(profile)
 	_refresh_move_strip()
 	_refresh_damage_preview()
+	# After the board exists, and before the shadows are captured: this nudges
+	# fighters sideways, and a shadow captured first would be left behind.
+	_respect_board_safe_zone()
+	# Re-read: the safe zone may have moved the player, and the walk between
+	# encounters returns them to this x.
+	_player_home_x = player_character.position.x
 	_ensure_shadows()
 	TouchFeedback.apply_to_tree(self)
+
+## Minimum clear space between the letter board and a fighter's VISIBLE edge,
+## in design units. Small enough that the composition stays close, wide enough
+## that a wind-up or a held prop does not immediately cross the board.
+const BOARD_SAFE_GAP := 16.0
+## How close a fighter's visible edge may come to the screen edge.
+const STAGE_EDGE_MARGIN := 2.0
+
+## Keeps both fighters out of the board's safe zone.
+##
+## The rivals are not all the same width. Measured across their idle sheets the
+## visible body runs from 163px (Auditor Alibi) to 210px (Contractor Kutsaba,
+## Bokal Bulsa) inside the same 256px canvas -- so placing every rival by the
+## same node centre puts the WIDE ones a great deal closer to the board than the
+## narrow ones, which is why Kutsaba crowds it and Alibi does not. Nothing was
+## wrong with his coordinates; the node box simply says nothing about where the
+## body's left edge is.
+##
+## So the gap is measured from the visible body (body_rect) rather than the
+## node, and only the fighters that actually breach it are moved -- and only far
+## enough to clear it. A rival already comfortably clear is left exactly where
+## the layout put it.
+func _respect_board_safe_zone() -> void:
+	if board_frame == null or not is_instance_valid(board_frame):
+		return
+	var frame := board_frame.get_global_rect()
+	if frame.size.x <= 0.0:
+		return
+	var limit: float = Layout.profile.design_size.x
+
+	# The rival stands to the RIGHT of the board: its visible LEFT edge is what
+	# can crowd it.
+	if enemy_character != null:
+		var body := enemy_character.body_rect()
+		var want: float = frame.end.x + BOARD_SAFE_GAP - body.position.x
+		if enemy_character.position.x < want:
+			# Never so far that the far shoulder leaves the screen.
+			var most: float = limit - STAGE_EDGE_MARGIN - body.end.x
+			enemy_character.position.x = minf(want, maxf(most, enemy_character.position.x))
+
+	# The player stands to the LEFT: its visible RIGHT edge is the one at risk.
+	if player_character != null:
+		var pbody := player_character.body_rect()
+		var pwant: float = frame.position.x - BOARD_SAFE_GAP - pbody.end.x
+		if player_character.position.x > pwant:
+			var least: float = STAGE_EDGE_MARGIN - pbody.position.x
+			player_character.position.x = maxf(pwant, minf(least, player_character.position.x))
 
 ## Shrinks the compact roster overlay to the moves it actually holds. It has to
 ## happen after _build_move_list(), because until the entries exist the panel
@@ -551,6 +625,13 @@ func _layout_battle_wide(profile: LayoutProfile) -> void:
 		Rect2(inset + 37.0, 258.0, 130.0, 180.0),
 		Rect2(inset + 478.0, 265.0, 130.0, 180.0),
 		1.0)
+	# _start_encounter() first assigns the new room, then re-runs this layout so
+	# the encounter's staging offsets can take effect. Compact layouts realign
+	# the backdrop inside _place_stage(), but WIDE goes straight through
+	# _place_fighter_pair(); without this matching pass the room stayed aligned
+	# to the pre-offset player floor. Encounters with a positive Y correction
+	# consequently floated above their own painted floor by that correction.
+	_place_battle_background(profile.design_size, _stage_floor())
 	_place_node(word_tray, Rect2(inset, 149.0, 640.0, 30.0))
 	_place_node(word_preview_label, Rect2(inset - 5.0, 416.0, 640.0, 36.0))
 	_place_board(inset + 205.0, 187.0)
@@ -684,9 +765,11 @@ func _place_stage(area: Rect2, height_share: float) -> void:
 		Rect2(area.position.x + 4.0, floor_y - h, w, h),
 		Rect2(area.end.x - 4.0 - w, floor_y - h, w, h),
 		clampf(area.size.x / 640.0, 0.45, 1.0))
-	# The backdrop follows the fighters rather than the other way round, so
-	# whatever height the stage ended up with, they are standing on its floor.
-	_place_battle_background(Layout.profile.design_size, floor_y)
+	# The backdrop follows the fighters rather than the other way round. Read the
+	# actual soles back after _place_fighter_pair(): an encounter may add a
+	# player_battle_offset.y staging correction, and aligning to the uncorrected
+	# area edge leaves both fighters floating by exactly that amount.
+	_place_battle_background(Layout.profile.design_size, _stage_floor())
 
 ## Applies the small per-room staging corrections stored on EnemyData while
 ## keeping each sprite's feet as the scale pivot. The room texture never
@@ -701,8 +784,44 @@ func _place_fighter_pair(player_rect: Rect2, enemy_rect: Rect2,
 		scale = clampf(data.battle_scale, 0.75, 1.5)
 		player_offset = data.player_battle_offset * offset_scale
 		enemy_offset = data.enemy_battle_offset * offset_scale
-	_place_node(player_character, _scaled_fighter_rect(player_rect, scale, player_offset))
-	_place_node(enemy_character, _scaled_fighter_rect(enemy_rect, scale, enemy_offset))
+	# ONE floor for both. The authored WIDE composition stands them on lines
+	# seven pixels apart (438 and 445), which was invisible while both were
+	# floating by different amounts and becomes a visible step now that each is
+	# grounded on its real soles. A room paints one walkable line, so both
+	# fighters get it, and enemy_battle_offset.y stays available as a deliberate
+	# per-room nudge on top.
+	var floor_y: float = player_rect.end.y + player_offset.y
+	var p_rect := _scaled_fighter_rect(player_rect, scale, player_offset)
+	_place_node(player_character, p_rect)
+	_stand_on_floor(player_character, floor_y)
+	var enemy_scale := scale * (data.enemy_battle_scale if data != null else 1.0)
+	var e_rect := _scaled_fighter_rect(enemy_rect, enemy_scale, enemy_offset)
+	_place_node(enemy_character, e_rect)
+	_stand_on_floor(enemy_character, floor_y + enemy_offset.y)
+
+## Drops a fighter so its DRAWN SOLES land on `floor_y`, rather than its node box.
+##
+## The node box is a bad proxy for the body, and by two stacking paddings. A
+## frame is a small figure on a larger transparent canvas -- Chapter 3's rivals
+## carry 10px of nothing below the feet in a 320px canvas -- and that canvas is
+## then letterboxed inside the node by KEEP_ASPECT_CENTERED, which for a 256x320
+## sheet in a 130x180 node adds another ~8.75px underneath. Aligning the node's
+## BOTTOM to the floor therefore hangs the rival ~14px above it, while the
+## player, whose 73x180 sheet needs almost no letterboxing and has 4px of
+## padding, hangs by ~4px. Different amounts, so they do not even float
+## together: the pair read as standing on two different floors.
+##
+## body_rect() already resolves both paddings and caches per texture, so the
+## correction is simply the distance from wherever the soles ended up to where
+## the floor is. Nothing is hardcoded and nothing needs per-character tuning:
+## a rival with a differently padded sheet is grounded by the same arithmetic.
+func _stand_on_floor(who: AnimatedCharacter, floor_y: float) -> void:
+	if who == null:
+		return
+	var body := who.body_rect()
+	if body.size.y <= 0.0:
+		return
+	who.position.y += floor_y - (who.position.y + body.end.y)
 
 func _scaled_fighter_rect(rect: Rect2, scale: float, offset: Vector2) -> Rect2:
 	var scaled_size := rect.size * scale
@@ -793,6 +912,44 @@ func _place_battle_background(d: Vector2, stage_floor: float) -> void:
 
 var _prop_layer: Control = null
 var _props: Array = []
+var _palace_environment: Control = null
+var _ch5_chamber: Control = null
+
+func _sync_ch5_chamber(drawn: Rect2) -> void:
+	if GameState.chapter_number() != 5 or _enemy == null:
+		if is_instance_valid(_ch5_chamber): _ch5_chamber.queue_free()
+		_ch5_chamber = null
+		return
+	if not is_instance_valid(_ch5_chamber):
+		_ch5_chamber = preload("res://scripts/environments/congress_environment.gd").new()
+		_ch5_chamber.name = "Chapter5Chamber"
+		add_child(_ch5_chamber)
+		_ch5_chamber.configure(GameState.encounter_index)
+		move_child(_ch5_chamber, background.get_index() + 1)
+	_place_node(_ch5_chamber, drawn)
+	_ch5_chamber.adapt_to_layout(Layout.profile.design_size)
+
+func _clear_palace_environment() -> void:
+	if is_instance_valid(_palace_environment):
+		_palace_environment.stop()
+		_palace_environment.queue_free()
+	_palace_environment = null
+	background.show()
+
+func _sync_palace_environment(drawn: Rect2) -> bool:
+	if GameState.chapter_number() != 4:
+		_clear_palace_environment()
+		return false
+	if not is_instance_valid(_palace_environment):
+		_palace_environment = preload("res://scripts/environments/palace_environment.gd").new()
+		_palace_environment.name = "PalaceEnvironment"
+		add_child(_palace_environment)
+		_palace_environment.setup(GameState.encounter_index)
+		move_child(_palace_environment, background.get_index()+1)
+	_place_node(_palace_environment,drawn)
+	_palace_environment.adapt_to_layout(Layout.profile.design_size)
+	background.hide()
+	return true
 
 ## Changes the room. Always use this rather than assigning background.texture:
 ## the props belong to the backdrop, and the layout pass that would rebuild
@@ -809,6 +966,18 @@ func _set_room(texture: Texture2D) -> void:
 ## Rebuilds the prop layer for the current room. Called from
 ## _place_battle_background, so it re-runs on rotation and on every encounter.
 func _build_props(drawn: Rect2) -> void:
+	_sync_ch5_chamber(drawn)
+	if is_instance_valid(_ch5_chamber):
+		background.hide()
+		if is_instance_valid(_prop_layer):
+			for child in _prop_layer.get_children(): child.queue_free()
+		_props.clear()
+		return
+	if _sync_palace_environment(drawn):
+		if is_instance_valid(_prop_layer):
+			for child in _prop_layer.get_children(): child.queue_free()
+		_props.clear()
+		return
 	if _prop_layer == null:
 		_prop_layer = Control.new()
 		_prop_layer.name = "PropLayer"
@@ -904,6 +1073,10 @@ func _tick_props(delta: float) -> void:
 ## moment and the props are knocked about. Hooked into _fx_impact, which is the
 ## one beat every skill in both chapters already shares.
 func _react_room(color: Color, strength: float) -> void:
+	if is_instance_valid(_ch5_chamber): _ch5_chamber.react(strength)
+	if is_instance_valid(_palace_environment):
+		_palace_environment.react(strength)
+		return
 	if background != null and is_instance_valid(background):
 		var tint := Color(
 			1.0 + color.r * 0.30, 1.0 + color.g * 0.30, 1.0 + color.b * 0.30)
@@ -1149,6 +1322,8 @@ func _build_move_strip() -> void:
 	_move_strip.add_theme_font_size_override("font_size", 11)
 	_move_strip.add_theme_color_override("font_color", MOVE_ACTIVE_NAME_COLOR)
 	_move_strip.clip_text = true
+	_move_strip.expand_icon = true
+	_move_strip.add_theme_constant_override("icon_max_width",int(MOVE_ICON_SIZE.x))
 	_move_strip.pressed.connect(_on_move_strip_pressed)
 	_move_strip.hide()
 	add_child(_move_strip)
@@ -1169,8 +1344,14 @@ func _refresh_move_strip() -> void:
 		return
 	var move := _current_move()
 	if move == null:
+		_move_strip.icon = null
+		_move_strip.tooltip_text = ""
 		_move_strip.text = "MOVES"
 		return
+	# Compact Chapter 4 telegraphs use the same resource icon as the expanded list.
+	_move_strip.icon = move.icon if GameState.chapter_number() in [4, 5] else null
+	_move_strip.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST if GameState.chapter_number() in [4, 5] else CanvasItem.TEXTURE_FILTER_PARENT_NODE
+	_move_strip.tooltip_text = "%s\n%s" % [move.move_name,move.description] if GameState.chapter_number() in [4, 5] else ""
 	_move_strip.text = "NEXT:  %s      ▸" % move.move_name.to_upper()
 
 func _on_attack_pressed() -> void:
@@ -1221,7 +1402,7 @@ func _flash_question_panel() -> void:
 
 ## Where both pages of the pause menu sit. Matches PauseMainPanel's own rect
 ## in word_battle.tscn so switching pages does not move the box.
-const PAUSE_PANEL_RECT := Rect2(195.0, 135.0, 250.0, 190.0)
+const PAUSE_PANEL_RECT := Rect2(195.0, 115.0, 250.0, 230.0)
 
 func _on_menu_pressed() -> void:
 	Audio.play_sfx("button_click")
@@ -1233,6 +1414,7 @@ func _on_menu_pressed() -> void:
 ## itself is process_mode=WHEN_PAUSED (set in the scene) so its own buttons
 ## keep working while everything else is frozen.
 func _open_pause_menu() -> void:
+	Audio.reset_voice()
 	pause_main_panel.show()
 	pause_options_panel.hide()
 	pause_overlay.show()
@@ -1247,6 +1429,11 @@ func _on_resume_pressed() -> void:
 ## menu's own page uses, so the two pages of the pause menu sit in one place
 ## rather than jumping as the player moves between them.
 func _build_pause_options() -> void:
+	var save_button:=Button.new()
+	save_button.text="Save / Load"
+	save_button.custom_minimum_size.y=30
+	pause_main_panel.get_node("VBox").add_child(save_button)
+	save_button.pressed.connect(func(): SaveFilePanel.open(self))
 	pause_options_panel = SettingsPanel.new()
 	pause_options_panel.name = "PauseOptionsPanel"
 	pause_options_panel.offset_left = PAUSE_PANEL_RECT.position.x
@@ -1291,12 +1478,24 @@ func _on_try_again_pressed() -> void:
 ## separates starting a chapter (fresh health bar) from walking into the next
 ## encounter of one already in progress (health carries, partly refunded).
 func _start_encounter(full_reset: bool) -> void:
+	if is_instance_valid(_ch5_chamber): _ch5_chamber.queue_free()
+	_ch5_chamber = null
+	_clear_palace_environment()
+	if is_instance_valid(_player_variations): _player_variations.cancel()
 	result_overlay.hide()
+	if is_instance_valid(_cong_meow):
+		_cong_meow.queue_free()
+	_cong_meow = null
+	if is_instance_valid(_regular_combat): _regular_combat.queue_free()
+	_regular_combat = null
+	_enemy_guard = 0.0
+	_clear_enemy_guard_badge()
 	_enemy = GameState.current_enemy()
 	if _enemy == null:
 		push_warning("WordBattleController: no encounter at index %d" % GameState.encounter_index)
 		return
 	enemy_character.configure_from(_enemy)
+	enemy_character.enable_limb_motion(GameState.chapter_number() in [1,2])
 	# Swapped here rather than in the transition because _start_encounter is the
 	# one path every encounter goes through — walking in, Try Again, or booting
 	# this scene directly all land on the right backdrop.
@@ -1308,17 +1507,40 @@ func _start_encounter(full_reset: bool) -> void:
 	_apply_layout(Layout.profile)
 
 	_enemy_hp = _enemy.max_hp
+	if _enemy.moves.size() == 3 and _enemy.moves[0].signature_id() == "cong_meow_capitol_claw":
+		_cong_meow = preload("res://scripts/bosses/cong_meow_boss.gd").new()
+		add_child(_cong_meow)
+		_cong_meow.setup(self)
+	elif _enemy.moves.size() == 3 and _enemy.moves[0].signature_id().begins_with("c3combat_"):
+		_regular_combat = preload("res://scripts/battle/chapter3_combat.gd").new()
+		add_child(_regular_combat)
+		_regular_combat.setup(self)
 	# Or the first blow of this fight could be swallowed by the cooldown left
 	# over from the last blow of the previous one.
 	Audio.reset_voice()
 	# Every encounter starts at phase 1, including a boss being retried.
 	_boss_phase = 1
 	_phase_changing = false
+	# And with its last stand unspent. Retrying the boss should offer the same
+	# fight, not a shorter one.
+	_ch4_last_stand_used = false
+	_ch4_last_guard_turn = -1
+	_ch5_final_reading_used = false
+	_ch5_final_reading_active = false
+	_ch5_final_reading_turns = 0
+	_ch5_move_active = false
+	_ch5_ranged_contact_pending = false
+	_ch5_last_guard_turn = -1
 	if full_reset:
 		_player_hp = GameState.player_max_hp
+		if not GameState.pending_checkpoint.is_empty():
+			_player_hp=int(GameState.pending_checkpoint.hp)
+			GameState.pending_checkpoint.clear()
 	else:
 		var refund := roundi(GameState.player_max_hp * BETWEEN_ENCOUNTER_HEAL_FRACTION)
 		_player_hp = mini(GameState.player_max_hp, _player_hp + refund)
+	# Snapshot AFTER the between-encounter heal, before any turn or potion use.
+	GameState.capture_checkpoint(_player_hp)
 
 	enemy_name_label.text = _enemy.enemy_name
 	_refresh_encounter_hud()
@@ -1744,7 +1966,8 @@ func _refresh_encounter_hud() -> void:
 		_hud_player_portrait.texture = _portrait_texture(
 			String(GameState.character_clips().get("idle_dir", "")))
 	if _hud_enemy_portrait != null:
-		_hud_enemy_portrait.texture = _portrait_texture(_enemy.idle_dir)
+		_hud_enemy_portrait.texture = _enemy.hud_portrait if _enemy.hud_portrait != null \
+			else _portrait_texture(_enemy.idle_dir)
 
 	var total := GameState.encounter_total()
 	var current := GameState.encounter_number()
@@ -1945,7 +2168,29 @@ func _current_move() -> EnemyMove:
 	var pool := _available_moves()
 	if pool.is_empty():
 		return null
-	return pool[_move_index % pool.size()]
+	if is_instance_valid(_cong_meow):
+		return pool[_cong_meow.selected]
+	if is_instance_valid(_regular_combat):
+		return pool[_regular_combat.selected]
+	var picked: EnemyMove = pool[_move_index % pool.size()]
+	# "No defence spam": the Chapter 4 boss may not raise Eternal Resolve twice
+	# in a row. The straight rotation would otherwise let a three-move rival
+	# guard, guard, guard whenever the other two were skipped, and a boss that
+	# can stand behind a barrier indefinitely is not a fight. Stepping to the
+	# next move rather than blocking the turn keeps the rotation honest -- he
+	# still acts, just not with the shield.
+	if _ch4_guard_on_cooldown(picked) or _ch5_guard_on_cooldown(picked):
+		picked = pool[(_move_index + 1) % pool.size()]
+	return picked
+
+## True when `move` is the boss's defensive skill and it was the last thing he
+## did. Deliberately narrow: only the Chapter 4 boss, only his guard.
+func _ch4_guard_on_cooldown(move: EnemyMove) -> bool:
+	if move == null or _enemy == null or not _enemy.is_boss:
+		return false
+	if move.signature_id() != "c4combat_eternal_resolve":
+		return false
+	return _ch4_last_guard_turn >= 0 and _move_index - _ch4_last_guard_turn <= 1
 
 ## The moves this rival may currently use. A skill held back for a later phase
 ## is simply absent from the rotation until that phase begins, which is what
@@ -2020,6 +2265,7 @@ func _move_entry(move: EnemyMove, wrap_width: float) -> PanelContainer:
 	slot.add_theme_stylebox_override("panel", _move_slot_style(false))
 	var icon := TextureRect.new()
 	icon.texture = move.icon
+	icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	icon.custom_minimum_size = MOVE_ICON_SIZE
 	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
@@ -2143,7 +2389,8 @@ func _highlight_current_move() -> void:
 	_refresh_move_strip()
 	if _move_entries.is_empty():
 		return
-	var active_index := _move_index % _move_entries.size()
+	var active_index: int = _cong_meow.selected if is_instance_valid(_cong_meow) else _move_index % _move_entries.size()
+	if is_instance_valid(_regular_combat): active_index = _regular_combat.selected
 	for i in _move_entries.size():
 		var entry: Dictionary = _move_entries[i]
 		var plate := entry["plate"] as PanelContainer
@@ -2156,8 +2403,11 @@ func _highlight_current_move() -> void:
 			"font_color", MOVE_DESC_COLOR if is_active else MOVE_IDLE_DESC_COLOR)
 		# The icons carry the same secondary treatment as their text, so an
 		# inactive entry recedes as a whole rather than keeping a bright icon.
-		(entry["icon"] as TextureRect).modulate = (
-			Color.WHITE if is_active else Color(1, 1, 1, 0.55))
+		var move_icon := entry["icon"] as TextureRect
+		var icon_path := move_icon.texture.resource_path if move_icon.texture != null else ""
+		var palace_or_capitol_icon := icon_path.begins_with("res://assets/images/ui/skill_icons/chapter3/") or icon_path.begins_with("res://assets/images/ui/skill_icons/chapter4/")
+		var idle_alpha := 0.80 if palace_or_capitol_icon else 0.55
+		move_icon.modulate = Color.WHITE if is_active else Color(1, 1, 1, idle_alpha)
 		var slot := (entry["icon"] as TextureRect).get_parent() as PanelContainer
 		if slot != null:
 			slot.add_theme_stylebox_override("panel", _move_slot_style(is_active))
@@ -2400,6 +2650,32 @@ func _damage_for(word: String, used_spark: bool, used_gold: bool,
 		damage = roundi(damage * POWER_UP_MULTIPLIER)
 	return damage
 
+## Guard is consumed by a real hit, never by a preview or a rejected word.
+var _enemy_guard: float = 0.0
+var _cong_meow: Node
+var _regular_combat: Node
+var _enemy_guard_badge: Label
+
+func _guarded_damage(damage: int) -> int:
+	return maxi(1, roundi(damage * (1.0 - _enemy_guard))) if damage > 0 else 0
+
+func _clear_enemy_guard_badge() -> void:
+	if is_instance_valid(_enemy_guard_badge):
+		_enemy_guard_badge.queue_free()
+	_enemy_guard_badge = null
+
+func _show_enemy_guard_badge() -> void:
+	_clear_enemy_guard_badge()
+	_enemy_guard_badge = Label.new()
+	_enemy_guard_badge.text = "GUARD -%d%%" % roundi(_enemy_guard * 100.0)
+	_enemy_guard_badge.add_theme_font_size_override("font_size", 9)
+	_enemy_guard_badge.add_theme_color_override("font_color", Color(0.6, 1.0, 0.8))
+	_enemy_guard_badge.add_theme_color_override("font_outline_color", Color(0.05, 0.1, 0.1))
+	_enemy_guard_badge.add_theme_constant_override("outline_size", 3)
+	_enemy_guard_badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	enemy_character.add_child(_enemy_guard_badge)
+	_enemy_guard_badge.position = Vector2(10, -12)
+
 ## Whether `word` is the answer the question on screen is asking for.
 func _is_answer(word: String) -> bool:
 	return (not _question.is_empty()
@@ -2437,7 +2713,7 @@ func _on_word_accepted(word: String, used_spark: bool, used_gold: bool) -> void:
 		bonuses.append("Spark")
 	if used_power_up:
 		bonuses.append("Power Up")
-	var message := "%s +%d" % [word.to_upper(), damage]
+	var message := "%s +%d" % [word.to_upper(), _guarded_damage(damage)]
 	if not bonuses.is_empty():
 		message += "! " + " + ".join(bonuses) + "!"
 	word_preview_label.text = message
@@ -2458,9 +2734,47 @@ func _on_word_accepted(word: String, used_spark: bool, used_gold: bool) -> void:
 ## Called ONLY from the paths where damage is real. Anticipation, a miss and a
 ## blocked blow never reach here, which is what keeps the voice honest.
 func _enemy_take_hit(damage: int) -> void:
+	# Invalid/no-damage events must not heal, recoil, or speak. The existing
+	# guard formula has a one-HP floor; we do not change that balance here.
+	if damage <= 0 or _enemy_hp <= 0: return
+	var previous_hp := _enemy_hp
+	var guarded_hit := _enemy_guard > 0.0
+	var boss_guard_hit := is_instance_valid(_cong_meow) and _enemy_guard > 0.0 and damage > 0
+	var regular_guard_hit := is_instance_valid(_regular_combat) and _enemy_guard > 0.0 and damage > 0
+	if _enemy_guard > 0.0 and damage > 0:
+		damage = _guarded_damage(damage)
+		if is_instance_valid(_cong_meow):
+			_cong_meow.consume_shield()
+		elif regular_guard_hit:
+			_regular_combat.consume_guard()
+		_enemy_guard = 0.0
+		_clear_enemy_guard_badge()
+		if not is_instance_valid(_cong_meow) and not regular_guard_hit:
+			_fx_word("GUARDED", enemy_character, Color(0.55, 1.0, 0.75))
+		_refresh_damage_preview()
 	_enemy_hp = maxi(0, _enemy_hp - damage)
+	if is_instance_valid(_ch5_chamber) and damage >= 35:
+		_ch5_chamber.react(clampf(float(damage) / 8.0, 4.0, 9.0))
+	# Cosmetic heavy-hit boundary only; damage and guards above remain unchanged.
+	if is_instance_valid(_palace_environment) and damage >= 35:
+		_palace_environment.react(clampf(float(damage) / 8.0,4.0,9.0))
+	if is_instance_valid(_palace_environment) and _enemy.is_boss and _enemy_hp > 0 and float(_enemy_hp) / _enemy.max_hp <= 0.5:
+		_palace_environment.escalate()
+	if is_instance_valid(_cong_meow):
+		_cong_meow.show_damage(damage)
+	elif not regular_guard_hit:
+		_fx_word("-%d HP" % damage, enemy_character, Color(1.0, 0.83, 0.55))
 	enemy_heart_row.set_value(_enemy_hp)
-	_speak_enemy_hurt()
+	if previous_hp > _enemy_hp:
+		_speak_enemy_hurt(guarded_hit)
+	if regular_guard_hit:
+		await _regular_combat.defend_impact(damage)
+		await _finish_enemy_defeat_voice()
+		return
+	if boss_guard_hit:
+		await _cong_meow.block_reaction()
+		await _finish_enemy_defeat_voice()
+		return
 
 	# The clip and the recoil run TOGETHER, not one after the other: the recoil
 	# is the body carrying the blow the clip is drawing, so playing them in
@@ -2475,11 +2789,27 @@ func _enemy_take_hit(damage: int) -> void:
 		# No flinch frames on this rival: still hold for the recoil, or the
 		# exchange would carry on over the top of it.
 		await get_tree().create_timer(RECOIL_SECONDS).timeout
+	await _finish_enemy_defeat_voice()
+
+## Let a lethal reaction finish before the existing encounter transition.
+## Reset/pause/scene exit stops the player, so no stale completion can speak.
+func _finish_enemy_defeat_voice() -> void:
+	if _enemy_hp > 0 or _enemy == null or not Audio.has_enemy_reaction_voice(_enemy.enemy_name): return
+	while Audio._voice_player.playing and is_inside_tree():
+		await get_tree().process_frame
 
 ## Picks the register and speaks. Falls back to the shared set for any rival
 ## with no voice of its own, so nobody is ever silent.
-func _speak_enemy_hurt() -> void:
+func _speak_enemy_hurt(reduced: bool = false) -> void:
 	var data: EnemyData = _enemy if _enemy != null else GameState.current_enemy()
+	if data != null and Audio.has_enemy_reaction_voice(data.enemy_name):
+		# Use Don's existing low-HP/rage boundary, measured after this hit.
+		# No new damage threshold or critical system is introduced.
+		var heavy := data.enemy_name=="Don Eraptado" and not data.rage_voice.is_empty() and data.max_hp>0 and float(_enemy_hp)/float(data.max_hp)<=data.rage_below
+		if not Audio.play_enemy_reaction(data.enemy_name,_enemy_hp <= 0,reduced,heavy):
+			# Missing authored speech remains audible, without borrowing another identity.
+			if _enemy_hp > 0: Audio.play_sfx("enemy_hurt")
+		return
 	if data == null:
 		Audio.play_sfx("enemy_hurt")
 		return
@@ -2538,7 +2868,11 @@ func _play_attack_sequence(damage: int, is_answer: bool, tier: Dictionary) -> vo
 	# Returns with the hit already landed -- the projectile arrived, or a melee
 	# attacker is standing over the rival. Either way the flinch below plays at
 	# the right moment rather than after the animation has finished.
-	await _play_player_attack(tier)
+	var landed: bool=await _play_player_attack(tier)
+	if not landed:
+		_sequence_running=false
+		_update_action_buttons()
+		return
 
 	_shake_screen(float(tier["shake"]))
 	await _enemy_take_hit(damage)
@@ -2548,14 +2882,28 @@ func _play_attack_sequence(damage: int, is_answer: bool, tier: Dictionary) -> vo
 	await _player_attack_recover()
 
 	if _enemy_hp <= 0:
+		# One rival gets back up, once. If the last stand fires, the fight is
+		# not over and the win check is skipped this time round.
+		if await _ch4_last_stand():
+			_sequence_running = false
+			_update_action_buttons()
+			return
+		# The last boss in the game does not simply vanish when the bar empties.
+		await _ch5_boss_defeat_if_due()
 		_sequence_running = false
 		_update_action_buttons()
 		_end_match(true)
 		return
 
+	# FINAL READING sits beside the phase check because it is the same kind of
+	# event -- a threshold crossed on the way down -- and, like the phase
+	# change, it must never fire on a blow that already ended the fight.
+
 	# Checked after the win test: a blow that would kill outright should end the
 	# fight rather than trigger a transformation the rival never survives to use.
 	await _check_phase_change()
+	# A large hit may cross both thresholds: session before final reading.
+	await _ch5_try_final_reading()
 
 	if is_answer:
 		var fact := String(_question.get("fact", ""))
@@ -2574,6 +2922,15 @@ func _play_attack_sequence(damage: int, is_answer: bool, tier: Dictionary) -> vo
 ## rotates so the panel shows something new for the next exchange.
 func _resolve_enemy_turn() -> void:
 	var move := _current_move()
+	if is_instance_valid(_cong_meow) and move != null:
+		await _cong_meow.resolve(move)
+		return
+	if is_instance_valid(_regular_combat) and move != null:
+		await _regular_combat.resolve(move)
+		return
+	if move != null and _is_chapter3_move(move):
+		await _resolve_chapter3_turn(move)
+		return
 	var damage := move.direct_damage if move != null else 0
 	var attacker := move.move_name if move != null else _enemy.enemy_name
 	var message := "%s hits! -%d HP" % [attacker, damage]
@@ -2730,7 +3087,8 @@ func _refresh_damage_preview() -> void:
 	# visible again would flash a stale number before the next refresh caught
 	# up. Clearing it keeps "what the badge holds is what the badge means" true
 	# whether it is on screen or not.
-	_damage_badge.show_damage(span.x, span.y, _power_up_active and span.y > 0)
+	_damage_badge.show_damage(_guarded_damage(span.x), _guarded_damage(span.y),
+		_power_up_active and span.y > 0)
 	_damage_badge.visible = span.y > 0
 
 ## Drives a fighter toward its opponent and back. Purely additive on top of the
@@ -2776,8 +3134,11 @@ func _shake_screen(strength: float) -> void:
 ## One projectile crossing the gap. `arc` bends its path, `delay` staggers it
 ## within a volley, `wobble` makes it drift rather than fly straight.
 func _spawn_bolt(from: Control, to: Control, tint: Color, bolt_size: float,
-		travel: float, delay: float = 0.0, arc: float = 0.0, wobble: bool = false) -> void:
+		travel: float, delay: float = 0.0, arc: float = 0.0, wobble: bool = false,
+		on_impact: Callable = Callable()) -> void:
 	var orb := Panel.new()
+	if on_impact.is_valid():
+		orb.name = "ContactProjectile"
 	var style := StyleBoxFlat.new()
 	style.bg_color = tint
 	var radius := int(bolt_size * 0.5)
@@ -2791,6 +3152,24 @@ func _spawn_bolt(from: Control, to: Control, tint: Color, bolt_size: float,
 	orb.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	orb.size = Vector2(bolt_size, bolt_size)
 	add_child(orb)
+	# Chapter 5 throws readable legislative objects, not anonymous circles.
+	# Reuse the established per-skill pixel icon; legacy bolts stay unchanged.
+	if from == enemy_character and to == player_character and _signature_move != null \
+			and _signature_move.signature_id().begins_with("c5combat_") and _signature_move.icon != null:
+		style.bg_color = Color.TRANSPARENT
+		style.shadow_size = 0
+		orb.size = Vector2.ONE * maxf(16.0, bolt_size)
+		var object_icon := TextureRect.new()
+		object_icon.texture = _signature_move.icon
+		object_icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		object_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		object_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		object_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		orb.add_child(object_icon)
+		object_icon.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		if _ch5_move_active:
+			travel *= _ch5_pace()
+			delay *= _ch5_pace()
 
 	var start := from.position + from.size * 0.5 - orb.size * 0.5
 	var finish := to.position + to.size * 0.5 - orb.size * 0.5
@@ -2810,6 +3189,8 @@ func _spawn_bolt(from: Control, to: Control, tint: Color, bolt_size: float,
 		tween.tween_property(orb, "position", finish, travel * 0.5) 			.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
 	if wobble:
 		tween.parallel().tween_property(orb, "rotation", randf_range(-2.0, 2.0), travel)
+	if on_impact.is_valid():
+		tween.tween_callback(on_impact)
 	tween.tween_callback(orb.queue_free)
 
 ## Fires `count` bolts and waits for the last of them to land.
@@ -3350,7 +3731,17 @@ func _pick_player_attack(pool: Dictionary) -> String:
 ## flinch and apply damage while a melee attacker is still standing over them.
 ## _player_attack_recover() must be called afterwards, whatever happens next --
 ## it is what walks a melee attacker home and restores the z-order.
-func _play_player_attack(tier: Dictionary) -> void:
+var _player_variations: Node
+
+func _play_player_attack(_tier: Dictionary) -> bool:
+	if not is_instance_valid(_player_variations):
+		_player_variations=load("res://scripts/battle/player_attack_variations.gd").new()
+		add_child(_player_variations)
+		_player_variations.setup(self)
+	await _player_variations.strike()
+	return _player_variations.contact_ready
+
+func _play_legacy_player_attack(tier: Dictionary) -> void:
 	var pool := _attack_pool(GameState.character)
 	_player_attack = pool[_pick_player_attack(pool)]
 	var melee: bool = _player_attack.get("kind", "ranged") == "melee"
@@ -3378,6 +3769,9 @@ func _play_player_attack(tier: Dictionary) -> void:
 ## Walks a melee attacker home and puts everything back. Safe to call for a
 ## ranged attack, which simply plays its follow-through in place.
 func _player_attack_recover() -> void:
+	if is_instance_valid(_player_variations): await _player_variations.recover()
+
+func _legacy_player_attack_recover() -> void:
 	if _player_attack.is_empty():
 		return
 	var dist := _player_melee_dx() if _player_attack.get("kind", "") == "melee" else 0.0
@@ -3560,29 +3954,55 @@ func _body_play(who: Control, beats: Array) -> void:
 	if not _body_home.has(who):
 		return
 	var home: Vector2 = _body_home[who]["pos"]
+	if who == enemy_character and enemy_character.contact_sync_pending:
+		var contact_seconds := 0.0
+		for beat: Dictionary in _with_follow_through(beats, who.position-home):
+			contact_seconds += float(beat["secs"])
+		enemy_character.synchronize_attack_contact(contact_seconds)
 	# One tween for the whole list, chained. A tween per beat cost a frame at
 	# every junction while the next one was created, so a five-beat skill sat
 	# still for five frames spread through its own animation.
 	var tween := create_tween()
 	for beat: Dictionary in _with_follow_through(beats, who.position - home):
 		var secs: float = beat["secs"]
+		var joint_driven := who == enemy_character and enemy_character.limb_motion != null and not enemy_character.is_rigged()
+		var angle := float(beat["deg"])
+		var stretch := Vector2(beat["sx"], beat["sy"])
+		if joint_driven:
+			# Keep the authored timing/travel, but distribute effort into the
+			# shoulders, forearms and knees instead of bending the entire sprite.
+			angle = clampf(angle * .35, -8.0, 8.0)
+			stretch = Vector2(clampf(stretch.x,.96,1.04),clampf(stretch.y,.96,1.04))
+		if _ch5_move_active and who == enemy_character:
+			secs *= _ch5_pace()
 		var step := tween.tween_property(
 			who, "position", home + Vector2(beat["dx"], beat["dy"]), secs)
 		step.set_trans(beat["trans"]).set_ease(beat["ease"])
 		tween.parallel().tween_property(
-			who, "rotation", deg_to_rad(beat["deg"]), secs) \
+			who, "rotation", deg_to_rad(angle), secs) \
 			.set_trans(beat["trans"]).set_ease(beat["ease"])
 		tween.parallel().tween_property(
-			who, "scale", Vector2(beat["sx"], beat["sy"]), secs) \
+			who, "scale", stretch, secs) \
 			.set_trans(beat["trans"]).set_ease(beat["ease"])
+		if joint_driven:
+			var joints := Vector3(clampf(float(beat["deg"])/24.0,-1,1),
+				clampf((1.0-float(beat["sy"]))*6.0,-1,1),
+				clampf(float(beat["deg"])/18.0,-1,1))
+			tween.parallel().tween_property(who,"combat_joint_pose",joints,secs) \
+				.set_trans(beat["trans"]).set_ease(beat["ease"])
 		tween.chain()
 	await tween.finished
 
 func _body_end(who: Control, secs: float = 0.18) -> void:
 	if not _body_home.has(who):
 		return
+	if _ch5_move_active and who == enemy_character:
+		secs *= _ch5_pace()
 	var home: Dictionary = _body_home[who]
 	var tween := create_tween().set_parallel(true)
+	if who == enemy_character and enemy_character.limb_motion != null:
+		tween.tween_property(who,"combat_joint_pose",Vector3.ZERO,secs) \
+			.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	tween.tween_property(who, "position", home["pos"], secs) \
 		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	tween.tween_property(who, "rotation", home["rot"], secs) \
@@ -3674,6 +4094,8 @@ func _strike_follow(who: AnimatedCharacter, facing: float = -1.0) -> void:
 ## lecture deliberately never call it, which is itself part of how they read
 ## as different actions.
 func _body_swing(who: AnimatedCharacter) -> void:
+	if who == enemy_character and who.limb_motion != null:
+		who.contact_sync_pending = true
 	# A skill with its own generated clip swings with THAT; everything else
 	# falls back to the rival's shared attack. Read from _signature_move rather
 	# than threaded through fifteen signatures that would all pass it along
@@ -3700,7 +4122,12 @@ const MELEE_THROUGH_X := -150.0
 ## from or land on the ground were written against the authored y=438 floor and
 ## have to follow the stage wherever it moved to.
 func _stage_floor() -> float:
-	return player_character.position.y + player_character.size.y
+	# The SOLES, not the node's bottom edge. Those were the same thing until
+	# fighters were grounded on their drawn feet (_stand_on_floor); the node now
+	# hangs below the floor by whatever padding its sheet carries, and placing
+	# the backdrop against it would put the painted floor back under the feet by
+	# exactly the amount the grounding just removed.
+	return player_character.position.y + player_character.body_rect().end.y
 
 ## How far the player must travel from its rest pose to bring its own visible
 ## edge MELEE_GAP from the rival's. The mirror of _melee_target_x, and measured
@@ -3840,6 +4267,111 @@ func _melee_retreat(secs: float, gait: String = "walk") -> Array:
 
 ## Entry point. Falls back to the old style-based patterns for any move without
 ## a signature, so an unfinished or renamed skill still animates.
+## Chapter 3's articulated clips are timed against the actual damage frame.
+## Other chapters continue through their existing signature choreography.
+## Chapter 3's move ids have been renamed once already (ch3_* -> c3combat_*).
+## Matching on a single prefix meant the rename silently unrouted all 24 skills:
+## they kept animating, via the generic Chapter 1/2 path, while guard_reduction
+## and self_heal -- which only this resolver reads -- stopped resolving at all.
+## Both prefixes are accepted so the next rename degrades to "unstyled", never
+## to "the defensive skills do nothing".
+## Chapter 4 joins the same resolver rather than getting one of its own. What
+## _resolve_chapter3_turn actually owns is generic -- read guard_reduction and
+## self_heal, drive the articulated clip, land the blow on the beat the routine
+## returns on -- and only _ch3_perform's match is chapter-specific. Adding a
+## second resolver would have meant a second copy of the defensive branch, and
+## the defensive branch is precisely the part that silently stopped working the
+## last time these ids were renamed.
+func _is_chapter3_move(move: EnemyMove) -> bool:
+	var id := move.signature_id()
+	return (id.begins_with("ch3_") or id.begins_with("c3combat_")
+		or id.begins_with("c4combat_") or id.begins_with("c5combat_"))
+
+func _resolve_chapter3_turn(move: EnemyMove) -> void:
+	var defending := move.guard_reduction > 0.0 or move.self_heal > 0
+	var melee := not defending and move.animation_style == "slam"
+	var tint := move.effect_color
+	var move_id := move.signature_id()
+	var mud := _pending_enemy_damage
+	_ch5_move_active = move_id.begins_with("c5combat_")
+	_pending_enemy_damage = 0
+	var damage := move.direct_damage + mud
+	if defending and move_id == "c4combat_eternal_resolve":
+		_ch4_last_guard_turn = _move_index
+	# Phase 2 is the same boss, more determined -- so it is a scaling of what he
+	# already does, not a new moveset. Damage is lifted here rather than in the
+	# routine because the routine performs the blow and the resolver is what
+	# lands it.
+	if defending and move_id in ["c5combat_speakers_shield", "c5combat_quorum_escape"]:
+		_ch5_last_guard_turn = _move_index
+	damage = roundi(float(damage) * _ch4_phase_gain(move_id) * _ch5_damage_gain(move_id))
+	var ch5_ranged := move_id.begins_with("c5combat_") and not melee and not defending
+	if ch5_ranged:
+		_ch5_ranged_contact_pending = true
+		_ch5_ranged_damage = damage
+	_signature_move = move
+	_body_begin(enemy_character, BODY_FEET)
+	if Audio.has_move_sfx(move_id, "cast"):
+		Audio.play_move_sfx(move_id, "cast")
+	# Per-skill choreography -- the Chapter 3 section at the foot of this file.
+	# Each routine runs its own anticipation, wind-up, execution and release,
+	# and returns on the beat the blow should land.
+	await _ch3_perform(move_id, move, tint, melee, defending)
+	# Wait for the final projectile's actual tween contact, including during
+	# accelerated boss phases. No guessed flight timer and no early HP loss.
+	while ch5_ranged and _ch5_ranged_contact_pending:
+		await get_tree().process_frame
+	# The cut-out rig is a display state, not a pose: whatever a skill left it
+	# in, the body is handed back to its drawn frames before anything below
+	# moves it. Idempotent, so a skill that already tidied up pays nothing.
+	if enemy_character.is_rigged():
+		await _ch3_ungather()
+	if defending:
+		if move.guard_reduction > 0.0:
+			_enemy_guard = maxf(_enemy_guard, move.guard_reduction)
+			_show_enemy_guard_badge()
+			_fx_ring(enemy_character, tint, 72.0, 0.40)
+			word_preview_label.text = "%s: guard for the next hit" % move.move_name
+		else:
+			var heal := mini(move.self_heal, _enemy.max_hp - _enemy_hp)
+			_enemy_hp += heal
+			enemy_heart_row.set_value(_enemy_hp)
+			_fx_word("+%d HP" % heal, enemy_character, Color(0.65, 1.0, 0.8))
+			word_preview_label.text = "%s: +%d HP" % [move.move_name, heal]
+		_refresh_damage_preview()
+	elif not ch5_ranged:
+		# Projectiles are released by the skill itself, on the frame they
+		# leave the hand, so nothing generic is thrown here any more.
+		if Audio.has_move_sfx(move_id, "hit"):
+			Audio.play_move_sfx(move_id, "hit")
+		else:
+			Audio.play_sfx("attack_impact")
+		_shake_screen(5.0 if melee else 2.5)
+		_react_room(tint, 8.0 if is_instance_valid(_palace_environment) and _enemy.is_boss else 4.0)
+		_fx_flash(tint, 0.16)
+		word_preview_label.text = "%s hits! -%d HP" % [move.move_name, damage]
+	if damage > 0 and not ch5_ranged:
+		_player_hp = maxi(0, _player_hp - damage)
+		player_heart_row.set_value(_player_hp)
+		Audio.play_sfx("player_hurt")
+		player_character.play_hit()
+		if defending:
+			word_preview_label.text += " (mud: -%d HP)" % mud
+	# Let the clip settle back to exactly the same idle pose before retreating.
+	var recovery := 0.47 if defending or melee else 0.25
+	if _ch5_move_active:
+		recovery *= _ch5_pace()
+	await get_tree().create_timer(recovery, not _ch5_move_active).timeout
+	if melee:
+		await _body_play_walking(enemy_character, _melee_retreat(0.36), 10.0)
+		_body_send_back(enemy_character)
+	await _body_end(enemy_character, 0.12)
+	_ch5_move_active = false
+	_move_index += 1
+	if move_id.begins_with("c5combat_"):
+		_ch5_finish_turn()
+	_highlight_current_move()
+
 func _play_signature_move(move: EnemyMove) -> void:
 	var move_id := move.signature_id() if move != null else ""
 	var tint: Color = move.effect_color if move != null else Color(0.75, 0.35, 0.85, 0.95)
@@ -4389,6 +4921,9 @@ func _on_mud_detonated() -> void:
 	_pending_enemy_damage += MUD_DAMAGE_BONUS
 
 func _end_match(player_won: bool) -> void:
+	if is_instance_valid(_ch5_chamber): _ch5_chamber.stop()
+	Audio.reset_voice()
+	if is_instance_valid(_player_variations): _player_variations.cancel()
 	# A tutorial is a rehearsal, and every real ending writes to GameState --
 	# reset_chapter() on a loss, mark_difficulty_completed() and an encounter
 	# advance on a win. The demonstrations are sized so neither bar should reach
@@ -4403,6 +4938,15 @@ func _end_match(player_won: bool) -> void:
 		_refresh_damage_preview()
 		return
 	_match_over = true
+	if is_instance_valid(_palace_environment): _palace_environment.stop()
+	if is_instance_valid(_regular_combat):
+		_regular_combat.clear_effects()
+		_enemy_guard = 0.0
+		_clear_enemy_guard_badge()
+	if is_instance_valid(_cong_meow):
+		_cong_meow.clear_effects()
+		_enemy_guard = 0.0
+		_clear_enemy_guard_badge()
 	_refresh_damage_preview()
 	if not player_won:
 		# Losing rewinds the whole chapter, not just this fight, and wipes the
@@ -4521,6 +5065,8 @@ func _check_phase_change() -> void:
 ## change together so the escalation reads as one event rather than a stat
 ## quietly moving behind the scenes.
 func _play_phase_transition(index: int) -> void:
+	if is_instance_valid(_ch5_chamber): _ch5_chamber.set_stage(1)
+	if is_instance_valid(_palace_environment): _palace_environment.escalate()
 	_sequence_running = true
 	_update_action_buttons()
 
@@ -5798,5 +6344,2493 @@ func _tutorial_demo_enemy_turn() -> void:
 	if _player_hp <= 0:
 		_player_hp = roundi(GameState.player_max_hp * 0.4)
 		player_heart_row.set_value(_player_hp)
+	_sequence_running = false
+	_update_action_buttons()
+
+# --- Chapter 3: per-skill choreography ------------------------------------
+#
+# Chapters 1 and 2 gave every skill its own _sig_ routine. Chapter 3 shipped
+# with all twenty-four sharing one generic block, which is why its rivals read
+# as the same fight repeated: identical wind-up, identical bolt, identical
+# recovery, whatever the skill was called.
+#
+# What a skill can actually DO here is bounded by two things, and it is worth
+# being plain about which is which:
+#
+#   THE DRAWN CLIPS carry the real limb work. Each rival has attack (12
+#   frames), attack2 (12) and guard (10) -- separate hand-drawn motions, not
+#   one clip recoloured. Nothing here can add a limb the frames do not draw.
+#
+#   THE CUT-OUT RIG (AnimatedCharacter.rig_pose) splits whatever frame is on
+#   screen into legs / torso / head bands and rotates them independently. That
+#   is what makes anticipation and recovery read as a BODY rather than a
+#   sliding picture: knees compress, the torso twists away from the target,
+#   the head leads or lags.
+#
+# So every skill below is built the same way, and it is the shape the brief
+# asks for:
+#
+#   ANTICIPATION + WIND-UP   rig -- knees, torso, head
+#   EXECUTION                the drawn clip, which is where the arm work lives
+#   RELEASE / IMPACT         props leave the hand on the frame they should
+#   FOLLOW-THROUGH+RECOVERY  rig again, then back to the exact idle baseline
+#
+# Props are the third piece. A coin pouch, a valuation stamp, a cashbox, a red
+# pen, a rolled masterplan, a briefcase: none are drawn in the sprites, so each
+# is a node that spawns at the hand, travels the arc the swing implies, and
+# dies. That is what puts the named weapon on screen.
+
+## Where a held prop sits on the sprite, as a fraction of its box. The rivals
+## face LEFT (the player stands on the left), so the working hand is on the
+## left side of the canvas.
+const CH3_HAND := Vector2(0.30, 0.44)
+const CH3_HAND_HIGH := Vector2(0.32, 0.24)
+
+## The rig's anticipation pose. Held for `secs`, then the caller hands the body
+## back to its drawn frames with _ch3_ungather.
+##
+## Positive `legs` rotates the whole figure back onto its rear foot, which is
+## what a wind-up looks like from the side; `torso` counter-rotates against it
+## and `head` against that, so the three bands do not read as one hinge.
+func _ch3_gather(legs: float, torso: float, head: float,
+		bob: float = 0.0, sway: float = 0.0, secs: float = 0.18) -> void:
+	enemy_character.rig_enable()
+	enemy_character.rig_pose(legs, torso, head, bob, sway, secs)
+	await get_tree().create_timer(secs).timeout
+
+## Another rig beat without rebuilding the cut-out -- for a two-stage gather
+## (settle, then coil) or a recoil after the blow.
+func _ch3_pose(legs: float, torso: float, head: float,
+		bob: float = 0.0, sway: float = 0.0, secs: float = 0.12) -> void:
+	if not enemy_character.is_rigged():
+		enemy_character.rig_enable()
+	enemy_character.rig_pose(legs, torso, head, bob, sway, secs)
+	await get_tree().create_timer(secs).timeout
+
+## Back to a neutral stance and off the rig, so the drawn clip can take over
+## from exactly the pose the rig left.
+func _ch3_ungather(secs: float = 0.09) -> void:
+	if not enemy_character.is_rigged():
+		return
+	enemy_character.rig_pose(0.0, 0.0, 0.0, 0.0, 0.0, secs)
+	await get_tree().create_timer(secs + 0.01).timeout
+	enemy_character.rig_disable()
+
+## Plays this skill's own drawn clip over `secs`.
+func _ch3_clip(move: EnemyMove, secs: float = 0.80) -> void:
+	if _ch5_move_active:
+		secs *= _ch5_pace()
+	if not move.attack_dir.is_empty():
+		enemy_character.play_clip(move.attack_dir, move.attack_count, secs)
+	else:
+		enemy_character.play_attack()
+
+## A held object. Spawned at the rival's hand rather than at its centre, so a
+## swing starts where a hand is instead of out of the chest.
+func _ch3_prop(tint: Color, prop_size: Vector2, corner: int = 2,
+		high: bool = false) -> Panel:
+	var prop := Panel.new()
+	prop.add_theme_stylebox_override("panel", _fx_style(tint, corner, prop_size.x * 0.3))
+	prop.size = prop_size
+	prop.pivot_offset = prop_size * 0.5
+	var anchor: Vector2 = CH3_HAND_HIGH if high else CH3_HAND
+	prop.position = enemy_character.position + enemy_character.size * anchor - prop_size * 0.5
+	_fx_node(prop, 1.2)
+	return prop
+
+## Carries a prop through the arc its swing implies. `dx`/`dy` are relative to
+## where it spawned, so a caller thinks in "up and across", not screen coords.
+func _ch3_prop_arc(prop: Panel, dx: float, dy: float, spin_deg: float,
+		secs: float, fade: bool = true) -> void:
+	var tween := create_tween()
+	tween.parallel().tween_property(prop, "position",
+		prop.position + Vector2(dx, dy), secs).set_trans(Tween.TRANS_QUAD)
+	tween.parallel().tween_property(prop, "rotation", deg_to_rad(spin_deg), secs)
+	if fade:
+		tween.parallel().tween_property(prop, "modulate:a", 0.0, secs).set_delay(secs * 0.55)
+
+## The walk in, using the rival's real ten-frame walk cycle. Chapter 3's rivals
+## all have one, so _body_play_walking uses the drawn legs rather than the rig.
+func _ch3_walk_in(secs: float = 0.42, gait: String = "charge") -> void:
+	_body_bring_forward(enemy_character)
+	await _body_play_walking(enemy_character, _melee_advance(gait, secs), 10.0)
+
+## Dispatch. Every id below is a real Chapter 3 move; anything unmatched falls
+## through to a competent generic performance rather than nothing, so a skill
+## added tomorrow still animates.
+func _ch3_perform(move_id: String, move: EnemyMove, tint: Color,
+		melee: bool, defending: bool) -> void:
+	# One approach for every melee skill, so a routine never has to know whether
+	# the data calls it a slam. The retreat is the resolver's, already.
+	if melee:
+		await _ch3_walk_in(0.46, "stride")
+	if move_id.begins_with("c4combat_"):
+		await _ch4_perform(move_id, move, tint, melee, defending)
+		return
+	if move_id.begins_with("c5combat_"):
+		await _ch5_perform(move_id, move, tint, melee, defending)
+		return
+	match move_id:
+		# --- Bokal Bulsa: the pocket politico -----------------------------
+		"c3combat_resolution_ricochet": await _ch3_kickback_flick(move, tint)
+		"c3combat_pocket_punch": await _ch3_pocket_payload(move, tint)
+		"c3combat_pocket_privilege": await _ch3_deep_pockets(move, tint)
+		# --- Assessor Altapresyo: the valuation vulture -------------------
+		"c3combat_tax_tag_toss": await _ch3_markup_strike(move, tint)
+		"c3combat_appraisal_hammer": await _ch3_appraisal_talons(move, tint)
+		"c3combat_assessment_shield": await _ch3_overvalued_cover(move, tint)
+		# --- Treasurer Tago: the vault keeper -----------------------------
+		"c3combat_coffer_crush": await _ch3_treasury_slam(move, tint)
+		"c3combat_lockbox_launch": await _ch3_keychain_lash(move, tint)
+		"c3combat_vault_lockdown": await _ch3_vault_lockdown(move, tint)
+		# --- Auditor Alibi: the paper trail painter -----------------------
+		"c3combat_red_pen_riposte": await _ch3_redaction_slash(move, tint)
+		"c3combat_paper_trail_storm": await _ch3_paper_trail_torrent(move, tint)
+		"c3combat_audit_exception": await _ch3_whitewash(move, tint)
+		# --- Planner Palusot: the masterplan manipulator ------------------
+		"c3combat_blueprint_bash": await _ch3_blueprint_crossfire(move, tint)
+		"c3combat_zoning_grid": await _ch3_compass_sweep(move, tint)
+		"c3combat_revised_plan": await _ch3_strategic_reroute(move, tint)
+		# --- Engineer Eskandalo: the project wrecker ----------------------
+		"c3combat_hard_hat_headbutt": await _ch3_substandard_smash(move, tint)
+		"c3combat_concrete_chuck": await _ch3_rebar_rake(move, tint)
+		"c3combat_safety_barricade": await _ch3_hardhat_hunker(move, tint)
+		# --- Contractor Kutsaba: the capitol partner ----------------------
+		"c3combat_change_order_barrage": await _ch3_rigged_deal(move, tint)
+		"c3combat_contract_case_combo": await _ch3_partners_cut(move, tint)
+		"c3combat_partner_protection": await _ch3_padded_contract(move, tint)
+		# --- Project Padrino: the backroom benefactor ---------------------
+		"c3combat_backroom_deal": await _ch3_strings_attached(move, tint)
+		"c3combat_padrino_palm": await _ch3_backroom_verdict(move, tint)
+		"c3combat_padrinos_favor": await _ch3_patrons_protection(move, tint)
+		_: await _ch3_generic(move, tint, melee, defending)
+
+## The fallback, kept deliberately competent: it still gathers on the rig and
+## still throws, so an unnamed skill is plain rather than broken.
+func _ch3_generic(move: EnemyMove, tint: Color, melee: bool, _defending: bool) -> void:
+	await _ch3_gather(4.0, -5.0, -3.0, 2.0, 3.0, 0.16)
+	await _ch3_ungather()
+	_ch3_clip(move, 0.80)
+	_fx_charge(enemy_character, tint, 0.28)
+	await _body_play(enemy_character, [_beat(_ch3_dx(), 0, 0, 1, 1, 0.22)])
+	if not melee:
+		var count := 3 if move.animation_style == "volley" else 1
+		for i in count:
+			_spawn_bolt(enemy_character, player_character, tint, 8.0,
+				0.15, float(i) * 0.035, float(i - count / 2) * 8.0, false)
+		await get_tree().create_timer(0.22).timeout
+
+## Where the body currently is relative to its home, so a beat written for a
+## standing rival still works after a melee walk-in has moved it.
+func _ch3_dx() -> float:
+	return enemy_character.position.x - _body_home_x(enemy_character)
+
+# =========================================================================
+# BOKAL BULSA -- The Pocket Politico
+# =========================================================================
+
+## RANGED. Envelopes flicked off the fingers -- the drawn attack clip is
+## exactly that motion, so the clip does the arm and the rig does the lean.
+## Three envelopes leave on three different lines: straight, curving up, then
+## one thrown hard enough to skip.
+func _ch3_kickback_flick(move: EnemyMove, tint: Color) -> void:
+	# Anticipation: weight settles back, torso closes, head checks the target.
+	await _ch3_gather(3.0, -6.0, -4.0, 2.0, 4.0, 0.16)
+	await _ch3_pose(5.0, -10.0, -6.0, 3.0, 6.0, 0.12)
+	await _ch3_ungather()
+	_ch3_clip(move, 0.74)
+	_fx_charge(enemy_character, tint, 0.24)
+	await _body_play(enemy_character, [_beat(_ch3_dx() - 4.0, 0, 2, 1, 1, 0.18)])
+	var paper := Color(0.96, 0.93, 0.84, 0.98)
+	_fx_paper(Vector2(16, 11), paper, 0.30, 0.00, 0.0, 30.0)
+	_fx_paper(Vector2(16, 11), paper, 0.34, 0.09, -26.0, -40.0)
+	_fx_paper(Vector2(19, 13), paper, 0.26, 0.19, 10.0, 90.0)
+	_fx_splatter(enemy_character, Color(0.78, 0.16, 0.16, 0.9), 4, 16.0, 0.34)
+	await get_tree().create_timer(0.46).timeout
+
+## MELEE. The pouch of coins. He walks in easily -- the deception is that
+## nothing about the approach telegraphs a strike -- then plants, coils, and
+## brings the pouch up from below.
+func _ch3_pocket_payload(move: EnemyMove, tint: Color) -> void:
+	# Plants the rear foot and coils: knees compress, torso winds away.
+	await _ch3_gather(7.0, -12.0, -5.0, 4.0, 5.0, 0.20)
+	await _ch3_ungather()
+	var gold := Color(0.95, 0.78, 0.30, 1.0)
+	var pouch := _ch3_prop(Color(0.44, 0.30, 0.16, 1.0), Vector2(22, 26), 8)
+	_ch3_clip(move, 0.72)
+	# The uppercut: body drives up and through, pouch swings from low to high.
+	_ch3_prop_arc(pouch, -34.0, -46.0, -120.0, 0.26, false)
+	await _body_play(enemy_character, [
+		_beat(_ch3_dx() + 4.0, 4, 3, 1.02, 0.97, 0.10, Tween.TRANS_QUAD, Tween.EASE_IN),
+		_beat(_ch3_dx() - 10.0, -6, -8, 1.0, 1.04, 0.14, Tween.TRANS_BACK, Tween.EASE_OUT),
+	])
+	_fx_splatter(player_character, gold, 12, 30.0, 0.55)
+	_fx_ring(player_character, gold, 64.0, 0.30)
+	var tween := create_tween()
+	tween.tween_property(pouch, "modulate:a", 0.0, 0.18)
+	await get_tree().create_timer(0.10).timeout
+
+## DEFENSIVE. An oversized Provincial Board folder held across the body. Foot
+## slides back, knees bend, the folder comes up on the diagonal and a seal
+## lights behind it.
+func _ch3_deep_pockets(move: EnemyMove, tint: Color) -> void:
+	# Notices it coming: head snaps first, body follows.
+	await _ch3_gather(0.0, -3.0, -9.0, 0.0, 2.0, 0.12)
+	await _ch3_pose(9.0, -8.0, -4.0, 5.0, 9.0, 0.16)
+	await _ch3_ungather()
+	_ch3_clip(move, 0.70)
+	var folder := _ch3_prop(Color(0.72, 0.60, 0.34, 1.0), Vector2(30, 40), 3)
+	folder.rotation = deg_to_rad(-24.0)
+	_ch3_prop_arc(folder, -10.0, -6.0, -14.0, 0.22, false)
+	_fx_ring(enemy_character, tint, 78.0, 0.36)
+	_fx_word("PRIVILEGE", enemy_character, Color(1.0, 0.88, 0.52), 20.0, 0.10, 10)
+	await get_tree().create_timer(0.30).timeout
+	# The barrier takes the hit: arms recoil, papers come loose.
+	_fx_splatter(enemy_character, Color(0.96, 0.93, 0.84, 0.9), 6, 22.0, 0.4)
+	await _ch3_pose(4.0, 6.0, 4.0, 3.0, 6.0, 0.12)
+	var tween := create_tween()
+	tween.tween_property(folder, "modulate:a", 0.0, 0.20)
+	await _ch3_ungather()
+
+# =========================================================================
+# ASSESSOR ALTAPRESYO -- The Valuation Vulture
+# =========================================================================
+
+## RANGED. Price tags thrown as projectiles: straight, curved, then one heavy
+## enough to arrive late and hard.
+func _ch3_markup_strike(move: EnemyMove, tint: Color) -> void:
+	await _ch3_gather(2.0, -5.0, -7.0, 1.0, 3.0, 0.15)
+	_fx_word("APPRAISING…", enemy_character, Color(0.86, 0.9, 1.0), 16.0, 0.0, 9)
+	await _ch3_pose(4.0, -11.0, -4.0, 3.0, 5.0, 0.13)
+	await _ch3_ungather()
+	_ch3_clip(move, 0.76)
+	_fx_charge(enemy_character, tint, 0.24)
+	await _body_play(enemy_character, [_beat(_ch3_dx() - 3.0, 0, 2, 1, 1, 0.18)])
+	var tag := Color(0.98, 0.86, 0.42, 0.98)
+	_fx_paper(Vector2(15, 10), tag, 0.28, 0.00, 0.0, 20.0)
+	_fx_paper(Vector2(15, 10), tag, 0.34, 0.08, -30.0, 160.0)
+	_fx_paper(Vector2(22, 15), tag, 0.22, 0.18, 6.0, 60.0)
+	_fx_word("₱₱₱", player_character, Color(0.98, 0.82, 0.36), 22.0, 0.30, 13)
+	await get_tree().create_timer(0.48).timeout
+
+## MELEE-ish LUNGE. The valuation stamp swung two-handed from over the
+## shoulder. Heaviest wind-up of the three: he genuinely struggles with it.
+func _ch3_appraisal_talons(move: EnemyMove, tint: Color) -> void:
+	# Hefts it up over the shoulder -- torso opens, knees take the weight.
+	await _ch3_gather(6.0, -14.0, -6.0, 5.0, 6.0, 0.22)
+	await _ch3_ungather()
+	var stamp := _ch3_prop(Color(0.72, 0.18, 0.18, 1.0), Vector2(26, 30), 4, true)
+	_ch3_clip(move, 0.70)
+	# The downward swing.
+	_ch3_prop_arc(stamp, -40.0, 44.0, 96.0, 0.22, false)
+	await _body_play(enemy_character, [
+		_beat(_ch3_dx() + 5.0, -4, 6, 1.0, 1.03, 0.12, Tween.TRANS_QUAD, Tween.EASE_IN),
+		_beat(_ch3_dx() - 14.0, 5, -7, 1.03, 0.96, 0.13, Tween.TRANS_BACK, Tween.EASE_OUT),
+	])
+	_fx_ring(player_character, Color(0.86, 0.22, 0.2), 70.0, 0.28)
+	_fx_word("OVERVALUED!", player_character, Color(0.98, 0.36, 0.3), 26.0, 0.04, 14)
+	_fx_splatter(player_character, Color(0.66, 0.58, 0.48, 0.85), 9, 26.0, 0.45)
+	var tween := create_tween()
+	tween.tween_property(stamp, "modulate:a", 0.0, 0.16)
+	# Knees compress under the landed weight.
+	await _ch3_pose(8.0, 5.0, 5.0, 6.0, 0.0, 0.12)
+	await _ch3_ungather()
+
+## DEFENSIVE. A torn-off assessment sheet held up, property boundary lines
+## snapping into a grid around him.
+func _ch3_overvalued_cover(move: EnemyMove, tint: Color) -> void:
+	await _ch3_gather(0.0, -4.0, -8.0, 0.0, 2.0, 0.12)
+	await _ch3_pose(7.0, -7.0, -3.0, 4.0, 7.0, 0.15)
+	await _ch3_ungather()
+	_ch3_clip(move, 0.72)
+	var sheet := _ch3_prop(Color(0.94, 0.92, 0.86, 1.0), Vector2(34, 30), 2)
+	_ch3_prop_arc(sheet, -8.0, -4.0, 6.0, 0.20, false)
+	# The grid: four boundary lines snapping in around him.
+	for i in _fx_count(4):
+		_fx_ring(enemy_character, tint, 46.0 + 16.0 * float(i), 0.34, 0.06 * float(i))
+	_fx_word("ASSESSED", enemy_character, Color(0.9, 0.94, 1.0), 18.0, 0.12, 10)
+	await get_tree().create_timer(0.32).timeout
+	_fx_splatter(enemy_character, Color(0.94, 0.92, 0.86, 0.9), 6, 20.0, 0.4)
+	await _ch3_pose(3.0, 5.0, 3.0, 2.0, 5.0, 0.12)
+	var tween := create_tween()
+	tween.tween_property(sheet, "modulate:a", 0.0, 0.20)
+	await _ch3_ungather()
+
+# =========================================================================
+# TREASURER TAGO -- The Vault Keeper
+# =========================================================================
+
+## MELEE. The treasury cashbox, carried in and swung sideways. He is visibly
+## working: the walk is slow, the coil is deep, and the momentum turns him.
+func _ch3_treasury_slam(move: EnemyMove, tint: Color) -> void:
+	# Both arms strain: knees bend hard, torso leans back against the weight.
+	await _ch3_gather(9.0, -10.0, -4.0, 6.0, 4.0, 0.24)
+	await _ch3_ungather()
+	var box := _ch3_prop(Color(0.52, 0.54, 0.58, 1.0), Vector2(34, 26), 3)
+	_ch3_clip(move, 0.74)
+	_ch3_prop_arc(box, -46.0, -6.0, -40.0, 0.24, false)
+	await _body_play(enemy_character, [
+		_beat(_ch3_dx() + 6.0, 2, 7, 1.02, 0.98, 0.11, Tween.TRANS_QUAD, Tween.EASE_IN),
+		_beat(_ch3_dx() - 12.0, -2, -10, 1.0, 1.02, 0.14, Tween.TRANS_BACK, Tween.EASE_OUT),
+	])
+	var gold := Color(0.95, 0.80, 0.32, 1.0)
+	_fx_splatter(player_character, gold, 14, 34.0, 0.6)
+	_fx_splatter(player_character, Color(0.96, 0.93, 0.84, 0.9), 5, 26.0, 0.5)
+	_fx_ring(player_character, gold, 66.0, 0.30)
+	var tween := create_tween()
+	tween.tween_property(box, "modulate:a", 0.0, 0.18)
+	# The swing carries him round; he catches his balance.
+	await _ch3_pose(-5.0, 9.0, 6.0, 3.0, -6.0, 0.14)
+	await _ch3_ungather()
+
+## RANGED. Three lockboxes: thrown overhand, thrown sidearm, and the third
+## KICKED -- the leg beat is the point of the skill.
+func _ch3_keychain_lash(move: EnemyMove, tint: Color) -> void:
+	await _ch3_gather(3.0, -6.0, -5.0, 2.0, 4.0, 0.16)
+	_fx_word("♪ click ♪", enemy_character, Color(0.86, 0.9, 0.96), 14.0, 0.0, 9)
+	await _ch3_ungather()
+	_ch3_clip(move, 0.78)
+	var steel := Color(0.62, 0.64, 0.70, 0.98)
+	# One overhand, one sidearm.
+	_fx_slab(enemy_character, player_character, steel, Vector2(16, 14), 0.30, 0.00, -22.0, 90.0, 3)
+	_fx_slab(enemy_character, player_character, steel, Vector2(16, 14), 0.30, 0.10, 14.0, -70.0, 3)
+	await _body_play(enemy_character, [_beat(_ch3_dx() - 4.0, 0, 3, 1, 1, 0.18)])
+	# The kick: the whole figure pivots onto the standing leg and the boot
+	# comes through. Legs rotate one way, torso counters, head stays level.
+	await _ch3_pose(-13.0, 9.0, 4.0, -4.0, -7.0, 0.13)
+	_fx_slab(enemy_character, player_character, steel, Vector2(20, 18), 0.22, 0.0, 0.0, 200.0, 3)
+	Audio.play_sfx("attack_impact")
+	await _ch3_pose(4.0, -3.0, -2.0, 2.0, 3.0, 0.12)
+	await _ch3_ungather()
+	_fx_splatter(player_character, Color(0.95, 0.80, 0.32, 1.0), 10, 28.0, 0.5)
+	await get_tree().create_timer(0.14).timeout
+
+## DEFENSIVE. A vault door hauled across on its wheel. Two-handed pull, brace
+## behind it, recoil when it is struck, then wind it back.
+func _ch3_vault_lockdown(move: EnemyMove, tint: Color) -> void:
+	await _ch3_gather(0.0, -3.0, -10.0, 0.0, 2.0, 0.12)
+	# Hauls the wheel: torso rotates hard, knees drop into it.
+	await _ch3_pose(10.0, -13.0, -3.0, 6.0, 8.0, 0.20)
+	await _ch3_ungather()
+	_ch3_clip(move, 0.70)
+	var door := _ch3_prop(Color(0.46, 0.48, 0.54, 1.0), Vector2(40, 58), 4)
+	door.position.y -= 8.0
+	_ch3_prop_arc(door, -14.0, 0.0, 0.0, 0.18, false)
+	_fx_ring(enemy_character, Color(0.72, 0.78, 0.86), 74.0, 0.34)
+	_fx_word("SEALED", enemy_character, Color(0.84, 0.9, 0.98), 18.0, 0.12, 10)
+	await get_tree().create_timer(0.30).timeout
+	# Struck: the door shakes, sparks, and he recoils behind it.
+	_fx_splatter(enemy_character, Color(1.0, 0.86, 0.5, 0.95), 8, 20.0, 0.32)
+	var shake := create_tween()
+	shake.tween_property(door, "position:x", door.position.x + 5.0, 0.05)
+	shake.tween_property(door, "position:x", door.position.x - 3.0, 0.05)
+	shake.tween_property(door, "position:x", door.position.x, 0.05)
+	await _ch3_pose(6.0, 7.0, 3.0, 4.0, 8.0, 0.13)
+	var tween := create_tween()
+	tween.tween_property(door, "modulate:a", 0.0, 0.22)
+	await _ch3_ungather()
+
+# =========================================================================
+# AUDITOR ALIBI -- The Paper Trail Painter
+# =========================================================================
+
+## RANGED. The red pen as a fencing weapon: he turns side-on, thrusts, recovers,
+## slashes on the diagonal, and leaves a check mark hanging.
+func _ch3_redaction_slash(move: EnemyMove, tint: Color) -> void:
+	# Side-on fencing stance: legs open, torso squares, head level.
+	await _ch3_gather(-6.0, 8.0, -3.0, 0.0, -5.0, 0.16)
+	await _ch3_ungather()
+	var pen := _ch3_prop(Color(0.88, 0.20, 0.22, 1.0), Vector2(30, 6), 2)
+	_ch3_clip(move, 0.76)
+	# Thrust.
+	_ch3_prop_arc(pen, -30.0, 0.0, 0.0, 0.12, false)
+	await _body_play(enemy_character, [
+		_beat(_ch3_dx() - 16.0, 0, 0, 1.04, 0.98, 0.10, Tween.TRANS_QUAD, Tween.EASE_OUT),
+		_beat(_ch3_dx() - 4.0, 0, 0, 1.0, 1.0, 0.09),
+	])
+	_fx_slab(enemy_character, player_character, Color(0.9, 0.24, 0.24, 0.9),
+		Vector2(26, 4), 0.14, 0.0, 0.0, 0.0, 1)
+	# Second cut, on the diagonal.
+	_ch3_prop_arc(pen, -22.0, 18.0, 40.0, 0.12, false)
+	await _body_play(enemy_character, [
+		_beat(_ch3_dx() - 14.0, 3, -5, 1.03, 0.99, 0.10, Tween.TRANS_QUAD, Tween.EASE_OUT),
+	])
+	_fx_slab(enemy_character, player_character, Color(0.9, 0.24, 0.24, 0.9),
+		Vector2(24, 4), 0.14, 0.0, -18.0, 32.0, 1)
+	_fx_word("✓", player_character, Color(0.96, 0.28, 0.26), 24.0, 0.10, 22)
+	var tween := create_tween()
+	tween.tween_property(pen, "modulate:a", 0.0, 0.16)
+	await get_tree().create_timer(0.22).timeout
+
+## RANGED. The binder opens and the trail comes out: receipts, then reports,
+## then one stamped document heavy enough to land like a brick.
+func _ch3_paper_trail_torrent(move: EnemyMove, tint: Color) -> void:
+	await _ch3_gather(2.0, -7.0, -6.0, 1.0, 3.0, 0.16)
+	# Draws the circle in the air: torso opens, head follows the hand.
+	await _ch3_pose(2.0, 9.0, 7.0, 0.0, -3.0, 0.16)
+	for i in _fx_count(3):
+		_fx_ring(enemy_character, tint, 40.0 + 18.0 * float(i), 0.36, 0.07 * float(i))
+	await _ch3_ungather()
+	_ch3_clip(move, 0.82)
+	await _body_play(enemy_character, [_beat(_ch3_dx() - 5.0, 0, 3, 1, 1, 0.16)])
+	var paper := Color(0.96, 0.94, 0.88, 0.98)
+	for i in _fx_count(5):
+		_fx_paper(Vector2(14, 10), paper, 0.30, 0.05 * float(i),
+			float(i - 2) * 14.0, float(i) * 40.0 - 60.0)
+	# The disallowance: bigger, slower, arrives last.
+	_fx_paper(Vector2(28, 22), Color(0.92, 0.88, 0.80, 1.0), 0.30, 0.30, 0.0, 24.0)
+	_fx_word("DISALLOWANCE", player_character, Color(0.96, 0.32, 0.28), 24.0, 0.42, 12)
+	await get_tree().create_timer(0.58).timeout
+
+## DEFENSIVE + HEAL. Sheets tossed up align into a wall; he writes a note
+## while it holds. This is the chapter's only self-heal.
+func _ch3_whitewash(move: EnemyMove, tint: Color) -> void:
+	await _ch3_gather(0.0, -4.0, -7.0, 0.0, 2.0, 0.13)
+	# Tosses the sheets: arms up, torso opens, head back.
+	await _ch3_pose(-3.0, 10.0, 8.0, -3.0, -4.0, 0.16)
+	await _ch3_ungather()
+	_ch3_clip(move, 0.74)
+	var white := Color(0.97, 0.96, 0.92, 1.0)
+	# The wall: three sheets standing in a row in front of him.
+	for i in 3:
+		var sheet := _ch3_prop(white, Vector2(16, 44), 1)
+		sheet.position += Vector2(-16.0 + float(i) * 14.0, -6.0)
+		var rise := create_tween()
+		rise.tween_property(sheet, "position:y", sheet.position.y - 10.0, 0.22)
+		rise.parallel().tween_property(sheet, "modulate:a", 0.0, 0.55).set_delay(0.30)
+	_fx_ring(enemy_character, white, 70.0, 0.34)
+	_fx_word("NO FINDING", enemy_character, Color(0.86, 1.0, 0.92), 20.0, 0.14, 10)
+	await get_tree().create_timer(0.34).timeout
+	await _ch3_pose(2.0, -4.0, -3.0, 1.0, 3.0, 0.12)
+	await _ch3_ungather()
+
+# =========================================================================
+# PLANNER PALUSOT -- The Masterplan Manipulator
+# =========================================================================
+
+## RANGED. The rolled masterplan used as a staff: horizontal swing, spin, then
+## the plan half-unrolls and sheets fly off it toward the player.
+func _ch3_blueprint_crossfire(move: EnemyMove, tint: Color) -> void:
+	await _ch3_gather(5.0, -9.0, -5.0, 3.0, 5.0, 0.18)
+	await _ch3_ungather()
+	var roll := _ch3_prop(Color(0.36, 0.52, 0.72, 1.0), Vector2(38, 8), 3)
+	_ch3_clip(move, 0.78)
+	# Horizontal sweep, then a spin through the body.
+	_ch3_prop_arc(roll, -26.0, -4.0, -150.0, 0.24, false)
+	await _body_play(enemy_character, [
+		_beat(_ch3_dx() + 4.0, 0, 6, 1.0, 1.0, 0.10, Tween.TRANS_QUAD, Tween.EASE_IN),
+		_beat(_ch3_dx() - 9.0, 0, -9, 1.02, 0.99, 0.13, Tween.TRANS_BACK, Tween.EASE_OUT),
+	])
+	var blue := Color(0.58, 0.74, 0.94, 0.96)
+	_fx_paper(Vector2(20, 14), blue, 0.28, 0.00, -18.0, 60.0)
+	_fx_paper(Vector2(20, 14), blue, 0.30, 0.10, 18.0, -60.0)
+	_fx_paper(Vector2(24, 16), blue, 0.24, 0.20, 0.0, 120.0)
+	var tween := create_tween()
+	tween.tween_property(roll, "modulate:a", 0.0, 0.20)
+	await get_tree().create_timer(0.42).timeout
+
+## MELEE. He kneels to set the plan down, the zoning grid lights under the
+## player, model buildings rise out of it -- and then fall on them.
+func _ch3_compass_sweep(move: EnemyMove, tint: Color) -> void:
+	# Kneels to place the map: deep knee bend, torso folds over it.
+	await _ch3_gather(12.0, -16.0, -8.0, 8.0, 3.0, 0.22)
+	await _ch3_ungather()
+	_ch3_clip(move, 0.72)
+	# The grid, drawn under the player rather than around the caster.
+	for i in _fx_count(3):
+		_fx_ring(player_character, Color(0.50, 0.78, 0.96), 52.0 + 20.0 * float(i),
+			0.32, 0.07 * float(i))
+	_fx_word("ZONED", player_character, Color(0.62, 0.86, 1.0), 18.0, 0.06, 11)
+	await _body_play(enemy_character, [_beat(_ch3_dx(), 0, 0, 1, 1, 0.16)])
+	# Buildings rise, then come down.
+	for i in 3:
+		var block := _ch3_prop(Color(0.72, 0.74, 0.78, 1.0), Vector2(12, 30), 1)
+		block.position = player_character.position + Vector2(
+			player_character.size.x * 0.3 + float(i) * 16.0, player_character.size.y * 0.34)
+		var t := create_tween()
+		t.tween_property(block, "position:y", block.position.y - 34.0, 0.20)
+		t.tween_property(block, "position:y", block.position.y + 12.0, 0.14)
+		t.parallel().tween_property(block, "modulate:a", 0.0, 0.18)
+	await get_tree().create_timer(0.36).timeout
+	_fx_splatter(player_character, Color(0.70, 0.66, 0.58, 0.9), 11, 30.0, 0.5)
+	_fx_ring(player_character, Color(0.66, 0.62, 0.56), 68.0, 0.28)
+	await _ch3_pose(4.0, -4.0, -3.0, 2.0, 4.0, 0.12)
+	await _ch3_ungather()
+
+## DEFENSIVE / EVASION. He redraws the route and steps off it. The sidestep is
+## real travel with real legs, not a fade -- and he comes back to the exact
+## same x, so the baseline is never lost.
+func _ch3_strategic_reroute(move: EnemyMove, tint: Color) -> void:
+	await _ch3_gather(0.0, -3.0, -9.0, 0.0, 2.0, 0.12)
+	_ch3_clip(move, 0.70)
+	_fx_word("REVISED", enemy_character, Color(0.66, 0.88, 1.0), 18.0, 0.0, 10)
+	var arrow := _ch3_prop(Color(0.52, 0.82, 0.98, 0.9), Vector2(30, 5), 2)
+	arrow.position.y += enemy_character.size.y * 0.36
+	_ch3_prop_arc(arrow, 20.0, 0.0, 0.0, 0.26)
+	await _ch3_ungather()
+	# The sidestep itself, on the drawn walk cycle.
+	var home := _body_home_x(enemy_character)
+	await _body_play_walking(enemy_character, [
+		_beat(_ch3_dx() + 26.0, 0, -4, 1, 1, 0.20),
+	], 12.0)
+	_fx_ring(enemy_character, tint, 60.0, 0.30)
+	await get_tree().create_timer(0.16).timeout
+	# Back to the exact baseline.
+	await _body_play_walking(enemy_character, [
+		_beat(0, 0, 0, 1, 1, 0.20),
+	], 12.0)
+	enemy_character.position.x = home
+
+# =========================================================================
+# ENGINEER ESKANDALO -- The Project Wrecker
+# =========================================================================
+
+## MELEE. The hard-hat headbutt. He stomps, drops his head, RUNS the whole
+## distance on the drawn walk cycle, and leads with the helmet.
+func _ch3_substandard_smash(move: EnemyMove, tint: Color) -> void:
+	# Tightens the strap and stomps: one hard knee compression on the spot.
+	await _ch3_gather(0.0, -6.0, -10.0, 5.0, 0.0, 0.16)
+	await _ch3_pose(3.0, -12.0, -16.0, 3.0, 4.0, 0.12)
+	await _ch3_ungather()
+	# The run -- a fast cadence so the legs visibly cycle.
+	_ch3_clip(move, 0.60)
+	# Head drops into the hit.
+	await _body_play(enemy_character, [
+		_beat(_ch3_dx() - 10.0, 6, -12, 1.04, 0.96, 0.10, Tween.TRANS_QUAD, Tween.EASE_IN),
+	])
+	_fx_splatter(player_character, Color(1.0, 0.88, 0.52, 0.95), 10, 24.0, 0.35)
+	_fx_ring(player_character, Color(1.0, 0.82, 0.36), 62.0, 0.26)
+	# Rebound: he bounces off it and shakes his head clear.
+	await _body_play(enemy_character, [
+		_beat(_ch3_dx() + 12.0, -3, 8, 1.0, 1.02, 0.12, Tween.TRANS_BACK, Tween.EASE_OUT),
+	])
+	await _ch3_pose(0.0, 4.0, 12.0, 0.0, 0.0, 0.10)
+	await _ch3_pose(0.0, 0.0, -8.0, 0.0, 0.0, 0.09)
+	await _ch3_ungather()
+
+## MELEE. Concrete. He kneels, lifts with both arms, throws overhead, then
+## kicks a smaller piece after it.
+func _ch3_rebar_rake(move: EnemyMove, tint: Color) -> void:
+	# Kneels and lifts: the deepest knee bend of any rival.
+	await _ch3_gather(14.0, -8.0, -6.0, 9.0, 2.0, 0.20)
+	await _ch3_pose(2.0, -14.0, -8.0, -3.0, 4.0, 0.16)
+	await _ch3_ungather()
+	var rock := Color(0.58, 0.56, 0.52, 1.0)
+	var chunk := _ch3_prop(rock, Vector2(24, 20), 3, true)
+	_ch3_clip(move, 0.70)
+	_ch3_prop_arc(chunk, -46.0, 6.0, -70.0, 0.22, false)
+	await _body_play(enemy_character, [
+		_beat(_ch3_dx() + 5.0, -3, 5, 1.0, 1.02, 0.10, Tween.TRANS_QUAD, Tween.EASE_IN),
+		_beat(_ch3_dx() - 11.0, 3, -6, 1.02, 0.98, 0.13, Tween.TRANS_BACK, Tween.EASE_OUT),
+	])
+	_fx_splatter(player_character, rock, 12, 30.0, 0.55)
+	_fx_ring(player_character, Color(0.72, 0.68, 0.60), 64.0, 0.28)
+	var tween := create_tween()
+	tween.tween_property(chunk, "modulate:a", 0.0, 0.16)
+	# And the kick after it.
+	await _ch3_pose(-12.0, 8.0, 3.0, -4.0, -6.0, 0.12)
+	_fx_slab(enemy_character, player_character, rock, Vector2(14, 12), 0.20, 0.0, 0.0, 180.0, 3)
+	await _ch3_pose(3.0, -3.0, -2.0, 2.0, 3.0, 0.11)
+	await _ch3_ungather()
+
+## DEFENSIVE. A folding barricade kicked open and braced with both hands. One
+## foot slides back under the force.
+func _ch3_hardhat_hunker(move: EnemyMove, tint: Color) -> void:
+	await _ch3_gather(0.0, -4.0, -8.0, 0.0, 2.0, 0.12)
+	# Kicks the legs of the barricade open.
+	await _ch3_pose(-10.0, 6.0, 2.0, -3.0, -5.0, 0.13)
+	await _ch3_ungather()
+	_ch3_clip(move, 0.72)
+	var bar := _ch3_prop(Color(0.94, 0.78, 0.16, 1.0), Vector2(44, 30), 2)
+	_ch3_prop_arc(bar, -12.0, 2.0, 0.0, 0.18, false)
+	_fx_word("UNDER CONSTRUCTION", enemy_character, Color(1.0, 0.88, 0.36), 18.0, 0.10, 9)
+	for i in _fx_count(2):
+		_fx_ring(enemy_character, Color(0.98, 0.82, 0.20), 60.0 + 18.0 * float(i),
+			0.32, 0.08 * float(i))
+	await get_tree().create_timer(0.30).timeout
+	# Braced: the barrier shakes and his rear foot slides.
+	var shake := create_tween()
+	shake.tween_property(bar, "position:x", bar.position.x + 6.0, 0.05)
+	shake.tween_property(bar, "position:x", bar.position.x, 0.07)
+	await _ch3_pose(8.0, 6.0, 3.0, 4.0, 10.0, 0.14)
+	var tween := create_tween()
+	tween.tween_property(bar, "modulate:a", 0.0, 0.20)
+	await _ch3_ungather()
+
+# =========================================================================
+# CONTRACTOR KUTSABA -- The Capitol Partner
+# =========================================================================
+
+## RANGED. Change orders thrown like cards -- one, then a sidestep and another,
+## then a spin and a third that arrives twice the size.
+func _ch3_rigged_deal(move: EnemyMove, tint: Color) -> void:
+	await _ch3_gather(3.0, -7.0, -5.0, 2.0, 4.0, 0.16)
+	_fx_word("CHANGE ORDER", enemy_character, Color(1.0, 0.92, 0.72), 16.0, 0.0, 9)
+	await _ch3_ungather()
+	_ch3_clip(move, 0.80)
+	var doc := Color(0.95, 0.92, 0.84, 0.98)
+	_fx_paper(Vector2(17, 12), doc, 0.28, 0.00, 0.0, 40.0)
+	await _body_play(enemy_character, [
+		_beat(_ch3_dx() - 5.0, 0, 3, 1, 1, 0.12),
+		# The sidestep between throws.
+		_beat(_ch3_dx() + 7.0, 0, -3, 1, 1, 0.12),
+	])
+	_fx_paper(Vector2(17, 12), doc, 0.30, 0.00, -22.0, -50.0)
+	await _body_play(enemy_character, [_beat(_ch3_dx() - 6.0, 0, 4, 1, 1, 0.12)])
+	_fx_paper(Vector2(26, 19), doc, 0.26, 0.06, 8.0, 110.0)
+	_fx_splatter(enemy_character, doc, 5, 18.0, 0.35)
+	await get_tree().create_timer(0.40).timeout
+
+## MELEE. The briefcase: a jab, a horizontal swing, then an overhead smash that
+## bursts it open and scatters the contracts.
+func _ch3_partners_cut(move: EnemyMove, tint: Color) -> void:
+	await _ch3_gather(6.0, -11.0, -5.0, 4.0, 5.0, 0.18)
+	await _ch3_ungather()
+	var case := _ch3_prop(Color(0.34, 0.22, 0.14, 1.0), Vector2(30, 22), 3)
+	_ch3_clip(move, 0.80)
+	# Jab.
+	_ch3_prop_arc(case, -22.0, 0.0, 0.0, 0.10, false)
+	await _body_play(enemy_character, [
+		_beat(_ch3_dx() - 10.0, 0, 0, 1.03, 0.99, 0.09, Tween.TRANS_QUAD, Tween.EASE_OUT),
+	])
+	# Horizontal swing.
+	_ch3_prop_arc(case, 14.0, -6.0, -80.0, 0.10, false)
+	await _body_play(enemy_character, [
+		_beat(_ch3_dx() + 6.0, 0, 7, 1.0, 1.0, 0.09),
+	])
+	# Overhead smash.
+	_ch3_prop_arc(case, -34.0, 30.0, 120.0, 0.16, false)
+	await _body_play(enemy_character, [
+		_beat(_ch3_dx() - 14.0, 5, -8, 1.03, 0.96, 0.13, Tween.TRANS_BACK, Tween.EASE_OUT),
+	])
+	_fx_splatter(player_character, Color(0.95, 0.92, 0.84, 0.95), 13, 32.0, 0.6)
+	_fx_ring(player_character, Color(0.80, 0.68, 0.44), 66.0, 0.28)
+	var tween := create_tween()
+	tween.tween_property(case, "modulate:a", 0.0, 0.18)
+	await _ch3_pose(6.0, 5.0, 4.0, 4.0, 4.0, 0.12)
+	await _ch3_ungather()
+
+## DEFENSIVE. He snaps his fingers and a second contractor comes out of the
+## dark to hold the other end of the board. Both brace; the partner fades.
+func _ch3_padded_contract(move: EnemyMove, tint: Color) -> void:
+	await _ch3_gather(0.0, -3.0, -8.0, 0.0, 2.0, 0.12)
+	# The snap.
+	await _ch3_pose(0.0, -8.0, -2.0, -3.0, 3.0, 0.10)
+	await _ch3_ungather()
+	_ch3_clip(move, 0.72)
+	# The partner: a silhouette behind him, holding the far edge.
+	var mate := _ch3_prop(Color(0.10, 0.09, 0.14, 0.72), Vector2(38, 84), 6)
+	mate.position += Vector2(26.0, -14.0)
+	mate.modulate.a = 0.0
+	var fade_in := create_tween()
+	fade_in.tween_property(mate, "modulate:a", 1.0, 0.14)
+	var board := _ch3_prop(Color(0.62, 0.52, 0.34, 1.0), Vector2(48, 34), 2)
+	_ch3_prop_arc(board, -10.0, -4.0, -6.0, 0.18, false)
+	_fx_ring(enemy_character, tint, 74.0, 0.34)
+	await get_tree().create_timer(0.30).timeout
+	# Both brace against the hit.
+	await _ch3_pose(7.0, 6.0, 3.0, 4.0, 8.0, 0.14)
+	_fx_splatter(enemy_character, Color(0.62, 0.52, 0.34, 0.9), 6, 22.0, 0.4)
+	var gone := create_tween()
+	gone.tween_property(mate, "modulate:a", 0.0, 0.22)
+	gone.parallel().tween_property(board, "modulate:a", 0.0, 0.22)
+	await _ch3_ungather()
+
+# =========================================================================
+# PROJECT PADRINO -- The Backroom Benefactor
+# =========================================================================
+#
+# The strongest ordinary rival, and his animation says so by being SLOWER than
+# everyone else's. Longer holds, smaller recoveries, no scrambling. Where
+# Eskandalo runs, Padrino walks and stops just outside range.
+
+## RANGED. Sealed envelopes summoned out of the dark and sent one at a time,
+## from three different angles, with the room dimmed while he does it.
+func _ch3_strings_attached(move: EnemyMove, tint: Color) -> void:
+	# One hand raised. Almost no body movement -- that is the character.
+	await _ch3_gather(0.0, -4.0, -3.0, -2.0, 1.0, 0.22)
+	_react_room(Color(0.16, 0.12, 0.22), 2.0)
+	_fx_charge(enemy_character, tint, 0.40)
+	for i in _fx_count(3):
+		_fx_ring(enemy_character, tint, 44.0 + 20.0 * float(i), 0.40, 0.09 * float(i))
+	await _ch3_ungather()
+	_ch3_clip(move, 0.84)
+	await _body_play(enemy_character, [_beat(_ch3_dx() - 3.0, 0, 2, 1, 1, 0.18)])
+	var seal := Color(0.94, 0.86, 0.56, 0.98)
+	_fx_paper(Vector2(20, 14), seal, 0.30, 0.00, 0.0, 20.0)
+	_fx_paper(Vector2(18, 13), seal, 0.32, 0.10, -30.0, -40.0)
+	_fx_paper(Vector2(18, 13), seal, 0.32, 0.14, 30.0, 40.0)
+	# The briefcase opening above the player.
+	_fx_slab(enemy_character, player_character, Color(0.30, 0.20, 0.12, 1.0),
+		Vector2(26, 20), 0.28, 0.24, -46.0, 30.0, 3)
+	_fx_splatter(player_character, seal, 9, 28.0, 0.5)
+	_fx_paper(Vector2(24, 18), Color(0.98, 0.90, 0.60, 1.0), 0.24, 0.40, 0.0, 60.0)
+	await get_tree().create_timer(0.66).timeout
+
+## The measured palm strike. He walks in, stops SHORT, sets one hand behind his
+## back, and drives the other through from the hip. Held finishing pose.
+func _ch3_backroom_verdict(move: EnemyMove, tint: Color) -> void:
+	# Settles. Hips load, torso closes, head stays level and on the target.
+	await _ch3_gather(5.0, -10.0, 0.0, 3.0, 5.0, 0.26)
+	await _ch3_ungather()
+	_ch3_clip(move, 0.70)
+	# Hips rotate through, shoulder drives, and the pose HOLDS.
+	await _body_play(enemy_character, [
+		_beat(_ch3_dx() - 16.0, 0, -6, 1.05, 0.98, 0.12, Tween.TRANS_QUAD, Tween.EASE_OUT),
+	])
+	_fx_ring(player_character, Color(0.98, 0.90, 0.60), 58.0, 0.24)
+	_fx_ring(player_character, Color(0.98, 0.90, 0.60), 86.0, 0.34, 0.06)
+	_fx_flash(Color(1.0, 0.94, 0.72), 0.20)
+	_fx_splatter(player_character, Color(0.96, 0.88, 0.58, 0.9), 8, 26.0, 0.5)
+	# The hold: three-tenths of nothing happening, which is the whole point.
+	await get_tree().create_timer(0.30).timeout
+	await _ch3_pose(-3.0, 4.0, 0.0, -2.0, -4.0, 0.16)
+	await _ch3_ungather(0.14)
+
+## DEFENSIVE / COUNTER. Two silhouettes and a golden seal. He barely moves,
+## then flicks one hand and the shockwave goes back the other way.
+func _ch3_patrons_protection(move: EnemyMove, tint: Color) -> void:
+	# One finger. No panic: the smallest anticipation in the chapter.
+	await _ch3_gather(0.0, -2.0, -2.0, -1.0, 1.0, 0.18)
+	_ch3_clip(move, 0.78)
+	var gold := Color(0.98, 0.86, 0.44, 1.0)
+	# The two backers.
+	for i in 2:
+		var shade := _ch3_prop(Color(0.10, 0.09, 0.14, 0.66), Vector2(30, 76), 6)
+		shade.position += Vector2(20.0 + float(i) * 16.0, -12.0 + float(i) * 5.0)
+		shade.modulate.a = 0.0
+		var t := create_tween()
+		t.tween_interval(0.05 * float(i))
+		t.tween_property(shade, "modulate:a", 1.0, 0.16)
+		t.tween_interval(0.34)
+		t.tween_property(shade, "modulate:a", 0.0, 0.22)
+	var seal := _ch3_prop(gold, Vector2(40, 40), 20)
+	seal.modulate.a = 0.0
+	var up := create_tween()
+	up.tween_property(seal, "modulate:a", 0.9, 0.16)
+	_fx_ring(enemy_character, gold, 80.0, 0.38)
+	_fx_word("FAVOR", enemy_character, Color(1.0, 0.92, 0.62), 20.0, 0.14, 11)
+	await _ch3_ungather()
+	await get_tree().create_timer(0.30).timeout
+	# The counter-flick: a small hand movement, a wave that travels.
+	_spawn_bolt(enemy_character, player_character, gold, 12.0, 0.24, 0.0, 0.0, false)
+	await _body_play(enemy_character, [
+		_beat(_ch3_dx() - 5.0, 0, -3, 1.0, 1.0, 0.10),
+		_beat(_ch3_dx(), 0, 0, 1.0, 1.0, 0.12),
+	])
+	var out := create_tween()
+	out.tween_property(seal, "modulate:a", 0.0, 0.22)
+	await get_tree().create_timer(0.16).timeout
+
+# =========================================================================
+# CHAPTER 4 -- MALACANANG PALACE
+# =========================================================================
+#
+# Every routine below is built from the same vocabulary Chapter 3 uses --
+# _ch3_gather / _ch3_pose / _ch3_ungather drive the cut-out rig, _ch3_clip
+# plays the drawn frames, _ch3_prop and _ch3_prop_arc carry a held object, and
+# _body_play sequences the whole body -- so the two chapters animate through
+# one system rather than two.
+#
+# The shape asked for in the brief is the shape of each routine, in order:
+# ANTICIPATION (the rig settles back), WIND-UP (it coils), EXECUTION (the clip
+# and the body drive forward), IMPACT (the effect lands on the beat the routine
+# returns), FOLLOW-THROUGH and RECOVERY (the tail beats), then the resolver
+# hands the body back to its idle. Nothing here moves the sprite as one rigid
+# block: the approach is a walk cycle, and the strike is the rig bending.
+
+## Chapter 4's dispatcher. Kept separate from _ch3_perform's match so the two
+## rosters cannot collide on an id, and so a Chapter 4 skill that has not been
+## choreographed yet degrades to a competent generic rather than to nothing.
+func _ch4_perform(move_id: String, move: EnemyMove, tint: Color,
+		melee: bool, defending: bool) -> void:
+	match move_id:
+		# --- Secretary Sipsip: the cabinet clinger ------------------------
+		"c4combat_approval_jab": await _ch4_approval_jab(move, tint)
+		"c4combat_cabinet_folder_toss": await _ch4_folder_toss(move, tint)
+		"c4combat_yes_sir_shield": await _ch4_yes_sir_shield(move, tint)
+		# --- Protocol Porma: the ceremony controller ----------------------
+		"c4combat_red_carpet_sweep": await _ch4_carpet_sweep(move, tint)
+		"c4combat_velvet_rope_snare": await _ch4_rope_snare(move, tint)
+		"c4combat_formal_formation": await _ch4_formal_formation(move, tint)
+		# --- Spox Spin: the narrative twister -----------------------------
+		"c4combat_mic_check_bash": await _ch4_mic_check(move, tint)
+		"c4combat_press_release_barrage": await _ch4_press_barrage(move, tint)
+		"c4combat_narrative_redirect": await _ch4_narrative_redirect(move, tint)
+		# --- Chief Utos: the command keeper -------------------------------
+		"c4combat_directive_strike": await _ch4_directive_strike(move, tint)
+		"c4combat_command_stamp": await _ch4_command_stamp(move, tint)
+		"c4combat_executive_order_brace": await _ch4_order_brace(move, tint)
+		# --- Cabinet Konek: the inner circle insider ----------------------
+		"c4combat_connection_kick": await _ch4_connection_kick(move, tint)
+		"c4combat_network_signal": await _ch4_network_signal(move, tint)
+		"c4combat_inner_circle_guard": await _ch4_inner_circle(move, tint)
+		# --- Director Dikta: the executive enforcer -----------------------
+		"c4combat_memo_slam": await _ch4_memo_slam(move, tint)
+		"c4combat_directive_volley": await _ch4_directive_volley(move, tint)
+		"c4combat_command_barrier": await _ch4_command_barrier(move, tint)
+		# --- Adviser Areglo: the backroom whisperer -----------------------
+		"c4combat_whisper_jab": await _ch4_whisper_jab(move, tint)
+		"c4combat_backroom_deal": await _ch4_backroom_deal(move, tint)
+		"c4combat_strategic_sidestep": await _ch4_strategic_sidestep(move, tint)
+		# --- EO Ego: the order overlord -----------------------------------
+		"c4combat_executive_smash": await _ch4_executive_smash(move, tint)
+		"c4combat_eo_barrage": await _ch4_eo_barrage(move, tint)
+		"c4combat_presidential_seal_guard": await _ch4_seal_guard(move, tint)
+		# --- Lolo Enrilegend: the eternal statesman -----------------------
+		"c4combat_veterans_verdict": await _ch4_veterans_verdict(move, tint)
+		"c4combat_history_repeats": await _ch4_history_repeats(move, tint)
+		"c4combat_eternal_resolve": await _ch4_eternal_resolve(move, tint)
+		_: await _ch3_generic(move, tint, melee, defending)
+
+
+## Palace paper. Chapter 4 throws a great deal of it, and it is always the same
+## cream official stock, so the colour lives in one place.
+func _ch4_paper() -> Color:
+	return Color(0.96, 0.94, 0.88, 0.98)
+
+
+## A gold seal flash -- the chapter's signature accent, used on anything that
+## carries executive authority.
+func _ch4_seal(who: Control, size: float = 70.0, secs: float = 0.34) -> void:
+	_fx_ring(who, Color(1.0, 0.84, 0.34, 0.95), size, secs)
+
+
+## A wait that shortens in the boss's second phase and is an ordinary wait for
+## everyone else. Used only by the three Lolo Enrilegend routines, so "attack
+## speed slightly increased" and "recovery time slightly shorter" are one
+## change in one place rather than thirty edited numbers.
+func _ch4_wait(secs: float) -> void:
+	await get_tree().create_timer(secs * _ch4_phase_pace()).timeout
+
+
+# -------------------------------------------------------------------------
+# SECRETARY SIPSIP -- The Cabinet Clinger
+# -------------------------------------------------------------------------
+
+## MELEE. A short stamping jab. He bows first -- the flattery IS the wind-up --
+## then drives the approval stamp straight out at chest height.
+func _ch4_approval_jab(move: EnemyMove, tint: Color) -> void:
+	await _ch3_gather(2.0, -8.0, -10.0, 3.0, 2.0, 0.16)     # the half-bow
+	await _ch3_pose(5.0, -12.0, -6.0, 4.0, 4.0, 0.12)       # coils behind it
+	await _ch3_ungather()
+	_ch3_clip(move, 0.70)
+	var stamp := _ch3_prop(Color(0.55, 0.35, 0.18, 1.0), Vector2(18, 20), 4)
+	_ch3_prop_arc(stamp, -30.0, -6.0, -18.0, 0.18, false)
+	await _body_play(enemy_character, [
+		_beat(_ch3_dx() + 3.0, 2, 2, 1.02, 0.98, 0.09, Tween.TRANS_QUAD, Tween.EASE_IN),
+		_beat(_ch3_dx() - 9.0, -3, -4, 1.0, 1.03, 0.13, Tween.TRANS_BACK, Tween.EASE_OUT),
+	])
+	_ch4_seal(player_character, 54.0, 0.26)
+	_fx_splatter(player_character, tint, 8, 22.0, 0.42)
+	var fade := create_tween()
+	fade.tween_property(stamp, "modulate:a", 0.0, 0.20)
+	await get_tree().create_timer(0.12).timeout
+
+
+## RANGED. Three folders skimmed out flat, shedding signed pages as they go.
+func _ch4_folder_toss(move: EnemyMove, tint: Color) -> void:
+	await _ch3_gather(3.0, -7.0, -5.0, 2.0, 5.0, 0.16)
+	await _ch3_pose(6.0, -11.0, -3.0, 3.0, 7.0, 0.12)
+	await _ch3_ungather()
+	_ch3_clip(move, 0.74)
+	_fx_charge(enemy_character, tint, 0.22)
+	await _body_play(enemy_character, [_beat(_ch3_dx() - 5.0, 0, 3, 1, 1, 0.17)])
+	var paper := _ch4_paper()
+	_fx_paper(Vector2(26, 18), Color(0.78, 0.66, 0.42, 0.98), 0.30, 0.00, 0.0, 34.0)
+	_fx_paper(Vector2(24, 17), Color(0.78, 0.66, 0.42, 0.98), 0.33, 0.08, -18.0, -30.0)
+	_fx_paper(Vector2(15, 11), paper, 0.26, 0.15, 12.0, 70.0)
+	_fx_paper(Vector2(13, 10), paper, 0.24, 0.21, -8.0, 100.0)
+	await get_tree().create_timer(0.44).timeout
+
+
+## DEFENSIVE. He agrees with everything, from behind the folder. Deep bow, the
+## folder comes up edge-on, and a seal lights behind it.
+func _ch4_yes_sir_shield(move: EnemyMove, tint: Color) -> void:
+	await _ch3_gather(0.0, -4.0, -11.0, 0.0, 2.0, 0.12)     # head ducks first
+	await _ch3_pose(7.0, -14.0, -9.0, 5.0, 4.0, 0.16)
+	await _ch3_ungather()
+	_ch3_clip(move, 0.70)
+	var folder := _ch3_prop(Color(0.74, 0.62, 0.38, 1.0), Vector2(28, 38), 3)
+	folder.rotation = deg_to_rad(-18.0)
+	_ch3_prop_arc(folder, -12.0, -8.0, -10.0, 0.22, false)
+	_ch4_seal(enemy_character, 78.0, 0.36)
+	_fx_word("YES SIR", enemy_character, Color(1.0, 0.90, 0.56), 20.0, 0.10, 10)
+	await get_tree().create_timer(0.30).timeout
+	_fx_splatter(enemy_character, _ch4_paper(), 6, 22.0, 0.40)
+
+
+# -------------------------------------------------------------------------
+# PROTOCOL PORMA -- The Ceremony Controller
+# -------------------------------------------------------------------------
+
+## MELEE. The carpet edge whipped low across the floor. Rigid and ceremonial:
+## she does not lunge, she pivots and the carpet does the travelling.
+func _ch4_carpet_sweep(move: EnemyMove, tint: Color) -> void:
+	await _ch3_gather(6.0, -5.0, -2.0, 1.0, 6.0, 0.18)      # heels together, coils
+	await _ch3_pose(10.0, -9.0, -4.0, 2.0, 9.0, 0.12)
+	await _ch3_ungather()
+	_ch3_clip(move, 0.72)
+	var carpet := _ch3_prop(Color(0.72, 0.14, 0.18, 1.0), Vector2(64, 12), 2)
+	carpet.rotation = deg_to_rad(6.0)
+	_ch3_prop_arc(carpet, -74.0, 26.0, -16.0, 0.26, false)
+	await _body_play(enemy_character, [
+		_beat(_ch3_dx() + 2.0, 1, 4, 1.01, 0.99, 0.10, Tween.TRANS_QUAD, Tween.EASE_IN),
+		_beat(_ch3_dx() - 7.0, 3, -5, 1.03, 0.98, 0.15, Tween.TRANS_BACK, Tween.EASE_OUT),
+	])
+	_fx_splatter(player_character, Color(0.72, 0.14, 0.18, 0.9), 10, 26.0, 0.48)
+	_fx_ring(player_character, tint, 58.0, 0.28)
+	var fade := create_tween()
+	fade.tween_property(carpet, "modulate:a", 0.0, 0.20)
+	await get_tree().create_timer(0.12).timeout
+
+
+## RANGED. The hooked velvet rope, thrown like a lasso and snapped taut.
+func _ch4_rope_snare(move: EnemyMove, tint: Color) -> void:
+	await _ch3_gather(4.0, -8.0, -4.0, 2.0, 6.0, 0.16)
+	await _ch3_pose(7.0, -13.0, -6.0, 3.0, 9.0, 0.14)
+	await _ch3_ungather()
+	_ch3_clip(move, 0.76)
+	_fx_charge(enemy_character, tint, 0.20)
+	await _body_play(enemy_character, [_beat(_ch3_dx() - 6.0, -2, 4, 1, 1, 0.16)])
+	# The rope reads as a run of linked segments crossing the gap.
+	for i in 5:
+		_spawn_bolt(enemy_character, player_character, Color(0.74, 0.16, 0.22, 0.95),
+			9.0, 0.16, float(i) * 0.045, float(i - 2) * 4.0, false)
+	await get_tree().create_timer(0.30).timeout
+	_fx_ring(player_character, Color(1.0, 0.84, 0.34, 0.95), 46.0, 0.24)
+	_fx_word("HOLD THE LINE", player_character, Color(0.96, 0.80, 0.80), 18.0, 0.08, 9)
+	await get_tree().create_timer(0.16).timeout
+
+
+## DEFENSIVE. She sets the boundary. Snaps to attention, plants the clipboard,
+## and a rope line of floor markers comes up in front of her.
+func _ch4_formal_formation(move: EnemyMove, tint: Color) -> void:
+	await _ch3_gather(0.0, -2.0, -6.0, 0.0, 1.0, 0.10)
+	await _ch3_pose(3.0, -4.0, -2.0, 1.0, 2.0, 0.14)        # ramrod straight
+	await _ch3_ungather()
+	_ch3_clip(move, 0.68)
+	var board := _ch3_prop(Color(0.62, 0.48, 0.26, 1.0), Vector2(24, 32), 3)
+	_ch3_prop_arc(board, -8.0, -4.0, 0.0, 0.20, false)
+	for i in 3:
+		_fx_ring(enemy_character, Color(0.74, 0.16, 0.22, 0.9), 40.0 + float(i) * 18.0,
+			0.30, float(i) * 0.06)
+	_fx_word("PROTOCOL", enemy_character, Color(1.0, 0.86, 0.50), 20.0, 0.10, 10)
+	await get_tree().create_timer(0.34).timeout
+
+
+# -------------------------------------------------------------------------
+# SPOX SPIN -- The Narrative Twister
+# -------------------------------------------------------------------------
+
+## MELEE. Check, check. Two short microphone jabs, the second one harder.
+func _ch4_mic_check(move: EnemyMove, tint: Color) -> void:
+	await _ch3_gather(3.0, -6.0, -6.0, 3.0, 3.0, 0.14)
+	await _ch3_ungather(0.07)
+	_ch3_clip(move, 0.72)
+	var mic := _ch3_prop(Color(0.20, 0.20, 0.24, 1.0), Vector2(14, 22), 6)
+	# Two beats, not one: the first is the tap, the second is the blow.
+	_ch3_prop_arc(mic, -20.0, -2.0, -8.0, 0.12, false)
+	await _body_play(enemy_character, [
+		_beat(_ch3_dx() - 6.0, 0, 2, 1.0, 1.0, 0.09, Tween.TRANS_QUAD, Tween.EASE_OUT),
+		_beat(_ch3_dx() + 2.0, 0, -1, 1.0, 1.0, 0.07),
+	])
+	_fx_ring(player_character, tint, 40.0, 0.18)
+	_ch3_prop_arc(mic, -26.0, 2.0, -14.0, 0.14, false)
+	await _body_play(enemy_character, [
+		_beat(_ch3_dx() - 12.0, -2, -5, 1.02, 1.0, 0.12, Tween.TRANS_BACK, Tween.EASE_OUT),
+	])
+	_fx_splatter(player_character, tint, 9, 24.0, 0.44)
+	var fade := create_tween()
+	fade.tween_property(mic, "modulate:a", 0.0, 0.18)
+	await get_tree().create_timer(0.12).timeout
+
+
+## RANGED. Five statement pages fanned out in a spreading arc -- the answer to
+## a question nobody asked.
+func _ch4_press_barrage(move: EnemyMove, tint: Color) -> void:
+	await _ch3_gather(2.0, -5.0, -4.0, 2.0, 4.0, 0.14)
+	await _ch3_pose(4.0, -9.0, -7.0, 3.0, 6.0, 0.12)
+	await _ch3_ungather()
+	_ch3_clip(move, 0.76)
+	_fx_charge(enemy_character, tint, 0.24)
+	await _body_play(enemy_character, [_beat(_ch3_dx() - 4.0, -1, 3, 1, 1, 0.16)])
+	var paper := _ch4_paper()
+	for i in 5:
+		_fx_paper(Vector2(17, 12), paper, 0.28 + float(i) * 0.02,
+			float(i) * 0.055, float(i - 2) * 16.0, float(i - 2) * 44.0)
+	_fx_word("NO FURTHER COMMENT", enemy_character, Color(0.80, 0.92, 1.0), 22.0, 0.14, 9)
+	await get_tree().create_timer(0.46).timeout
+
+
+## DEFENSIVE. The question is redirected. He spins on the ball of one foot and
+## a curtain of turning headlines closes in front of him.
+func _ch4_narrative_redirect(move: EnemyMove, tint: Color) -> void:
+	await _ch3_gather(2.0, -6.0, -8.0, 2.0, 3.0, 0.12)
+	await _ch3_pose(6.0, 12.0, 9.0, 3.0, -8.0, 0.18)        # torso turns AWAY
+	await _ch3_ungather()
+	_ch3_clip(move, 0.70)
+	for i in 4:
+		_fx_paper(Vector2(20, 14), _ch4_paper(), 0.10, float(i) * 0.05,
+			float(i - 2) * 22.0, 0.0)
+	_fx_ring(enemy_character, tint, 74.0, 0.34)
+	_fx_word("MOVING ON", enemy_character, Color(0.82, 0.94, 1.0), 20.0, 0.10, 10)
+	await get_tree().create_timer(0.32).timeout
+
+
+# -------------------------------------------------------------------------
+# CHIEF UTOS -- The Command Keeper
+# -------------------------------------------------------------------------
+
+## MELEE. The clipboard edge, brought down overhand. Brisk and impatient: the
+## wind-up is short because she has somewhere else to be.
+func _ch4_directive_strike(move: EnemyMove, tint: Color) -> void:
+	await _ch3_gather(5.0, -10.0, -5.0, 3.0, 4.0, 0.13)
+	await _ch3_ungather(0.07)
+	_ch3_clip(move, 0.70)
+	var board := _ch3_prop(Color(0.58, 0.60, 0.64, 1.0), Vector2(22, 30), 3)
+	_ch3_prop_arc(board, -26.0, -34.0, -74.0, 0.22, false)
+	await _body_play(enemy_character, [
+		_beat(_ch3_dx() + 4.0, -4, 3, 1.0, 1.03, 0.09, Tween.TRANS_QUAD, Tween.EASE_IN),
+		_beat(_ch3_dx() - 11.0, 5, -6, 1.03, 0.97, 0.14, Tween.TRANS_BACK, Tween.EASE_OUT),
+	])
+	_fx_splatter(player_character, tint, 11, 27.0, 0.46)
+	_fx_ring(player_character, tint, 56.0, 0.26)
+	var fade := create_tween()
+	fade.tween_property(board, "modulate:a", 0.0, 0.20)
+	await get_tree().create_timer(0.12).timeout
+
+
+## RANGED. A sealed order slammed flat; three stamped seals skid out across the
+## floor towards the player.
+func _ch4_command_stamp(move: EnemyMove, tint: Color) -> void:
+	await _ch3_gather(6.0, -9.0, -4.0, 4.0, 4.0, 0.16)
+	await _ch3_ungather()
+	_ch3_clip(move, 0.74)
+	await _body_play(enemy_character, [
+		_beat(_ch3_dx(), 6, 2, 1.0, 0.96, 0.10, Tween.TRANS_QUAD, Tween.EASE_IN),
+		_beat(_ch3_dx(), 0, 0, 1.0, 1.0, 0.10, Tween.TRANS_BACK, Tween.EASE_OUT),
+	])
+	_ch4_seal(enemy_character, 52.0, 0.22)
+	for i in 3:
+		_spawn_bolt(enemy_character, player_character, Color(1.0, 0.84, 0.34, 0.95),
+			12.0, 0.17, float(i) * 0.07, float(i - 1) * 10.0, false)
+	await get_tree().create_timer(0.38).timeout
+
+
+## DEFENSIVE. Both feet planted, clipboard held flat: a bracing wall of pinned
+## schedules that the next blow has to get through first.
+func _ch4_order_brace(move: EnemyMove, tint: Color) -> void:
+	await _ch3_gather(0.0, -3.0, -7.0, 0.0, 2.0, 0.11)
+	await _ch3_pose(8.0, -7.0, -3.0, 4.0, 5.0, 0.15)
+	await _ch3_ungather()
+	_ch3_clip(move, 0.70)
+	var board := _ch3_prop(Color(0.58, 0.60, 0.64, 1.0), Vector2(30, 36), 3)
+	_ch3_prop_arc(board, -10.0, -6.0, -6.0, 0.20, false)
+	for i in 3:
+		_fx_paper(Vector2(14, 10), _ch4_paper(), 0.08, float(i) * 0.05,
+			float(i - 1) * 16.0, 0.0)
+	_ch4_seal(enemy_character, 76.0, 0.34)
+	_fx_word("BY ORDER", enemy_character, Color(1.0, 0.88, 0.54), 20.0, 0.10, 10)
+	await get_tree().create_timer(0.32).timeout
+
+
+# -------------------------------------------------------------------------
+# CABINET KONEK -- The Inner Circle Insider
+# -------------------------------------------------------------------------
+
+## MELEE. A low forward kick -- the only skill in the chapter that leads with a
+## leg, so the rig drives the legs band hard and the torso follows late.
+func _ch4_connection_kick(move: EnemyMove, tint: Color) -> void:
+	await _ch3_gather(9.0, -6.0, -3.0, 5.0, 3.0, 0.18)      # weight onto the back foot
+	await _ch3_pose(14.0, -4.0, -2.0, 6.0, 5.0, 0.12)
+	await _ch3_ungather()
+	_ch3_clip(move, 0.72)
+	await _body_play(enemy_character, [
+		_beat(_ch3_dx() + 5.0, 3, 2, 0.98, 1.02, 0.10, Tween.TRANS_QUAD, Tween.EASE_IN),
+		_beat(_ch3_dx() - 13.0, -2, -7, 1.04, 0.98, 0.14, Tween.TRANS_BACK, Tween.EASE_OUT),
+	])
+	_fx_splatter(player_character, tint, 10, 26.0, 0.46)
+	_fx_ring(player_character, tint, 60.0, 0.28)
+	await get_tree().create_timer(0.14).timeout
+
+
+## RANGED. He does not throw anything. He signals, and the signal travels along
+## the connections -- linked nodes racing outward.
+func _ch4_network_signal(move: EnemyMove, tint: Color) -> void:
+	await _ch3_gather(2.0, -5.0, -5.0, 2.0, 4.0, 0.15)
+	await _ch3_pose(4.0, -8.0, -3.0, 3.0, 7.0, 0.13)
+	await _ch3_ungather()
+	_ch3_clip(move, 0.74)
+	_fx_charge(enemy_character, tint, 0.26)
+	await _body_play(enemy_character, [_beat(_ch3_dx() - 3.0, -1, 2, 1, 1, 0.15)])
+	# A chain rather than a volley: each node leaves as the last one lands.
+	for i in 4:
+		_spawn_bolt(enemy_character, player_character, tint, 10.0,
+			0.19, float(i) * 0.085, float(i % 2) * 12.0 - 6.0, false)
+		_fx_ring(enemy_character, tint, 34.0 + float(i) * 10.0, 0.22, float(i) * 0.085)
+	await get_tree().create_timer(0.44).timeout
+
+
+## DEFENSIVE. The circle closes. A ring of linked contacts comes up around him
+## and takes the blow instead.
+func _ch4_inner_circle(move: EnemyMove, tint: Color) -> void:
+	await _ch3_gather(1.0, -4.0, -6.0, 1.0, 3.0, 0.12)
+	await _ch3_pose(5.0, -7.0, -3.0, 3.0, 6.0, 0.16)
+	await _ch3_ungather()
+	_ch3_clip(move, 0.72)
+	for i in 4:
+		_fx_ring(enemy_character, tint, 44.0 + float(i) * 14.0, 0.34, float(i) * 0.055)
+	_fx_word("KAKILALA", enemy_character, Color(0.68, 1.0, 0.90), 22.0, 0.12, 10)
+	await get_tree().create_timer(0.36).timeout
+	_fx_splatter(enemy_character, tint, 6, 20.0, 0.36)
+
+
+# -------------------------------------------------------------------------
+# DIRECTOR DIKTA -- The Executive Enforcer
+# -------------------------------------------------------------------------
+
+## MELEE. The whole folder stack hauled overhead and dropped. The heaviest
+## melee in the chapter, so the wind-up is the longest and the recoil the most.
+func _ch4_memo_slam(move: EnemyMove, tint: Color) -> void:
+	await _ch3_gather(8.0, -14.0, -8.0, 6.0, 4.0, 0.22)     # the long haul up
+	await _ch3_pose(11.0, -18.0, -11.0, 8.0, 5.0, 0.14)
+	await _ch3_ungather()
+	_ch3_clip(move, 0.78)
+	var stack := _ch3_prop(Color(0.70, 0.58, 0.36, 1.0), Vector2(34, 40), 2)
+	_ch3_prop_arc(stack, -18.0, -46.0, -96.0, 0.26, false)
+	await _body_play(enemy_character, [
+		_beat(_ch3_dx() + 6.0, -7, 4, 1.0, 1.05, 0.12, Tween.TRANS_QUAD, Tween.EASE_IN),
+		_beat(_ch3_dx() - 12.0, 8, -7, 1.06, 0.94, 0.16, Tween.TRANS_BACK, Tween.EASE_OUT),
+	])
+	_shake_screen(7.0)
+	_fx_splatter(player_character, _ch4_paper(), 14, 32.0, 0.55)
+	_fx_ring(player_character, tint, 72.0, 0.32)
+	var fade := create_tween()
+	fade.tween_property(stack, "modulate:a", 0.0, 0.24)
+	await get_tree().create_timer(0.16).timeout
+
+
+## RANGED. Four heavy directives hammered out low and fast.
+func _ch4_directive_volley(move: EnemyMove, tint: Color) -> void:
+	await _ch3_gather(5.0, -10.0, -5.0, 4.0, 4.0, 0.17)
+	await _ch3_ungather()
+	_ch3_clip(move, 0.76)
+	_fx_charge(enemy_character, tint, 0.22)
+	await _body_play(enemy_character, [_beat(_ch3_dx() - 7.0, 2, 3, 1.0, 1.0, 0.16)])
+	for i in 4:
+		_spawn_bolt(enemy_character, player_character, tint, 13.0,
+			0.15, float(i) * 0.05, float(i - 2) * 7.0, false)
+	_fx_paper(Vector2(24, 17), Color(0.72, 0.60, 0.38, 0.98), 0.28, 0.12, 8.0, 40.0)
+	await get_tree().create_timer(0.40).timeout
+
+
+## DEFENSIVE. The stamp goes into the floor and a wall of stamped directives
+## comes up out of it.
+func _ch4_command_barrier(move: EnemyMove, tint: Color) -> void:
+	await _ch3_gather(4.0, -9.0, -6.0, 3.0, 3.0, 0.14)
+	await _ch3_pose(9.0, -6.0, -2.0, 6.0, 4.0, 0.16)
+	await _ch3_ungather()
+	_ch3_clip(move, 0.72)
+	await _body_play(enemy_character, [
+		_beat(_ch3_dx(), 7, 1, 1.0, 0.95, 0.11, Tween.TRANS_QUAD, Tween.EASE_IN),
+		_beat(_ch3_dx(), 0, 0, 1.0, 1.0, 0.10, Tween.TRANS_BACK, Tween.EASE_OUT),
+	])
+	_shake_screen(3.0)
+	for i in 3:
+		_fx_ring(enemy_character, tint, 46.0 + float(i) * 16.0, 0.32, float(i) * 0.05)
+	_fx_word("DIRECTIVE", enemy_character, Color(1.0, 0.80, 0.72), 20.0, 0.10, 10)
+	await get_tree().create_timer(0.34).timeout
+
+
+# -------------------------------------------------------------------------
+# ADVISER AREGLO -- The Backroom Whisperer
+# -------------------------------------------------------------------------
+
+## MELEE. A feint high, then a short palm strike close in. The feint is a real
+## beat of its own -- the body commits to it and then goes somewhere else.
+func _ch4_whisper_jab(move: EnemyMove, tint: Color) -> void:
+	await _ch3_gather(2.0, -5.0, -9.0, 1.0, 3.0, 0.14)
+	# The feint: shoulder and head lead high, then stop dead.
+	await _body_play(enemy_character, [
+		_beat(_ch3_dx() - 5.0, -4, -6, 1.0, 1.0, 0.11, Tween.TRANS_SINE, Tween.EASE_OUT),
+		_beat(_ch3_dx() - 2.0, -2, -3, 1.0, 1.0, 0.07),
+	])
+	await _ch3_pose(7.0, -11.0, -4.0, 3.0, 6.0, 0.10)
+	await _ch3_ungather()
+	_ch3_clip(move, 0.70)
+	await _body_play(enemy_character, [
+		_beat(_ch3_dx() - 10.0, 3, -4, 1.02, 0.99, 0.12, Tween.TRANS_BACK, Tween.EASE_OUT),
+	])
+	_fx_splatter(player_character, tint, 8, 22.0, 0.42)
+	_fx_ring(player_character, tint, 48.0, 0.24)
+	await get_tree().create_timer(0.14).timeout
+
+
+## RANGED. Three folders set drifting, then sprung all at once after a beat --
+## the arrangement was already made before the conversation started.
+func _ch4_backroom_deal(move: EnemyMove, tint: Color) -> void:
+	await _ch3_gather(2.0, -4.0, -5.0, 1.0, 3.0, 0.15)
+	await _ch3_ungather()
+	_ch3_clip(move, 0.80)
+	# The three folders hang there. Nothing happens for a moment.
+	for i in 3:
+		_fx_paper(Vector2(20, 15), Color(0.30, 0.26, 0.36, 0.95), 0.09,
+			float(i) * 0.04, float(i - 1) * 26.0, 0.0)
+	_fx_charge(enemy_character, tint, 0.30)
+	await get_tree().create_timer(0.34).timeout
+	# Then all three at once.
+	for i in 3:
+		_spawn_bolt(enemy_character, player_character, tint, 12.0,
+			0.13, 0.0, float(i - 1) * 14.0, false)
+	_fx_word("AREGLADO", enemy_character, Color(0.82, 0.72, 1.0), 22.0, 0.10, 10)
+	await get_tree().create_timer(0.30).timeout
+
+
+## DEFENSIVE. He is simply not where the blow is going. One clean step off the
+## line, then a counter-ready stance.
+func _ch4_strategic_sidestep(move: EnemyMove, tint: Color) -> void:
+	await _ch3_gather(3.0, -3.0, -6.0, 1.0, 4.0, 0.12)
+	_ch3_clip(move, 0.68)
+	await _body_play(enemy_character, [
+		_beat(_ch3_dx() + 13.0, 0, 5, 1.0, 1.0, 0.15, Tween.TRANS_SINE, Tween.EASE_OUT),
+		_beat(_ch3_dx() + 4.0, 0, -2, 1.0, 1.0, 0.13, Tween.TRANS_SINE, Tween.EASE_IN_OUT),
+	])
+	await _ch3_ungather()
+	_fx_ring(enemy_character, tint, 66.0, 0.30)
+	_fx_word("WALA AKO DOON", enemy_character, Color(0.84, 0.76, 1.0), 20.0, 0.10, 9)
+	await get_tree().create_timer(0.28).timeout
+
+
+# -------------------------------------------------------------------------
+# EO EGO -- The Order Overlord
+# -------------------------------------------------------------------------
+
+## MELEE. The giant golden seal, two-handed, straight down. Mini-boss weight:
+## the longest wind-up of any regular skill and the hardest landing.
+func _ch4_executive_smash(move: EnemyMove, tint: Color) -> void:
+	await _ch3_gather(7.0, -15.0, -10.0, 6.0, 3.0, 0.24)
+	await _ch3_pose(10.0, -20.0, -13.0, 9.0, 4.0, 0.15)
+	await _ch3_ungather()
+	_ch3_clip(move, 0.80)
+	var seal := _ch3_prop(Color(0.98, 0.80, 0.28, 1.0), Vector2(36, 36), 18)
+	_ch3_prop_arc(seal, -16.0, -52.0, -110.0, 0.28, false)
+	await _body_play(enemy_character, [
+		_beat(_ch3_dx() + 7.0, -8, 5, 1.0, 1.06, 0.13, Tween.TRANS_QUAD, Tween.EASE_IN),
+		_beat(_ch3_dx() - 14.0, 9, -8, 1.07, 0.93, 0.17, Tween.TRANS_BACK, Tween.EASE_OUT),
+	])
+	_shake_screen(8.0)
+	_ch4_seal(player_character, 92.0, 0.36)
+	_fx_splatter(player_character, Color(1.0, 0.84, 0.34, 0.95), 16, 36.0, 0.58)
+	var fade := create_tween()
+	fade.tween_property(seal, "modulate:a", 0.0, 0.26)
+	await get_tree().create_timer(0.16).timeout
+
+
+## RANGED. Six sealed documents in two waves -- issuances, not arguments.
+func _ch4_eo_barrage(move: EnemyMove, tint: Color) -> void:
+	await _ch3_gather(4.0, -9.0, -6.0, 3.0, 5.0, 0.18)
+	await _ch3_pose(7.0, -13.0, -8.0, 4.0, 8.0, 0.13)
+	await _ch3_ungather()
+	_ch3_clip(move, 0.82)
+	_fx_charge(enemy_character, tint, 0.28)
+	await _body_play(enemy_character, [_beat(_ch3_dx() - 6.0, -3, 4, 1, 1, 0.16)])
+	for i in 3:                                     # first wave, straight
+		_spawn_bolt(enemy_character, player_character, Color(1.0, 0.84, 0.34, 0.95),
+			13.0, 0.16, float(i) * 0.05, float(i - 1) * 9.0, false)
+	await get_tree().create_timer(0.20).timeout
+	for i in 3:                                     # second wave, spread
+		_spawn_bolt(enemy_character, player_character, Color(1.0, 0.84, 0.34, 0.95),
+			13.0, 0.17, float(i) * 0.05, float(i - 1) * 26.0, false)
+	_fx_paper(Vector2(26, 19), _ch4_paper(), 0.30, 0.10, 0.0, 30.0)
+	_fx_word("BY EXECUTIVE ORDER", enemy_character, Color(1.0, 0.90, 0.56), 24.0, 0.14, 9)
+	await get_tree().create_timer(0.40).timeout
+
+
+## DEFENSIVE. The seal is planted in front of him and a gold crest rises and
+## holds. The strongest regular guard in the chapter.
+func _ch4_seal_guard(move: EnemyMove, tint: Color) -> void:
+	await _ch3_gather(2.0, -6.0, -8.0, 2.0, 3.0, 0.13)
+	await _ch3_pose(8.0, -10.0, -4.0, 5.0, 5.0, 0.17)
+	await _ch3_ungather()
+	_ch3_clip(move, 0.74)
+	var seal := _ch3_prop(Color(0.98, 0.80, 0.28, 1.0), Vector2(34, 34), 17)
+	_ch3_prop_arc(seal, -14.0, -10.0, -20.0, 0.22, false)
+	for i in 3:
+		_ch4_seal(enemy_character, 56.0 + float(i) * 18.0, 0.36)
+	_fx_word("SEALED", enemy_character, Color(1.0, 0.90, 0.52), 22.0, 0.12, 11)
+	await get_tree().create_timer(0.36).timeout
+	_fx_splatter(enemy_character, Color(1.0, 0.84, 0.34, 0.9), 8, 24.0, 0.40)
+
+
+# -------------------------------------------------------------------------
+# LOLO ENRILEGEND -- The Eternal Statesman
+# -------------------------------------------------------------------------
+#
+# The boss is a FICTIONAL satirical character. Nothing in these routines
+# depicts, names or implies any real person, and nothing here asserts
+# wrongdoing: what they dramatise is age, patience and refusal to move.
+
+## MELEE. The full verdict, in the order the brief sets out: adjust the sleeve,
+## plant the cane, raise one finger, two deliberate steps, then jab, sweep and
+## a heavy downward strike. He is old, so every beat is slower than any other
+## melee in the game -- and the last one is the hardest.
+func _ch4_veterans_verdict(move: EnemyMove, tint: Color) -> void:
+	# Adjusts the sleeve. Head first, unhurried.
+	await _ch3_gather(0.0, -2.0, -5.0, 0.0, 2.0, 0.18)
+	# Plants the cane, raises one finger.
+	await _ch3_pose(4.0, -5.0, -8.0, 2.0, 3.0, 0.20)
+	_fx_word("ONE MOMENT", enemy_character, Color(0.96, 0.88, 0.62), 18.0, 0.06, 9)
+	await _ch3_ungather()
+	_ch3_clip(move, 0.92)
+	var cane := _ch3_prop(Color(0.42, 0.28, 0.16, 1.0), Vector2(9, 58), 4)
+
+	# JAB -- short, straight, testing.
+	_ch3_prop_arc(cane, -26.0, -6.0, -12.0, 0.16, false)
+	await _body_play(enemy_character, [
+		_beat(_ch3_dx() - 7.0, 0, 2, 1.0, 1.0, 0.14, Tween.TRANS_QUAD, Tween.EASE_OUT),
+	])
+	_fx_ring(player_character, tint, 40.0, 0.18)
+
+	# SWEEP -- horizontal, across.
+	_ch3_prop_arc(cane, -14.0, 18.0, -78.0, 0.20, false)
+	await _body_play(enemy_character, [
+		_beat(_ch3_dx() - 3.0, 3, -6, 1.02, 0.99, 0.16, Tween.TRANS_SINE, Tween.EASE_IN_OUT),
+	])
+	_fx_splatter(player_character, _ch4_paper(), 8, 24.0, 0.40)
+
+	# VERDICT -- the downward strike. This is the beat that hurts.
+	_ch3_prop_arc(cane, -20.0, -44.0, -104.0, 0.24, false)
+	await _body_play(enemy_character, [
+		_beat(_ch3_dx() + 5.0, -6, 4, 1.0, 1.05, 0.13, Tween.TRANS_QUAD, Tween.EASE_IN),
+		_beat(_ch3_dx() - 13.0, 8, -7, 1.06, 0.94, 0.18, Tween.TRANS_BACK, Tween.EASE_OUT),
+	])
+	_shake_screen(8.0)
+	_ch4_seal(player_character, 96.0, 0.38)
+	_fx_splatter(player_character, Color(1.0, 0.84, 0.34, 0.95), 15, 34.0, 0.58)
+	var fade := create_tween()
+	fade.tween_property(cane, "modulate:a", 0.0, 0.26)
+	await _ch4_wait(0.18)
+
+
+## RANGED. Aged documents orbit him, launch in two waves -- two straight, then
+## two curving in from either side -- and finally one great historical page is
+## loosed on a point of the cane. He never leaves his spot.
+func _ch4_history_repeats(move: EnemyMove, tint: Color) -> void:
+	var sepia := Color(0.86, 0.74, 0.52, 0.97)
+	# Raises both hands. The papers gather.
+	await _ch3_gather(0.0, -6.0, -9.0, 0.0, 2.0, 0.20)
+	for i in 4:
+		_fx_paper(Vector2(19, 14), sepia, 0.08, float(i) * 0.05,
+			float(i - 2) * 24.0, -18.0)
+	_fx_charge(enemy_character, Color(1.0, 0.84, 0.34, 0.9), 0.34)
+	await _ch3_ungather()
+	_ch3_clip(move, 0.88)
+
+	# First wave: two straight.
+	for i in 2:
+		_spawn_bolt(enemy_character, player_character, sepia, 12.0,
+			0.17, float(i) * 0.06, float(i) * 12.0 - 6.0, false)
+	await _ch4_wait(0.22)
+	# Second wave: two curving in from above and below.
+	for i in 2:
+		_spawn_bolt(enemy_character, player_character, sepia, 12.0,
+			0.19, float(i) * 0.05, 34.0 if i == 0 else -34.0, false)
+	await _ch4_wait(0.20)
+
+	# The great page forms above him, then the cane points and it goes.
+	_fx_paper(Vector2(46, 34), sepia, 0.06, 0.0, 0.0, -46.0)
+	_fx_word("HISTORY REPEATS!", enemy_character, Color(1.0, 0.88, 0.56), 26.0, 0.10, 12)
+	await _ch4_wait(0.20)
+	await _body_play(enemy_character, [
+		_beat(_ch3_dx() - 5.0, 0, 3, 1.0, 1.0, 0.12, Tween.TRANS_QUAD, Tween.EASE_OUT),
+	])
+	_spawn_bolt(enemy_character, player_character, Color(1.0, 0.84, 0.34, 0.95),
+		22.0, 0.20, 0.0, 0.0, false)
+	_fx_flash(Color(0.86, 0.74, 0.52, 0.55), 0.20)
+	await _ch4_wait(0.30)
+
+
+## DEFENSIVE. Eternal Resolve. A step back, both feet planted, the cane held
+## vertical, and a translucent golden barrier that holds.
+##
+## The cooldown the brief asks for is enforced by the boss controller, not
+## here: this routine only performs the block. See chapter4_boss.gd.
+func _ch4_eternal_resolve(move: EnemyMove, tint: Color) -> void:
+	# The small step back.
+	await _body_play(enemy_character, [
+		_beat(_ch3_dx() + 9.0, 0, 2, 1.0, 1.0, 0.16, Tween.TRANS_SINE, Tween.EASE_OUT),
+	])
+	# Plants both feet, cane upright.
+	await _ch3_gather(2.0, -4.0, -6.0, 1.0, 2.0, 0.16)
+	await _ch3_pose(6.0, -2.0, -2.0, 2.0, 2.0, 0.18)
+	await _ch3_ungather()
+	_ch3_clip(move, 0.84)
+	var cane := _ch3_prop(Color(0.42, 0.28, 0.16, 1.0), Vector2(9, 60), 4)
+	_ch3_prop_arc(cane, -6.0, -6.0, 0.0, 0.20, false)
+	# The statesman's emblem, then the barrier over it.
+	_ch4_seal(enemy_character, 56.0, 0.30)
+	for i in 3:
+		_fx_paper(Vector2(16, 12), Color(0.86, 0.74, 0.52, 0.9), 0.07,
+			float(i) * 0.05, float(i - 1) * 20.0, -10.0)
+	_ch4_seal(enemy_character, 88.0, 0.42)
+	_fx_word("STILL HERE", enemy_character, Color(1.0, 0.90, 0.58), 22.0, 0.12, 11)
+	await _ch4_wait(0.40)
+	var fade := create_tween()
+	fade.tween_property(cane, "modulate:a", 0.0, 0.22)
+
+
+# =========================================================================
+# LOLO ENRILEGEND -- the last stand
+# =========================================================================
+
+## Set the moment the last stand fires, and never cleared for the rest of the
+## encounter. This is what makes it happen ONCE: a second trip to zero finds
+## the flag already true and the fight ends normally.
+##
+## It is deliberately a plain member and not saved anywhere. The revive belongs
+## to one fight, so retrying the boss should offer it again -- and _setup_enemy
+## resets it along with everything else about the encounter.
+var _ch4_last_stand_used: bool = false
+
+## The turn on which the boss last raised Eternal Resolve, or -1 if never.
+## Read by _ch4_guard_on_cooldown; reset with the encounter.
+var _ch4_last_guard_turn: int = -1
+
+## Whether the boss just refused to lose. Returns true when the encounter
+## should CONTINUE instead of ending.
+##
+## Guarded on three things, all of which must hold: the rival is the Chapter 4
+## boss (matched on its own move id rather than on a name, so renaming the
+## character cannot silently disarm it), the health really is at zero, and it
+## has not already been used this encounter.
+func _ch4_last_stand() -> bool:
+	if _ch4_last_stand_used or _enemy == null or not _enemy.is_boss:
+		return false
+	if _enemy_hp > 0 or _enemy.moves.is_empty():
+		return false
+	if not _enemy.moves[0].signature_id().begins_with("c4combat_"):
+		return false          # Chapter 5's boss has its own final mechanic
+	_ch4_last_stand_used = true
+	await _play_ch4_last_stand()
+	return true
+
+## The beat itself: he kneels, the cane hits the floor, the fight looks won --
+## and then he stands up again.
+##
+## The pause before he rises is the whole point. It has to be long enough for
+## the player to believe it is over.
+func _play_ch4_last_stand() -> void:
+	_sequence_running = true
+	_update_action_buttons()
+
+	# Down. The cane goes first, then he follows it.
+	Audio.play_sfx("attack_impact")
+	_shake_screen(6.0)
+	_body_begin(enemy_character, BODY_FEET)
+	await _body_play(enemy_character, [
+		_beat(0, 10, 4, 1.02, 0.88, 0.26, Tween.TRANS_QUAD, Tween.EASE_IN),
+		_beat(0, 16, 6, 1.03, 0.82, 0.20, Tween.TRANS_SINE, Tween.EASE_OUT),
+	])
+	_fx_splatter(enemy_character, Color(0.86, 0.74, 0.52, 0.9), 10, 26.0, 0.5)
+
+	# The pause where the player thinks they have won.
+	await get_tree().create_timer(0.95).timeout
+
+	# Back up. Slowly, and without any help.
+	_fx_charge(enemy_character, Color(1.0, 0.82, 0.34, 1.0), 0.55)
+	await _body_play(enemy_character, [
+		_beat(0, 8, 2, 1.0, 0.94, 0.28, Tween.TRANS_SINE, Tween.EASE_IN_OUT),
+		_beat(0, -6, 0, 0.98, 1.08, 0.34, Tween.TRANS_BACK, Tween.EASE_OUT),
+		_beat(0, 0, 0, 1.0, 1.0, 0.20),
+	])
+	await _body_end(enemy_character)
+
+	var restored: int = maxi(1, roundi(float(_enemy.max_hp) * CH4_LAST_STAND_FRACTION))
+	_enemy_hp = restored
+	enemy_heart_row.set_value(_enemy_hp)
+	_refresh_damage_preview()
+
+	_fx_ring(enemy_character, Color(1.0, 0.84, 0.36, 0.95), 130.0, 0.5)
+	_fx_word("NOT YET.", enemy_character, Color(1.0, 0.88, 0.44), 34.0, 0.0, 17)
+	_fx_flash(Color(1.0, 0.70, 0.26), 0.42)
+	_shake_screen(8.0)
+	word_preview_label.text = "%s is still standing." % _enemy.enemy_name
+	await get_tree().create_timer(0.75).timeout
+
+	_sequence_running = false
+	_update_action_buttons()
+
+
+## How much harder the Chapter 4 boss hits once "STILL STANDING" has fired.
+##
+## 1.0 for everyone else and for phase 1, so this multiplier is invisible
+## everywhere except the fight it was written for. The brief asks for phase 2
+## to be "slightly" stronger and explicitly NOT a redesign, so the number is
+## small and applies to every skill equally rather than singling one out.
+func _ch4_phase_gain(move_id: String) -> float:
+	if _boss_phase < 2 or _enemy == null or not _enemy.is_boss:
+		return 1.0
+	if not move_id.begins_with("c4combat_"):
+		return 1.0
+	return CH4_PHASE2_DAMAGE_GAIN
+
+## How much quicker phase 2 is. Used by the boss routines to shorten their own
+## beats; a value below 1.0 shortens both the wind-up and the recovery, which
+## is what "attack speed slightly increased, recovery time slightly shorter"
+## amounts to when the animation is written as timed beats.
+func _ch4_phase_pace() -> float:
+	if _boss_phase < 2 or _enemy == null or not _enemy.is_boss:
+		return 1.0
+	return CH4_PHASE2_PACE
+
+
+# =========================================================================
+# CHAPTER 5 -- CONGRESS OF THE PHILIPPINES
+# =========================================================================
+#
+# The final chapter, animated through the same vocabulary as Chapters 3 and 4:
+# _ch3_gather / _ch3_pose / _ch3_ungather bend the cut-out rig, _ch3_clip plays
+# the drawn frames, _ch3_prop and _ch3_prop_arc carry a held object, _body_play
+# sequences the whole body. Nothing new was added to the engine for it.
+#
+# Every routine runs ANTICIPATION -> WIND-UP -> EXECUTION -> IMPACT/RELEASE ->
+# FOLLOW-THROUGH -> RECOVERY, and the resolver returns the body to idle after.
+# No routine translates the sprite as a rigid block: an approach is a walk
+# cycle, a strike is the rig bending at the shoulder, hip and knee.
+#
+# PROJECTILE TIMING. The brief is explicit that damage must land when a
+# projectile ARRIVES, not when it is created. That is already how the engine
+# works and these routines keep it that way: _spawn_bolt / _fx_paper only put a
+# thing in the air, and the resolver applies damage after the routine returns,
+# so every ranged routine awaits its own travel time before returning.
+
+## Chapter 5's dispatcher.
+func _ch5_perform(move_id: String, move: EnemyMove, tint: Color,
+		melee: bool, defending: bool) -> void:
+	match move_id:
+		# --- Cong Kodigo: the scripted solon -----------------------------
+		"c5combat_scripted_strike": await _ch5_scripted_strike(move, tint)
+		"c5combat_bill_barrage": await _ch5_bill_barrage(move, tint)
+		"c5combat_talking_point_guard": await _ch5_talking_point_guard(move, tint)
+		# --- Senador Sawsaw: the floor interrupter ------------------------
+		"c5combat_interpellation_jab": await _ch5_interpellation_jab(move, tint)
+		"c5combat_floor_hirit": await _ch5_floor_hirit(move, tint)
+		"c5combat_point_of_order": await _ch5_point_of_order(move, tint)
+		# --- Chairman Chika: the hearing hype -----------------------------
+		"c5combat_gavel_bang": await _ch5_gavel_bang(move, tint)
+		"c5combat_mic_barrage": await _ch5_mic_barrage(move, tint)
+		"c5combat_committee_shield": await _ch5_committee_shield(move, tint)
+		# --- Quorum Kuno: the vanishing vote ------------------------------
+		"c5combat_attendance_swipe": await _ch5_attendance_swipe(move, tint)
+		"c5combat_empty_seat_shuffle": await _ch5_empty_seat_shuffle(move, tint)
+		"c5combat_quorum_escape": await _ch5_quorum_escape(move, tint)
+		# --- Whip Walanghiya: the vote wrangler ---------------------------
+		"c5combat_bloc_breaker": await _ch5_bloc_breaker(move, tint)
+		"c5combat_vote_count_volley": await _ch5_vote_volley(move, tint)
+		"c5combat_majority_guard": await _ch5_majority_guard(move, tint)
+		# --- Amendment Atras: the bill rewriter ---------------------------
+		"c5combat_red_pen_slash": await _ch5_red_pen_slash(move, tint)
+		"c5combat_revision_rain": await _ch5_revision_rain(move, tint)
+		"c5combat_motion_to_amend": await _ch5_motion_to_amend(move, tint)
+		# --- Bicam Berto: the conference closer ---------------------------
+		"c5combat_conference_crash": await _ch5_conference_crash(move, tint)
+		"c5combat_bicam_merge": await _ch5_bicam_merge(move, tint)
+		"c5combat_compromise_shield": await _ch5_compromise_shield(move, tint)
+		# --- Budget Bomba: the appropriation bruiser ----------------------
+		"c5combat_budget_book_bash": await _ch5_budget_book_bash(move, tint)
+		"c5combat_appropriation_bombardment": await _ch5_appropriation_bombardment(move, tint)
+		"c5combat_fiscal_fortress": await _ch5_fiscal_fortress(move, tint)
+		# --- MarTinde RomuRulez: the house supremo -------------------------
+		"c5combat_house_rules": await _ch5_house_rules(move, tint)
+		"c5combat_majority_motion": await _ch5_majority_motion(move, tint)
+		"c5combat_speakers_shield": await _ch5_speakers_shield(move, tint)
+		_: await _ch3_generic(move, tint, melee, defending)
+
+
+## Congress runs on paper, and it is always the same official cream stock.
+func _ch5_paper() -> Color:
+	return Color(0.97, 0.95, 0.89, 0.98)
+
+
+## The chamber's authority colour: gavels, seals, the majority.
+func _ch5_gold() -> Color:
+	return Color(0.97, 0.80, 0.33, 0.95)
+
+
+## A wait that shortens once the boss is in session, and is an ordinary wait
+## for every rival. Chapter 4 proved the pattern; reusing it means "phase 2 is
+## quicker" stays one number rather than thirty edited timings.
+func _ch5_wait(secs: float) -> void:
+	await get_tree().create_timer(secs * _ch5_pace(), false).timeout
+
+
+func _ch5_pace() -> float:
+	if _enemy == null or not _enemy.is_boss:
+		return 1.0
+	if _ch5_final_reading_active:
+		return CH5_FINAL_READING_PACE
+	if _boss_phase >= 2:
+		return CH5_PHASE2_PACE
+	return 1.0
+
+
+# -------------------------------------------------------------------------
+# CONG KODIGO -- The Scripted Solon
+# -------------------------------------------------------------------------
+
+## MELEE. He checks the card first. That IS the anticipation -- he cannot begin
+## until he has read what he is about to say.
+func _ch5_scripted_strike(move: EnemyMove, tint: Color) -> void:
+	await _ch3_gather(1.0, -3.0, -8.0, 1.0, 2.0, 0.18)      # reads the card
+	await _ch3_pose(6.0, -11.0, -4.0, 3.0, 5.0, 0.13)       # nods, coils
+	await _ch3_ungather()
+	_ch3_clip(move, 0.74)
+	var scroll := _ch3_prop(Color(0.94, 0.91, 0.82, 1.0), Vector2(34, 10), 5)
+	_ch3_prop_arc(scroll, -32.0, -4.0, -58.0, 0.22, false)
+	await _body_play(enemy_character, [
+		_beat(_ch3_dx() + 4.0, 1, 4, 1.01, 0.99, 0.10, Tween.TRANS_QUAD, Tween.EASE_IN),
+		_beat(_ch3_dx() - 10.0, -3, -6, 1.02, 0.99, 0.14, Tween.TRANS_BACK, Tween.EASE_OUT),
+	])
+	_fx_splatter(player_character, _ch5_paper(), 10, 26.0, 0.46)
+	_fx_ring(player_character, tint, 52.0, 0.26)
+	var fade := create_tween()
+	fade.tween_property(scroll, "modulate:a", 0.0, 0.20)
+	await _ch5_wait(0.13)
+
+
+## RANGED. Three bills: straight, curving, then one bigger and faster. Each is
+## released as its own beat, and the routine waits for the last to cross.
+func _ch5_bill_barrage(move: EnemyMove, tint: Color) -> void:
+	await _ch3_gather(2.0, -6.0, -5.0, 2.0, 4.0, 0.16)
+	await _ch3_pose(5.0, -10.0, -3.0, 3.0, 6.0, 0.12)
+	await _ch3_ungather()
+	_ch3_clip(move, 0.78)
+	_fx_charge(enemy_character, tint, 0.22)
+	await _body_play(enemy_character, [_beat(_ch3_dx() - 5.0, 0, 3, 1, 1, 0.16)])
+	var paper := _ch5_paper()
+	_fx_paper(Vector2(16, 12), paper, 0.28, 0.00, 0.0, 26.0)
+	_spawn_bolt(enemy_character, player_character, paper, 9.0, 0.17, 0.00, 0.0, false)
+	_fx_paper(Vector2(17, 12), paper, 0.30, 0.10, -20.0, -34.0)
+	_spawn_bolt(enemy_character, player_character, paper, 9.0, 0.18, 0.10, -18.0, false)
+	_fx_paper(Vector2(22, 16), tint, 0.24, 0.20, 8.0, 44.0)
+	_spawn_bolt(enemy_character, player_character, tint, 14.0, 0.14, 0.20, 6.0, false, _ch5_land_ranged_hit)
+	await _ch5_wait(0.44)
+
+
+## DEFENSIVE. The talking points come up in layers and he braces behind them.
+func _ch5_talking_point_guard(move: EnemyMove, tint: Color) -> void:
+	await _ch3_gather(0.0, -3.0, -8.0, 0.0, 2.0, 0.12)
+	await _ch3_pose(8.0, -9.0, -4.0, 5.0, 4.0, 0.16)        # knees bend
+	await _ch3_ungather()
+	_ch3_clip(move, 0.72)
+	for i in 3:
+		var card := _ch3_prop(_ch5_paper(), Vector2(22, 28), 2)
+		card.rotation = deg_to_rad(-14.0 + float(i) * 12.0)
+		_ch3_prop_arc(card, -8.0 - float(i) * 4.0, -6.0, -8.0, 0.20 + float(i) * 0.04, false)
+	_fx_ring(enemy_character, tint, 76.0, 0.36)
+	_fx_word("ON THE RECORD", enemy_character, Color(1.0, 0.94, 0.70), 20.0, 0.10, 9)
+	await _ch5_wait(0.32)
+	_fx_splatter(enemy_character, _ch5_paper(), 8, 24.0, 0.42)   # cards scatter
+
+
+# -------------------------------------------------------------------------
+# SENADOR SAWSAW -- The Floor Interrupter
+# -------------------------------------------------------------------------
+
+## MELEE. A pointing feint, then two jabs -- the second harder than the first.
+func _ch5_interpellation_jab(move: EnemyMove, tint: Color) -> void:
+	await _ch3_gather(2.0, -5.0, -9.0, 2.0, 3.0, 0.14)      # finger up
+	# The feint: he commits, then stops.
+	await _body_play(enemy_character, [
+		_beat(_ch3_dx() - 6.0, -3, -5, 1.0, 1.0, 0.10, Tween.TRANS_SINE, Tween.EASE_OUT),
+		_beat(_ch3_dx() - 2.0, -1, -2, 1.0, 1.0, 0.06),
+	])
+	await _ch3_ungather()
+	_ch3_clip(move, 0.76)
+	# First jab.
+	await _body_play(enemy_character, [
+		_beat(_ch3_dx() - 9.0, 0, -3, 1.0, 1.0, 0.10, Tween.TRANS_QUAD, Tween.EASE_OUT),
+		_beat(_ch3_dx() - 3.0, 0, 0, 1.0, 1.0, 0.07),
+	])
+	_fx_ring(player_character, tint, 38.0, 0.16)
+	# Second, harder.
+	await _body_play(enemy_character, [
+		_beat(_ch3_dx() - 14.0, -3, -6, 1.03, 0.99, 0.12, Tween.TRANS_BACK, Tween.EASE_OUT),
+	])
+	_fx_splatter(player_character, tint, 10, 26.0, 0.46)
+	await _ch5_wait(0.14)
+
+
+## RANGED. Three speech waves off the microphone, each wider than the last.
+func _ch5_floor_hirit(move: EnemyMove, tint: Color) -> void:
+	await _ch3_gather(2.0, -7.0, -6.0, 2.0, 4.0, 0.17)      # leans to the mic
+	await _ch3_pose(4.0, -11.0, -8.0, 3.0, 6.0, 0.13)       # inhales
+	await _ch3_ungather()
+	_ch3_clip(move, 0.80)
+	_fx_charge(enemy_character, tint, 0.24)
+	await _body_play(enemy_character, [_beat(_ch3_dx() - 4.0, -2, 3, 1, 1, 0.15)])
+	# Waves rather than text walls: rings that leave him and cross the gap.
+	for i in 3:
+		_fx_ring(enemy_character, tint, 46.0 + float(i) * 22.0, 0.30, float(i) * 0.10)
+		_spawn_bolt(enemy_character, player_character, tint,
+			10.0 + float(i) * 4.0, 0.18, float(i) * 0.10, float(i - 1) * 10.0, false,
+			_ch5_land_ranged_hit if i == 2 else Callable())
+	_fx_word("MISTER SPEAKER!", enemy_character, Color(1.0, 0.84, 0.60), 22.0, 0.12, 9)
+	await _ch5_wait(0.46)
+
+
+## DEFENSIVE COUNTER. One finger, a chamber flash, and everything stops.
+func _ch5_point_of_order(move: EnemyMove, tint: Color) -> void:
+	await _ch3_gather(0.0, -2.0, -10.0, 0.0, 1.0, 0.10)     # the finger snaps up
+	_ch3_clip(move, 0.70)
+	_fx_flash(Color(1.0, 0.92, 0.70, 0.45), 0.16)
+	_fx_word("POINT OF ORDER!", enemy_character, Color(1.0, 0.88, 0.52), 24.0, 0.04, 11)
+	await _ch3_pose(6.0, -6.0, -4.0, 3.0, 4.0, 0.16)
+	await _ch3_ungather()
+	_fx_ring(enemy_character, _ch5_gold(), 70.0, 0.34)
+	await _ch5_wait(0.30)
+	# The counter: the barrier answers back.
+	_fx_ring(enemy_character, tint, 96.0, 0.28)
+	_fx_splatter(player_character, tint, 6, 20.0, 0.34)
+	await _ch5_wait(0.16)
+
+
+# -------------------------------------------------------------------------
+# CHAIRMAN CHIKA -- The Hearing Hype
+# -------------------------------------------------------------------------
+
+## MELEE. The gavel, all the way up and all the way down.
+func _ch5_gavel_bang(move: EnemyMove, tint: Color) -> void:
+	await _ch3_gather(6.0, -14.0, -9.0, 5.0, 3.0, 0.20)     # arm high, torso back
+	await _ch3_pose(9.0, -17.0, -12.0, 7.0, 4.0, 0.13)      # feet brace
+	await _ch3_ungather()
+	_ch3_clip(move, 0.78)
+	var gavel := _ch3_prop(Color(0.55, 0.36, 0.18, 1.0), Vector2(14, 30), 4)
+	_ch3_prop_arc(gavel, -18.0, -48.0, -102.0, 0.26, false)
+	await _body_play(enemy_character, [
+		_beat(_ch3_dx() + 6.0, -7, 4, 1.0, 1.05, 0.12, Tween.TRANS_QUAD, Tween.EASE_IN),
+		_beat(_ch3_dx() - 12.0, 8, -7, 1.05, 0.95, 0.16, Tween.TRANS_BACK, Tween.EASE_OUT),
+	])
+	_shake_screen(7.0)
+	_fx_ring(player_character, _ch5_gold(), 74.0, 0.32)
+	_fx_splatter(player_character, _ch5_paper(), 13, 32.0, 0.54)
+	var fade := create_tween()
+	fade.tween_property(gavel, "modulate:a", 0.0, 0.24)
+	await _ch5_wait(0.16)
+
+
+## RANGED. Three microphones: straight, diagonal, then a spinning fast one.
+func _ch5_mic_barrage(move: EnemyMove, tint: Color) -> void:
+	await _ch3_gather(3.0, -7.0, -5.0, 2.0, 5.0, 0.16)
+	await _ch3_ungather()
+	_ch3_clip(move, 0.78)
+	_fx_charge(enemy_character, tint, 0.22)
+	await _body_play(enemy_character, [_beat(_ch3_dx() - 5.0, -1, 3, 1, 1, 0.15)])
+	var steel := Color(0.62, 0.68, 0.76, 0.96)
+	_spawn_bolt(enemy_character, player_character, steel, 11.0, 0.18, 0.00, 0.0, false)
+	_spawn_bolt(enemy_character, player_character, steel, 11.0, 0.19, 0.09, -26.0, false)
+	_spawn_bolt(enemy_character, player_character, tint, 15.0, 0.13, 0.18, 12.0, false, _ch5_land_ranged_hit)
+	_fx_paper(Vector2(12, 9), steel, 0.22, 0.06, -6.0, 20.0)
+	await _ch5_wait(0.42)
+
+
+## DEFENSIVE. The hearing table itself comes up, folders stacked around it.
+func _ch5_committee_shield(move: EnemyMove, tint: Color) -> void:
+	await _ch3_gather(0.0, -4.0, -7.0, 0.0, 2.0, 0.12)
+	await _ch3_pose(8.0, -8.0, -3.0, 5.0, 5.0, 0.16)
+	await _ch3_ungather()
+	_ch3_clip(move, 0.74)
+	var table := _ch3_prop(Color(0.44, 0.28, 0.15, 1.0), Vector2(44, 22), 3)
+	_ch3_prop_arc(table, -12.0, -14.0, -6.0, 0.22, false)
+	for i in 2:
+		var stack := _ch3_prop(_ch5_paper(), Vector2(16, 20), 2)
+		_ch3_prop_arc(stack, -6.0 + float(i) * 24.0, -8.0, 6.0, 0.20, false)
+	_fx_ring(enemy_character, tint, 82.0, 0.36)
+	_fx_word("ORDER IN THE HEARING", enemy_character, Color(1.0, 0.86, 0.96), 20.0, 0.12, 9)
+	await _ch5_wait(0.34)
+	_fx_splatter(enemy_character, _ch5_paper(), 9, 26.0, 0.44)   # papers fall
+
+
+# -------------------------------------------------------------------------
+# QUORUM KUNO -- The Vanishing Vote
+# -------------------------------------------------------------------------
+#
+# The brief is firm that evasion must never be unfair, so every vanish here is
+# telegraphed before it happens, has a visible destination, and ends with him
+# back on his own mark. He is hard to hit, never impossible to read.
+
+## MELEE. He actually runs in -- real legs, not a slide -- swipes, and runs out.
+func _ch5_attendance_swipe(move: EnemyMove, tint: Color) -> void:
+	await _ch3_gather(2.0, -4.0, -7.0, 1.0, 3.0, 0.16)      # checks the sheet
+	await _ch3_pose(10.0, -6.0, -3.0, 5.0, 4.0, 0.12)       # lowers his stance
+	await _ch3_ungather()
+	_ch3_clip(move, 0.74)
+	var board := _ch3_prop(Color(0.80, 0.74, 0.60, 1.0), Vector2(20, 26), 3)
+	_ch3_prop_arc(board, -30.0, -6.0, -46.0, 0.20, false)
+	await _body_play(enemy_character, [
+		_beat(_ch3_dx() + 3.0, 2, 3, 1.0, 1.0, 0.09, Tween.TRANS_QUAD, Tween.EASE_IN),
+		_beat(_ch3_dx() - 11.0, -3, -5, 1.02, 0.99, 0.13, Tween.TRANS_BACK, Tween.EASE_OUT),
+	])
+	_fx_splatter(player_character, _ch5_paper(), 9, 24.0, 0.44)
+	_fx_ring(player_character, tint, 48.0, 0.24)
+	# And straight back out again.
+	await _body_play(enemy_character, [
+		_beat(_ch3_dx() + 6.0, 0, 4, 1.0, 1.0, 0.14, Tween.TRANS_SINE, Tween.EASE_OUT),
+		_beat(_ch3_dx(), 0, 0, 1.0, 1.0, 0.12),
+	])
+	var fade := create_tween()
+	fade.tween_property(board, "modulate:a", 0.0, 0.18)
+
+
+## RANGED TRICK. Empty chairs bloom, he half-fades, throws from the new spot,
+## and comes back. The chairs ARE the telegraph: they appear before he moves.
+func _ch5_empty_seat_shuffle(move: EnemyMove, tint: Color) -> void:
+	# Telegraph first, always.
+	for i in 3:
+		_fx_paper(Vector2(18, 22), Color(0.62, 0.70, 0.78, 0.65), 0.05,
+			float(i) * 0.06, float(i - 1) * 30.0, 6.0)
+	await _ch5_wait(0.26)
+	_ch3_clip(move, 0.76)
+	var dim := create_tween()
+	dim.tween_property(enemy_character, "modulate:a", 0.45, 0.14)
+	await _body_play(enemy_character, [
+		_beat(_ch3_dx() + 18.0, 0, 6, 1.0, 1.0, 0.16, Tween.TRANS_SINE, Tween.EASE_IN_OUT),
+	])
+	var back := create_tween()
+	back.tween_property(enemy_character, "modulate:a", 1.0, 0.12)
+	_fx_charge(enemy_character, tint, 0.18)
+	for i in 3:
+		_spawn_bolt(enemy_character, player_character, _ch5_paper(),
+			10.0, 0.18, float(i) * 0.06, float(i - 1) * 16.0, false,
+			_ch5_land_ranged_hit if i == 2 else Callable())
+	await _ch5_wait(0.30)
+	# Home again, on his own mark.
+	await _body_play(enemy_character, [
+		_beat(_ch3_dx(), 0, 0, 1.0, 1.0, 0.16, Tween.TRANS_SINE, Tween.EASE_OUT),
+	])
+
+
+## DEFENSIVE EVASION. Telegraphed, then a real sidestep -- never a teleport.
+func _ch5_quorum_escape(move: EnemyMove, tint: Color) -> void:
+	await _ch3_gather(1.0, -3.0, -9.0, 1.0, 3.0, 0.16)      # glances around
+	_fx_paper(Vector2(20, 24), Color(0.62, 0.70, 0.78, 0.55), 0.05, 0.0, 22.0, 4.0)
+	await _ch3_pose(9.0, -5.0, -4.0, 5.0, 4.0, 0.14)        # knees bend
+	await _ch3_ungather()
+	_ch3_clip(move, 0.72)
+	var dim := create_tween()
+	dim.tween_property(enemy_character, "modulate:a", 0.40, 0.12)
+	await _body_play(enemy_character, [
+		_beat(_ch3_dx() + 15.0, 0, 5, 1.0, 1.0, 0.16, Tween.TRANS_SINE, Tween.EASE_OUT),
+	])
+	_fx_ring(enemy_character, tint, 68.0, 0.30)
+	_fx_word("WALANG QUORUM", enemy_character, Color(0.80, 0.90, 1.0), 20.0, 0.08, 9)
+	await _ch5_wait(0.26)
+	var back := create_tween()
+	back.tween_property(enemy_character, "modulate:a", 1.0, 0.14)
+	await _body_play(enemy_character, [
+		_beat(_ch3_dx(), 0, 0, 1.0, 1.0, 0.15, Tween.TRANS_SINE, Tween.EASE_IN_OUT),
+	])
+
+
+# -------------------------------------------------------------------------
+# WHIP WALANGHIYA -- The Vote Wrangler
+# -------------------------------------------------------------------------
+
+## MELEE. He points, the bloc gathers behind the point, then he goes through.
+func _ch5_bloc_breaker(move: EnemyMove, tint: Color) -> void:
+	await _ch3_gather(2.0, -6.0, -6.0, 2.0, 4.0, 0.16)      # the point
+	for i in 3:
+		_fx_ring(enemy_character, tint, 30.0 + float(i) * 12.0, 0.22, float(i) * 0.05)
+	await _ch3_pose(10.0, -12.0, -4.0, 6.0, 5.0, 0.14)      # loads the shoulder
+	await _ch3_ungather()
+	_ch3_clip(move, 0.74)
+	await _body_play(enemy_character, [
+		_beat(_ch3_dx() + 5.0, 3, 3, 1.01, 1.0, 0.10, Tween.TRANS_QUAD, Tween.EASE_IN),
+		_beat(_ch3_dx() - 13.0, -4, -6, 1.04, 0.98, 0.15, Tween.TRANS_BACK, Tween.EASE_OUT),
+	])
+	_shake_screen(5.0)
+	_fx_splatter(player_character, tint, 12, 30.0, 0.50)
+	_fx_ring(player_character, tint, 66.0, 0.30)
+	await _ch5_wait(0.14)
+
+
+## RANGED. Two waves of tokens at different heights, then one big marker.
+func _ch5_vote_volley(move: EnemyMove, tint: Color) -> void:
+	await _ch3_gather(3.0, -7.0, -5.0, 2.0, 5.0, 0.16)
+	await _ch3_ungather()
+	_ch3_clip(move, 0.80)
+	_fx_charge(enemy_character, tint, 0.24)
+	await _body_play(enemy_character, [_beat(_ch3_dx() - 5.0, -1, 3, 1, 1, 0.15)])
+	for i in 3:                                     # low wave
+		_spawn_bolt(enemy_character, player_character, tint, 10.0, 0.17,
+			float(i) * 0.05, 16.0 + float(i) * 4.0, false)
+	await _ch5_wait(0.16)
+	for i in 3:                                     # high wave
+		_spawn_bolt(enemy_character, player_character, tint, 10.0, 0.17,
+			float(i) * 0.05, -20.0 - float(i) * 4.0, false)
+	await _ch5_wait(0.16)
+	_spawn_bolt(enemy_character, player_character, _ch5_gold(), 20.0, 0.19, 0.0, 0.0, false, _ch5_land_ranged_hit)
+	await _ch5_wait(0.32)
+
+
+## DEFENSIVE. The bloc falls in behind him and links up.
+func _ch5_majority_guard(move: EnemyMove, tint: Color) -> void:
+	await _ch3_gather(1.0, -4.0, -6.0, 1.0, 3.0, 0.13)
+	await _ch3_pose(6.0, -8.0, -3.0, 4.0, 5.0, 0.16)
+	await _ch3_ungather()
+	_ch3_clip(move, 0.74)
+	# The allies: silhouettes that arrive, link, and go again.
+	var allies: Array[Panel] = []
+	for i in 4:
+		var ally := _ch3_prop(Color(tint.r, tint.g, tint.b, 0.55), Vector2(18, 44), 3)
+		_ch3_prop_arc(ally, 10.0 + float(i) * 12.0, -4.0, 0.0, 0.22 + float(i) * 0.03, false)
+		allies.append(ally)
+	for i in 3:
+		_fx_ring(enemy_character, tint, 50.0 + float(i) * 16.0, 0.34, float(i) * 0.05)
+	_fx_word("MAYORYA", enemy_character, Color(0.72, 1.0, 0.84), 22.0, 0.12, 11)
+	await _ch5_wait(0.38)
+	for ally in allies:
+		var out := create_tween()
+		out.tween_property(ally, "modulate:a", 0.0, 0.20)
+
+
+# -------------------------------------------------------------------------
+# AMENDMENT ATRAS -- The Bill Rewriter
+# -------------------------------------------------------------------------
+
+## MELEE. Two cuts of the red pen: diagonal, then horizontal.
+func _ch5_red_pen_slash(move: EnemyMove, tint: Color) -> void:
+	await _ch3_gather(4.0, -8.0, -6.0, 3.0, 4.0, 0.16)      # spins the pen
+	await _ch3_pose(8.0, -12.0, -3.0, 4.0, 6.0, 0.12)       # repositions the feet
+	await _ch3_ungather()
+	_ch3_clip(move, 0.76)
+	var pen := _ch3_prop(Color(0.81, 0.24, 0.23, 1.0), Vector2(30, 8), 4)
+	# Cut one: diagonal.
+	_ch3_prop_arc(pen, -28.0, -20.0, -66.0, 0.18, false)
+	await _body_play(enemy_character, [
+		_beat(_ch3_dx() - 8.0, -2, -5, 1.0, 1.0, 0.12, Tween.TRANS_QUAD, Tween.EASE_OUT),
+	])
+	_fx_splatter(player_character, Color(0.86, 0.22, 0.20, 0.95), 7, 22.0, 0.36)
+	# Cut two: horizontal, the correction.
+	_ch3_prop_arc(pen, -20.0, 16.0, 54.0, 0.18, false)
+	await _body_play(enemy_character, [
+		_beat(_ch3_dx() - 13.0, 3, 5, 1.02, 0.99, 0.13, Tween.TRANS_BACK, Tween.EASE_OUT),
+	])
+	_fx_splatter(player_character, Color(0.86, 0.22, 0.20, 0.95), 9, 26.0, 0.44)
+	var fade := create_tween()
+	fade.tween_property(pen, "modulate:a", 0.0, 0.20)
+	await _ch5_wait(0.14)
+
+
+## RANGED. Pages fall in two telegraphed sets, then one REVISED document.
+func _ch5_revision_rain(move: EnemyMove, tint: Color) -> void:
+	await _ch3_gather(2.0, -6.0, -8.0, 2.0, 3.0, 0.16)
+	await _ch3_ungather()
+	_ch3_clip(move, 0.84)
+	# Telegraph: the pages gather overhead before any of them fall.
+	for i in 3:
+		_fx_paper(Vector2(16, 12), _ch5_paper(), 0.05, float(i) * 0.05,
+			float(i - 1) * 26.0, -52.0)
+	await _ch5_wait(0.28)
+	for i in 3:
+		_spawn_bolt(enemy_character, player_character, _ch5_paper(),
+			9.0, 0.20, float(i) * 0.06, -34.0 + float(i) * 6.0, false)
+	await _ch5_wait(0.20)
+	for i in 2:
+		_spawn_bolt(enemy_character, player_character, _ch5_paper(),
+			9.0, 0.20, float(i) * 0.06, 18.0 + float(i) * 8.0, false)
+	await _ch5_wait(0.18)
+	_fx_paper(Vector2(40, 30), tint, 0.06, 0.0, 0.0, -40.0)
+	_fx_word("REVISED", enemy_character, Color(1.0, 0.72, 0.68), 24.0, 0.08, 12)
+	_spawn_bolt(enemy_character, player_character, tint, 22.0, 0.20, 0.0, 0.0, false, _ch5_land_ranged_hit)
+	await _ch5_wait(0.32)
+
+
+## DEFENSIVE. He crosses the incoming text out and rewrites it into a wall.
+func _ch5_motion_to_amend(move: EnemyMove, tint: Color) -> void:
+	await _ch3_gather(1.0, -4.0, -7.0, 1.0, 3.0, 0.13)
+	_ch3_clip(move, 0.76)
+	var bill := _ch3_prop(_ch5_paper(), Vector2(34, 42), 3)
+	_ch3_prop_arc(bill, -10.0, -8.0, -6.0, 0.20, false)
+	await _ch5_wait(0.18)
+	# The crossing-out, then the replacement.
+	_fx_splatter(enemy_character, Color(0.86, 0.22, 0.20, 0.95), 6, 18.0, 0.30)
+	_fx_word("AMENDED", enemy_character, Color(1.0, 0.74, 0.70), 20.0, 0.06, 10)
+	await _ch3_pose(6.0, -7.0, -3.0, 4.0, 4.0, 0.15)
+	await _ch3_ungather()
+	_fx_ring(enemy_character, tint, 78.0, 0.34)
+	await _ch5_wait(0.30)
+
+
+# -------------------------------------------------------------------------
+# BICAM BERTO -- The Conference Closer
+# -------------------------------------------------------------------------
+#
+# His whole identity is TWO WEAKER THINGS -> MERGE -> ONE STRONGER RESULT, and
+# all three of his skills say it: two strikes then a double, two bills then a
+# fused one, two barriers then a single shield.
+
+## MELEE. One folder, the other folder, then both together.
+func _ch5_conference_crash(move: EnemyMove, tint: Color) -> void:
+	await _ch3_gather(4.0, -9.0, -5.0, 3.0, 4.0, 0.17)
+	await _ch3_ungather()
+	_ch3_clip(move, 0.82)
+	var senate := _ch3_prop(Color(0.31, 0.44, 0.78, 1.0), Vector2(24, 30), 3)
+	var house := _ch3_prop(Color(0.78, 0.28, 0.28, 1.0), Vector2(24, 30), 3)
+	# Strike one.
+	_ch3_prop_arc(senate, -26.0, -8.0, -40.0, 0.16, false)
+	await _body_play(enemy_character, [
+		_beat(_ch3_dx() - 7.0, 0, -3, 1.0, 1.0, 0.11, Tween.TRANS_QUAD, Tween.EASE_OUT),
+	])
+	_fx_ring(player_character, Color(0.42, 0.56, 0.92, 0.9), 40.0, 0.18)
+	# Strike two.
+	_ch3_prop_arc(house, -26.0, 6.0, 40.0, 0.16, false)
+	await _body_play(enemy_character, [
+		_beat(_ch3_dx() - 4.0, 0, 3, 1.0, 1.0, 0.11, Tween.TRANS_QUAD, Tween.EASE_OUT),
+	])
+	_fx_ring(player_character, Color(0.90, 0.36, 0.34, 0.9), 40.0, 0.18)
+	# And both, together, downward.
+	_ch3_prop_arc(senate, -14.0, -34.0, -84.0, 0.20, false)
+	_ch3_prop_arc(house, -14.0, -34.0, -84.0, 0.20, false)
+	await _body_play(enemy_character, [
+		_beat(_ch3_dx() + 5.0, -6, 4, 1.0, 1.05, 0.11, Tween.TRANS_QUAD, Tween.EASE_IN),
+		_beat(_ch3_dx() - 14.0, 8, -7, 1.05, 0.95, 0.16, Tween.TRANS_BACK, Tween.EASE_OUT),
+	])
+	_shake_screen(6.0)
+	_fx_splatter(player_character, _ch5_paper(), 14, 32.0, 0.54)
+	for prop in [senate, house]:
+		var fade := create_tween()
+		fade.tween_property(prop, "modulate:a", 0.0, 0.22)
+	await _ch5_wait(0.16)
+
+
+## RANGED SIGNATURE. Two bills converge, fuse, and the fused one is what flies.
+func _ch5_bicam_merge(move: EnemyMove, tint: Color) -> void:
+	await _ch3_gather(2.0, -6.0, -6.0, 2.0, 4.0, 0.18)
+	await _ch3_ungather()
+	_ch3_clip(move, 0.90)
+	var blue := Color(0.36, 0.50, 0.88, 0.96)
+	var red := Color(0.86, 0.32, 0.30, 0.96)
+	# Each chamber's bill takes its own side, and hovers.
+	_fx_paper(Vector2(22, 28), blue, 0.05, 0.00, -40.0, -26.0)
+	_fx_paper(Vector2(22, 28), red, 0.05, 0.00, 40.0, -26.0)
+	_fx_charge(enemy_character, tint, 0.32)
+	await _ch5_wait(0.34)
+	# They come together at the centre.
+	_fx_paper(Vector2(20, 26), blue, 0.10, 0.00, -14.0, -20.0)
+	_fx_paper(Vector2(20, 26), red, 0.10, 0.00, 14.0, -20.0)
+	await _ch5_wait(0.24)
+	# And leave as one, larger and gold.
+	_fx_ring(enemy_character, _ch5_gold(), 84.0, 0.30)
+	_fx_paper(Vector2(46, 34), _ch5_gold(), 0.08, 0.0, 0.0, -22.0)
+	_fx_word("BICAM", enemy_character, Color(1.0, 0.88, 0.52), 24.0, 0.06, 13)
+	await _ch5_wait(0.18)
+	await _body_play(enemy_character, [
+		_beat(_ch3_dx() - 6.0, 0, 3, 1.0, 1.0, 0.13, Tween.TRANS_QUAD, Tween.EASE_OUT),
+	])
+	_spawn_bolt(enemy_character, player_character, _ch5_gold(), 26.0, 0.22, 0.0, 0.0, false, _ch5_land_ranged_hit)
+	await _ch5_wait(0.34)
+
+
+## DEFENSIVE. Two barriers slide together and become one.
+func _ch5_compromise_shield(move: EnemyMove, tint: Color) -> void:
+	await _ch3_gather(1.0, -4.0, -6.0, 1.0, 3.0, 0.14)
+	await _ch3_pose(6.0, -8.0, -3.0, 4.0, 4.0, 0.15)
+	await _ch3_ungather()
+	_ch3_clip(move, 0.78)
+	var senate := _ch3_prop(Color(0.34, 0.48, 0.86, 0.92), Vector2(20, 46), 3)
+	var house := _ch3_prop(Color(0.84, 0.30, 0.28, 0.92), Vector2(20, 46), 3)
+	_ch3_prop_arc(senate, -22.0, -6.0, -8.0, 0.22, false)
+	_ch3_prop_arc(house, 18.0, -6.0, 8.0, 0.22, false)
+	await _ch5_wait(0.26)
+	# The compromise: they meet in the middle.
+	_ch3_prop_arc(senate, 12.0, 0.0, 8.0, 0.18, false)
+	_ch3_prop_arc(house, -12.0, 0.0, -8.0, 0.18, false)
+	_fx_ring(enemy_character, _ch5_gold(), 80.0, 0.34)
+	_fx_word("RECONCILED", enemy_character, Color(1.0, 0.90, 0.62), 20.0, 0.10, 10)
+	await _ch5_wait(0.32)
+
+
+# -------------------------------------------------------------------------
+# BUDGET BOMBA -- The Appropriation Bruiser
+# -------------------------------------------------------------------------
+#
+# Slow on purpose. Every beat here is longer than its equivalent elsewhere in
+# the chapter -- the threat is weight and reach, never speed.
+
+## MELEE. He strains the book up, walks it in, swings, then brings it down.
+func _ch5_budget_book_bash(move: EnemyMove, tint: Color) -> void:
+	# The strain. Longest anticipation in the game.
+	await _ch3_gather(6.0, -8.0, -4.0, 4.0, 2.0, 0.26)
+	await _ch3_pose(10.0, -16.0, -9.0, 8.0, 3.0, 0.20)
+	await _ch3_ungather()
+	_ch3_clip(move, 0.94)
+	var book := _ch3_prop(Color(0.42, 0.28, 0.14, 1.0), Vector2(46, 52), 2)
+	# Horizontal swing.
+	_ch3_prop_arc(book, -34.0, -6.0, -52.0, 0.26, false)
+	await _body_play(enemy_character, [
+		_beat(_ch3_dx() - 6.0, 2, -4, 1.02, 1.0, 0.18, Tween.TRANS_SINE, Tween.EASE_IN_OUT),
+	])
+	_fx_splatter(player_character, _ch5_gold(), 10, 28.0, 0.46)
+	# Then the downward smash.
+	_ch3_prop_arc(book, -18.0, -56.0, -112.0, 0.30, false)
+	await _body_play(enemy_character, [
+		_beat(_ch3_dx() + 8.0, -8, 5, 1.0, 1.07, 0.15, Tween.TRANS_QUAD, Tween.EASE_IN),
+		_beat(_ch3_dx() - 15.0, 10, -8, 1.08, 0.92, 0.20, Tween.TRANS_BACK, Tween.EASE_OUT),
+	])
+	_shake_screen(9.0)
+	_fx_ring(player_character, _ch5_gold(), 96.0, 0.36)
+	_fx_splatter(player_character, _ch5_paper(), 18, 38.0, 0.60)
+	var fade := create_tween()
+	fade.tween_property(book, "modulate:a", 0.0, 0.28)
+	await _ch5_wait(0.20)
+
+
+## RANGED. A light volley, a heavy one, then the whole folder.
+func _ch5_appropriation_bombardment(move: EnemyMove, tint: Color) -> void:
+	await _ch3_gather(5.0, -9.0, -5.0, 4.0, 3.0, 0.22)
+	await _ch3_ungather()
+	_ch3_clip(move, 0.92)
+	_fx_charge(enemy_character, tint, 0.30)
+	await _body_play(enemy_character, [_beat(_ch3_dx() - 4.0, 2, 3, 1, 1, 0.18)])
+	for i in 3:                                     # light
+		_spawn_bolt(enemy_character, player_character, _ch5_gold(),
+			9.0, 0.19, float(i) * 0.05, float(i - 1) * 12.0, false)
+	await _ch5_wait(0.22)
+	for i in 3:                                     # heavy
+		_spawn_bolt(enemy_character, player_character, tint,
+			15.0, 0.20, float(i) * 0.06, float(i - 1) * 20.0, false)
+	await _ch5_wait(0.24)
+	_fx_paper(Vector2(44, 32), tint, 0.28, 0.0, 0.0, 26.0)
+	_spawn_bolt(enemy_character, player_character, tint, 26.0, 0.24, 0.0, 0.0, false, _ch5_land_ranged_hit)
+	await _ch5_wait(0.36)
+
+
+## DEFENSIVE. The ledger opens, he grips both covers and plants.
+func _ch5_fiscal_fortress(move: EnemyMove, tint: Color) -> void:
+	await _ch3_gather(3.0, -6.0, -6.0, 2.0, 3.0, 0.18)
+	await _ch3_pose(12.0, -8.0, -3.0, 7.0, 4.0, 0.20)       # feet very wide
+	await _ch3_ungather()
+	_ch3_clip(move, 0.86)
+	var ledger := _ch3_prop(Color(0.46, 0.30, 0.16, 1.0), Vector2(58, 50), 2)
+	_ch3_prop_arc(ledger, -16.0, -10.0, -4.0, 0.26, false)
+	for i in 3:
+		_fx_ring(enemy_character, _ch5_gold(), 58.0 + float(i) * 20.0, 0.38, float(i) * 0.06)
+	_fx_word("APPROPRIATED", enemy_character, Color(1.0, 0.88, 0.48), 22.0, 0.12, 11)
+	await _ch5_wait(0.42)
+	_fx_splatter(enemy_character, _ch5_paper(), 10, 28.0, 0.46)  # pages fly
+
+
+# -------------------------------------------------------------------------
+# MARTINDE ROMURULEZ -- The House Supremo
+# -------------------------------------------------------------------------
+#
+# The fictional parody uses the user's appearance reference, with his approved
+# navy polo and dark pants. Satire concerns procedure, never factual allegations.
+
+## MELEE. The full command combo, in the order the brief sets out: cuff, gavel
+## raised, a point, a step through, then gavel jab, folder sweep, and the
+## overhead slam that carries the damage.
+func _ch5_house_rules(move: EnemyMove, tint: Color) -> void:
+	# Adjusts his polo collar, unhurried and composed.
+	await _ch3_gather(0.0, -2.0, -4.0, 0.0, 2.0, 0.20)
+	# Raises the gavel and points.
+	await _ch3_pose(3.0, -7.0, -9.0, 2.0, 3.0, 0.20)
+	_fx_word("ORDER!", enemy_character, Color(1.0, 0.90, 0.56), 20.0, 0.04, 11)
+	await _ch3_ungather()
+	_ch3_clip(move, 0.94)
+	var gavel := _ch3_prop(Color(0.52, 0.34, 0.17, 1.0), Vector2(13, 34), 4)
+	var folder := _ch3_prop(_ch5_paper(), Vector2(26, 32), 3)
+
+	# The step through, then the gavel jab.
+	_ch3_prop_arc(gavel, -24.0, -6.0, -16.0, 0.16, false)
+	await _body_play(enemy_character, [
+		_beat(_ch3_dx() - 7.0, 0, 3, 1.0, 1.0, 0.14, Tween.TRANS_QUAD, Tween.EASE_OUT),
+	])
+	_fx_ring(player_character, tint, 42.0, 0.18)
+
+	# The folder sweep, horizontal.
+	_ch3_prop_arc(folder, -22.0, 12.0, 62.0, 0.18, false)
+	await _body_play(enemy_character, [
+		_beat(_ch3_dx() - 4.0, 3, -5, 1.02, 0.99, 0.15, Tween.TRANS_SINE, Tween.EASE_IN_OUT),
+	])
+	_fx_splatter(player_character, _ch5_paper(), 9, 26.0, 0.42)
+
+	# THE SLAM. This is the strongest frame and the one the damage belongs to,
+	# so it is the last thing that happens before the routine returns.
+	_ch3_prop_arc(gavel, -20.0, -50.0, -110.0, 0.24, false)
+	await _body_play(enemy_character, [
+		_beat(_ch3_dx() + 6.0, -7, 5, 1.0, 1.06, 0.13, Tween.TRANS_QUAD, Tween.EASE_IN),
+		_beat(_ch3_dx() - 15.0, 9, -8, 1.07, 0.93, 0.18, Tween.TRANS_BACK, Tween.EASE_OUT),
+	])
+	_shake_screen(9.0)
+	_fx_ring(player_character, _ch5_gold(), 104.0, 0.38)
+	_fx_splatter(player_character, _ch5_gold(), 16, 36.0, 0.58)
+	for prop in [gavel, folder]:
+		var fade := create_tween()
+		fade.tween_property(prop, "modulate:a", 0.0, 0.26)
+	await _ch5_wait(0.18)
+
+
+## RANGED. The board lights, the count gathers, two waves go, and the MAJORITY
+## symbol follows them. He never leaves his mark while any of it travels.
+func _ch5_majority_motion(move: EnemyMove, tint: Color) -> void:
+	# One calm raised hand. That is the entire wind-up.
+	await _ch3_gather(0.0, -5.0, -7.0, 0.0, 2.0, 0.22)
+	_fx_charge(enemy_character, _ch5_gold(), 0.34)
+	# The board and the count.
+	for i in 4:
+		_fx_paper(Vector2(14, 14), _ch5_gold(), 0.05, float(i) * 0.05,
+			float(i - 2) * 22.0, -30.0)
+	await _ch3_ungather()
+	_ch3_clip(move, 0.92)
+	await _ch5_wait(0.22)
+
+	# Wave one: the votes.
+	for i in 3:
+		_spawn_bolt(enemy_character, player_character, _ch5_gold(),
+			11.0, 0.18, float(i) * 0.05, float(i - 1) * 14.0, false)
+	await _ch5_wait(0.22)
+	# Wave two: the papers.
+	for i in 3:
+		_fx_paper(Vector2(18, 13), _ch5_paper(), 0.28, float(i) * 0.05,
+			float(i - 1) * 20.0, float(i - 1) * 26.0)
+		_spawn_bolt(enemy_character, player_character, _ch5_paper(),
+			10.0, 0.19, float(i) * 0.05, float(i - 1) * 24.0, false)
+	await _ch5_wait(0.22)
+
+	# And the motion itself.
+	_fx_word("MAJORITY", enemy_character, Color(1.0, 0.88, 0.50), 28.0, 0.06, 14)
+	_fx_ring(enemy_character, _ch5_gold(), 110.0, 0.34)
+	await _ch5_wait(0.18)
+	await _body_play(enemy_character, [
+		_beat(_ch3_dx() - 6.0, 0, 3, 1.0, 1.0, 0.12, Tween.TRANS_QUAD, Tween.EASE_OUT),
+	])
+	_spawn_bolt(enemy_character, player_character, _ch5_gold(), 28.0, 0.22, 0.0, 0.0, false, _ch5_land_ranged_hit)
+	_fx_flash(Color(1.0, 0.86, 0.44, 0.40), 0.20)
+	_shake_screen(3.0)
+	await _ch5_wait(0.34)
+
+
+## DEFENSIVE. He strikes the stand, the emblem lights, and the panels rise.
+##
+## The cooldown the brief asks for is enforced by _ch5_guard_on_cooldown in the
+## move rotation, not here: this routine only performs the block.
+func _ch5_speakers_shield(move: EnemyMove, tint: Color) -> void:
+	# Into a firm stance, gavel up.
+	await _ch3_gather(2.0, -4.0, -6.0, 1.0, 2.0, 0.18)
+	await _ch3_pose(7.0, -9.0, -8.0, 3.0, 3.0, 0.16)
+	await _ch3_ungather()
+	_ch3_clip(move, 0.88)
+	# The strike on the stand.
+	await _body_play(enemy_character, [
+		_beat(_ch3_dx(), 6, 2, 1.0, 0.96, 0.11, Tween.TRANS_QUAD, Tween.EASE_IN),
+		_beat(_ch3_dx(), 0, 0, 1.0, 1.0, 0.10, Tween.TRANS_BACK, Tween.EASE_OUT),
+	])
+	_shake_screen(4.0)
+	# The emblem under his feet, then the panels, then the orbiting votes.
+	_fx_ring(enemy_character, _ch5_gold(), 62.0, 0.30)
+	for i in 3:
+		var panel := _ch3_prop(Color(0.96, 0.93, 0.86, 0.90), Vector2(20, 44), 3)
+		_ch3_prop_arc(panel, -26.0 + float(i) * 26.0, -8.0,
+			-10.0 + float(i) * 10.0, 0.24, false)
+	for i in 3:
+		_fx_ring(enemy_character, _ch5_gold(), 74.0 + float(i) * 16.0,
+			0.36, float(i) * 0.06)
+	_fx_word("THE CHAIR IS PROTECTED", enemy_character,
+		Color(1.0, 0.90, 0.56), 22.0, 0.12, 10)
+	await _ch5_wait(0.42)
+	_fx_splatter(enemy_character, _ch5_paper(), 8, 24.0, 0.40)
+
+
+# =========================================================================
+# SPIKER SUPREMO -- FINAL READING, and the defeat of the last boss
+# =========================================================================
+
+## True once FINAL READING has fired, for the rest of the encounter. This is
+## what makes it happen ONCE: the trigger checks the flag before anything else.
+var _ch5_final_reading_used: bool = false
+## True only while the closing stage is running, so the pace helper can read it.
+var _ch5_final_reading_active: bool = false
+var _ch5_move_active: bool = false
+var _ch5_final_reading_turns: int = 0
+var _ch5_ranged_contact_pending: bool = false
+var _ch5_ranged_damage: int = 0
+
+func _ch5_land_ranged_hit() -> void:
+	if not _ch5_ranged_contact_pending:
+		return
+	_ch5_ranged_contact_pending = false
+	var move := _signature_move
+	if move == null:
+		return
+	var tint := move.effect_color
+	_react_room(tint, 7.0 if _enemy.is_boss else 4.0)
+	if Audio.has_move_sfx(move.signature_id(), "hit"):
+		Audio.play_move_sfx(move.signature_id(), "hit")
+	else:
+		Audio.play_sfx("attack_impact")
+	_shake_screen(2.5)
+	_fx_flash(tint, 0.16)
+	_fx_ring(player_character, tint, 48.0, 0.20)
+	word_preview_label.text = "%s hits! -%d HP" % [move.move_name, _ch5_ranged_damage]
+	if _ch5_ranged_damage > 0:
+		_player_hp = maxi(0, _player_hp - _ch5_ranged_damage)
+		player_heart_row.set_value(_player_hp)
+		Audio.play_sfx("player_hurt")
+		player_character.play_hit()
+
+func _ch5_finish_turn() -> void:
+	if not _ch5_final_reading_active:
+		return
+	_ch5_final_reading_turns = maxi(0, _ch5_final_reading_turns - 1)
+	if _ch5_final_reading_turns == 0:
+		_ch5_final_reading_active = false
+		if is_instance_valid(_ch5_chamber): _ch5_chamber.set_stage(1)
+		_fx_word("FINAL READING COMPLETE", enemy_character, _ch5_gold(), 20.0, 0.0, 10)
+## The turn the boss last raised Speaker's Shield, or -1. Read by
+## _ch5_guard_on_cooldown; reset with the encounter.
+var _ch5_last_guard_turn: int = -1
+
+## Whether `move` is the Chapter 5 boss's shield and he used it last turn.
+## "No shield spam", scoped as narrowly as Chapter 4's equivalent.
+func _ch5_guard_on_cooldown(move: EnemyMove) -> bool:
+	if move == null or _enemy == null:
+		return false
+	if move.signature_id() not in ["c5combat_speakers_shield", "c5combat_quorum_escape"]:
+		return false
+	return _ch5_last_guard_turn >= 0 and _move_index - _ch5_last_guard_turn <= 1
+
+## How much harder the Chapter 5 boss hits, by stage. Phase 2 and FINAL READING
+## stack deliberately: the closing stage is meant to be the hardest the game
+## ever gets, and it is still only a fifth above phase 2.
+func _ch5_damage_gain(move_id: String) -> float:
+	if _enemy == null or not _enemy.is_boss or not move_id.begins_with("c5combat_"):
+		return 1.0
+	var gain := 1.0
+	if _boss_phase >= 2:
+		gain *= CH5_PHASE2_DAMAGE_GAIN
+	if _ch5_final_reading_active:
+		gain *= CH5_FINAL_READING_GAIN
+	return gain
+
+## Fires the closing stage the first time the boss falls into the last quarter.
+## Returns true if it ran, so the caller knows a beat has been spent.
+##
+## Deliberately NOT a heal. The brief asks for a climax, not a second health
+## bar, so nothing here touches _enemy_hp -- what changes is speed, damage and
+## how loud the room is.
+func _ch5_try_final_reading() -> bool:
+	if _ch5_final_reading_used or _enemy == null or not _enemy.is_boss:
+		return false
+	if _enemy.moves.is_empty() or not _enemy.moves[0].signature_id().begins_with("c5combat_"):
+		return false
+	if _enemy_hp <= 0:
+		return false
+	var fraction := float(_enemy_hp) / float(maxi(1, _enemy.max_hp))
+	if fraction > CH5_FINAL_READING_AT:
+		return false
+	_ch5_final_reading_used = true
+	_ch5_final_reading_active = true
+	_ch5_final_reading_turns = 3
+	if is_instance_valid(_ch5_chamber): _ch5_chamber.set_stage(2)
+	await _play_ch5_final_reading()
+	return true
+
+## He raises the bill, the chamber dims, the bell goes, and the last stage of
+## the last fight in the game begins.
+func _play_ch5_final_reading() -> void:
+	_sequence_running = true
+	_update_action_buttons()
+
+	# The room drops away.
+	var veil := ColorRect.new()
+	veil.color = Color(0.02, 0.02, 0.04, 0.0)
+	veil.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	veil.offset_right = Layout.profile.design_size.x
+	veil.offset_bottom = Layout.profile.design_size.y
+	_fx_node(veil, 2.4)
+	var dim := create_tween()
+	dim.tween_property(veil, "color:a", 0.62, 0.28)
+	await dim.finished
+
+	# The bill goes up.
+	Audio.play_sfx("attack_impact")
+	_body_begin(enemy_character, BODY_FEET)
+	await _body_play(enemy_character, [
+		_beat(0, 4, 0, 1.0, 0.97, 0.16, Tween.TRANS_QUAD, Tween.EASE_OUT),
+		_beat(0, -10, 0, 0.98, 1.10, 0.30, Tween.TRANS_BACK, Tween.EASE_OUT),
+	])
+	_fx_paper(Vector2(52, 40), Color(1.0, 0.88, 0.52, 0.98), 0.06, 0.0, 0.0, -54.0)
+	# The voting symbols come up around the arena.
+	for i in 6:
+		_fx_ring(enemy_character, Color(1.0, 0.84, 0.36, 0.9),
+			60.0 + float(i) * 22.0, 0.5, float(i) * 0.05)
+	_fx_word("FINAL READING", enemy_character, Color(1.0, 0.90, 0.50), 36.0, 0.0, 18)
+	_fx_flash(Color(1.0, 0.80, 0.34), 0.5)
+	_shake_screen(8.0)
+	await get_tree().create_timer(0.7).timeout
+
+	await _body_play(enemy_character, [_beat(0, 0, 0, 1.0, 1.0, 0.18)])
+	await _body_end(enemy_character)
+	var lift := create_tween()
+	lift.tween_property(veil, "color:a", 0.0, 0.4)
+	word_preview_label.text = "%s calls the final reading." % _enemy.enemy_name
+	await get_tree().create_timer(0.4).timeout
+
+	_sequence_running = false
+	_update_action_buttons()
+
+## Plays the Chapter 5 boss's defeat sequence, and nothing at all for anyone
+## else. Matched on the move id rather than the name, so renaming the character
+## cannot silently skip his send-off.
+func _ch5_boss_defeat_if_due() -> void:
+	if _enemy == null or not _enemy.is_boss or _enemy.moves.is_empty():
+		return
+	if not _enemy.moves[0].signature_id().begins_with("c5combat_"):
+		return
+	await _play_ch5_boss_defeat()
+
+## The last defeat in the game. Played instead of cutting straight to the
+## victory screen, because the brief asks for it to be dignified: the gavel
+## goes first, then the board, then the man.
+func _play_ch5_boss_defeat() -> void:
+	if is_instance_valid(_ch5_chamber): _ch5_chamber.stop()
+	_sequence_running = true
+	_update_action_buttons()
+
+	# The final hit has landed. He takes it standing, then does not.
+	_body_begin(enemy_character, BODY_FEET)
+	await _body_play(enemy_character, [
+		_beat(6, -3, 4, 1.0, 1.0, 0.14, Tween.TRANS_QUAD, Tween.EASE_OUT),
+	])
+	# The gavel slips, and hits the floor.
+	var gavel := _ch3_prop(Color(0.52, 0.34, 0.17, 1.0), Vector2(13, 34), 4)
+	_ch3_prop_arc(gavel, -6.0, 54.0, -120.0, 0.34, false)
+	await get_tree().create_timer(0.34).timeout
+	Audio.play_sfx("attack_impact")
+	_shake_screen(3.0)
+	_fx_splatter(enemy_character, Color(0.52, 0.34, 0.17, 0.9), 5, 16.0, 0.32)
+
+	# The board powers down and the papers lose their lift.
+	for i in 3:
+		_fx_paper(Vector2(18, 13), Color(0.90, 0.88, 0.82, 0.75), 0.16,
+			float(i) * 0.07, float(i - 1) * 22.0, 34.0)
+	await get_tree().create_timer(0.30).timeout
+
+	# He takes the stand for support rather than falling.
+	await _body_play(enemy_character, [
+		_beat(4, 8, 3, 1.01, 0.92, 0.30, Tween.TRANS_SINE, Tween.EASE_IN_OUT),
+		_beat(2, 13, 5, 1.02, 0.86, 0.26, Tween.TRANS_SINE, Tween.EASE_OUT),
+	])
+	# The chamber lights come back to neutral.
+	_fx_flash(Color(0.96, 0.94, 0.88, 0.30), 0.55)
+	var settle := create_tween()
+	settle.tween_property(gavel, "modulate:a", 0.0, 0.5)
+	word_preview_label.text = "The session is adjourned."
+	await get_tree().create_timer(0.85).timeout
+	await _body_end(enemy_character)
+
 	_sequence_running = false
 	_update_action_buttons()

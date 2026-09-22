@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/images/portraits/enemy_chief_utos.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/images/backgrounds/chapter4/04_operations_courtyard.png" id="3"]
+[ext_resource type="Resource" path="res://data/moves/c4_directive_strike.tres" id="10"]
+[ext_resource type="Resource" path="res://data/moves/c4_command_stamp.tres" id="11"]
+[ext_resource type="Resource" path="res://data/moves/c4_executive_order_brace.tres" id="12"]
+
+[resource]
+script = ExtResource("1")
+enemy_name = "Chief Utos"
+title = "The Command Keeper"
+max_hp = 520
+portrait = ExtResource("2")
+hud_portrait = ExtResource("2")
+background = ExtResource("3")
+ground_fraction = 0.0
+player_battle_offset = Vector2(0, 0)
+enemy_battle_offset = Vector2(-25, 0)
+enemy_battle_scale = 1.18
+lore = "The Command Keeper. She holds the schedule, and in this building the schedule holds everyone else."
+is_boss = false
+moves = [ExtResource("10"), ExtResource("11"), ExtResource("12")]
+idle_dir = "res://assets/images/characters/chapter4/chief_utos_idle"
+idle_count = 8
+attack_dir = "res://assets/images/characters/chapter4/chief_utos_attack"
+attack_count = 12
+hit_dir = "res://assets/images/characters/chapter4/chief_utos_hit"
+hit_count = 8
+walk_dir = "res://assets/images/characters/chapter4/chief_utos_walk"
+walk_count = 10
+flip_h = false

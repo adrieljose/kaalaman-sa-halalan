@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="EnemyMove" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_move.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+move_id = "compliance_crush"
+move_name = "Compliance Crush"
+description = "The paperwork weighs more than the finding."
+direct_damage = 24
+animation_style = "slam"
+effect_color = Color(0.86, 0.56, 0.50, 0.95)

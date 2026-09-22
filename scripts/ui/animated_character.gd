@@ -42,6 +42,88 @@ var _current_frames: Array[Texture2D] = []
 var _frame_index: int = 0
 var _timer: float = 0.0
 var _one_shot: bool = false
+var limb_motion: ShaderMaterial
+var _limb_elapsed := 0.0
+var _limb_progress := 0.0
+var _limb_action := 0.0
+var _limb_duration := 1.0
+var _limb_bounds: Dictionary = {}
+## Driven by the SAME tween as each skill beat: shoulder turn, knee brace,
+## forearm reach. Never an independent looping attack oscillator.
+var combat_joint_pose := Vector3.ZERO
+var _limb_texture: Texture2D
+var contact_sync_pending := false
+
+func synchronize_attack_contact(seconds: float) -> void:
+	contact_sync_pending = false
+	if limb_motion == null or not _one_shot or _current_frames.size()<2: return
+	# Use the frame with the greatest forward silhouette reach. When a clip
+	# has no measurable extension (e.g. a lecture), retain its authored rate.
+	var best := 0
+	var low := INF
+	var high := -INF
+	for i in _current_frames.size():
+		var bounds: Vector4 = _limb_bounds.get(_current_frames[i].get_rid(),Vector4(0,0,1,1))
+		var edge := 1.0-bounds.x-bounds.z if flip_h else bounds.x
+		if edge < low:
+			low = edge
+			best = i
+		high = maxf(high,edge)
+	if high-low < .015 or best==0: return
+	# The middle of the contact frame coincides with the effect/launch beat.
+	_fps = (float(best)+.5)/maxf(seconds,.06)
+
+func _cache_limb_frames(frames: Array[Texture2D]) -> void:
+	for tex in frames:
+		var key := tex.get_rid()
+		if _limb_bounds.has(key): continue
+		var used := tex.get_image().get_used_rect()
+		var ts := tex.get_size()
+		_limb_bounds[key] = Vector4(used.position.x / ts.x, used.position.y / ts.y,
+			used.size.x / ts.x, used.size.y / ts.y)
+
+func enable_limb_motion(enabled: bool) -> void:
+	if not enabled:
+		if material == limb_motion: material = null
+		limb_motion = null
+		_limb_bounds.clear()
+		_limb_texture = null
+		combat_joint_pose = Vector3.ZERO
+		return
+	if limb_motion != null: return
+	limb_motion = ShaderMaterial.new()
+	limb_motion.shader = preload("res://scripts/shaders/enemy_limb_motion.gdshader")
+	material = limb_motion
+	_limb_elapsed = 0.0
+	_limb_action = 0.0
+	_limb_progress = 0.0
+	for frames in [_idle_frames, _attack_frames, _hit_frames, _walk_frames]:
+		_cache_limb_frames(frames)
+	_update_limb_motion(0.0)
+
+func _update_limb_motion(delta: float) -> void:
+	if limb_motion == null or texture == null: return
+	_limb_elapsed += delta
+	# Clip position is authoritative, including frame stalls and pause/resume.
+	if _one_shot:
+		_limb_progress = clampf((float(_frame_index) + _timer * _fps) / maxf(1.0, _current_frames.size()), 0.0, 1.0)
+	elif _limb_action in [1.0,2.0]:
+		_limb_action = 0.0
+		_limb_progress = 0.0
+	if texture != _limb_texture:
+		_limb_texture = texture
+		limb_motion.set_shader_parameter("body",_limb_bounds.get(texture.get_rid(), Vector4(0,0,1,1)))
+	limb_motion.set_shader_parameter("motion_time",_limb_elapsed)
+	limb_motion.set_shader_parameter("action",_limb_action)
+	limb_motion.set_shader_parameter("progress",_limb_progress)
+	limb_motion.set_shader_parameter("joint_pose",combat_joint_pose)
+	limb_motion.set_shader_parameter("choreographed",pose_locked)
+	limb_motion.set_shader_parameter("intensity",0.0 if is_rigged() else 1.0)
+
+func _limb_start(action: float, seconds: float) -> void:
+	_limb_action=action
+	_limb_progress=0.0
+	_limb_duration=seconds
 
 ## Per-rival idle motion (see IdlePersonality). Empty means "stand exactly as
 ## the frames were drawn", which is what Chapter 1 does.
@@ -60,6 +142,9 @@ func _reload_frames() -> void:
 	_attack_frames = _load_frames(attack_dir, attack_count)
 	_hit_frames = _load_frames(hit_dir, hit_count)
 	_walk_frames = _load_frames(walk_dir, walk_count)
+	if limb_motion != null:
+		for frames in [_idle_frames, _attack_frames, _hit_frames, _walk_frames]:
+			_cache_limb_frames(frames)
 	_play_idle()
 
 ## Repoints this character at a different set of sprite folders and reloads
@@ -115,6 +200,10 @@ func _load_frames(dir: String, count: int) -> Array[Texture2D]:
 	return frames
 
 func _process(delta: float) -> void:
+	_tick_frames(delta)
+	_update_limb_motion(delta)
+
+func _tick_frames(delta: float) -> void:
 	_tick_idle_pose(delta)
 	if _current_frames.size() <= 1:
 		return
@@ -127,18 +216,21 @@ func _process(delta: float) -> void:
 	# exact but the same clip on a 75Hz or a stuttering one drifted, and the
 	# frame the damage is timed against arrived early or late by up to a whole
 	# display frame. Subtracting keeps the clip on its own clock.
-	_timer -= interval
+	var advance := 1
+	if limb_motion != null:
+		advance = int(_timer / interval)
+	_timer -= interval * advance
 	# A long stall (a scene load, a dropped frame) must not fast-forward the
 	# whole clip in one tick trying to catch up.
 	if _timer > interval:
 		_timer = 0.0
-	_frame_index += 1
+	_frame_index += advance
 	if _frame_index >= _current_frames.size():
 		if _one_shot:
 			_play_idle()
 			one_shot_finished.emit()
 			return
-		_frame_index = 0
+		_frame_index %= _current_frames.size()
 	texture = _current_frames[_frame_index]
 
 ## Returns true only when a clip actually started and is guaranteed to emit
@@ -159,9 +251,11 @@ const ATTACK_SECONDS := 0.42
 const HIT_SECONDS := 0.46
 
 func play_attack() -> bool:
+	_limb_start(1.0,ATTACK_SECONDS)
 	return _play_once(_attack_frames, _rate_for(_attack_frames, ATTACK_SECONDS, attack_fps))
 
 func play_hit() -> bool:
+	_limb_start(2.0,HIT_SECONDS)
 	return _play_once(_hit_frames, _rate_for(_hit_frames, HIT_SECONDS, hit_fps))
 
 ## Frames per second that spends `seconds` on the whole clip. Falls back to the
@@ -177,21 +271,37 @@ func _rate_for(frames: Array[Texture2D], seconds: float, fallback: float) -> flo
 ## first time that skill is actually used.
 var _clip_cache: Dictionary = {}
 
-func play_clip(dir: String, count: int) -> bool:
+func play_clip(dir: String, count: int, seconds: float = ATTACK_SECONDS) -> bool:
+	_limb_start(1.0,seconds)
 	if dir.is_empty() or count <= 0:
 		return false
 	var key := "%s#%d" % [dir, count]
 	if not _clip_cache.has(key):
 		_clip_cache[key] = _load_frames(dir, count)
+		if limb_motion != null: _cache_limb_frames(_clip_cache[key])
 	# A skill's own clip is an attack too, so it is timed the same way -- the
 	# per-move clips have their own frame counts as well.
 	var frames: Array[Texture2D] = _clip_cache[key]
-	return _play_once(frames, _rate_for(frames, ATTACK_SECONDS, attack_fps))
+	return _play_once(frames, _rate_for(frames, seconds, attack_fps))
+
+## A shield can remain held across the player's turn, with live bracing motion.
+func play_loop_clip(dir: String, count: int, rate: float = 5.0) -> void:
+	var key := "%s#%d" % [dir, count]
+	if not _clip_cache.has(key): _clip_cache[key] = _load_frames(dir, count)
+	var frames: Array[Texture2D] = _clip_cache[key]
+	if frames.size()<2: return
+	_current_frames=frames
+	_fps=rate
+	_frame_index=0
+	_one_shot=false
+	_timer=0
+	texture=frames[0]
 
 ## Starts the walk loop. Unlike attack/hit this never self-terminates — the
 ## caller stops it with play_idle() when the character arrives, because the
 ## walk lasts exactly as long as the travel tween, not a fixed frame count.
 func play_walk() -> void:
+	_limb_start(3.0,1.0)
 	if _walk_frames.size() < 2:
 		return
 	_fps = walk_fps
@@ -204,6 +314,7 @@ func play_walk() -> void:
 ## Public stop for the walk loop; also the way callers reset a character to
 ## neutral after a transition.
 func play_idle() -> void:
+	_limb_start(0.0,1.0)
 	_play_idle()
 
 func _play_once(frames: Array[Texture2D], rate: float = -1.0) -> bool:
@@ -249,6 +360,7 @@ func _reset_idle_pose() -> void:
 	rotation = 0.0
 
 func _play_idle() -> void:
+	contact_sync_pending = false
 	_fps = fps
 	_current_frames = _idle_frames
 	_frame_index = 0

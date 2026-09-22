@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/images/portraits/enemy_cashier_kaltas.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/images/backgrounds/capitol_treasury.png" id="3"]
+[ext_resource type="Resource" path="res://data/moves/vault_door_slam.tres" id="10"]
+[ext_resource type="Resource" path="res://data/moves/disbursement_dash.tres" id="11"]
+[ext_resource type="Resource" path="res://data/moves/petty_cash_spray.tres" id="12"]
+
+[resource]
+script = ExtResource("1")
+enemy_name = "Treasurer Tuso"
+title = "The Clever Ledger"
+max_hp = 360
+portrait = ExtResource("2")
+background = ExtResource("3")
+lore = "She can tell you where every peso is. She has simply never been asked by anyone who could make her."
+is_boss = false
+moves = [ExtResource("10"), ExtResource("11"), ExtResource("12")]
+idle_dir = "res://assets/images/characters/cashier_kaltas_battle_idle_34"
+idle_count = 8
+attack_dir = "res://assets/images/characters/cashier_kaltas_battle_attack_34"
+attack_count = 9
+hit_dir = "res://assets/images/characters/cashier_kaltas_battle_hit_34"
+hit_count = 6

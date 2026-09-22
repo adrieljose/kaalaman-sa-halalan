@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="EnemyMove" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_move.gd" id="1"]
+
+[ext_resource type="Texture2D" path="res://assets/images/ui/skill_icons/chapter3/assessor_altapresyo/appraisal_hammer.png" id="skill_icon"]
+
+[resource]
+script = ExtResource("1")
+icon = ExtResource("skill_icon")
+move_id = "c3combat_appraisal_hammer"
+move_name = "Appraisal Hammer"
+description = "Heavy stamp smash: OVERVALUED!"
+direct_damage = 19
+self_heal = 0
+guard_reduction = 0.0
+animation_style = "slam"
+effect_color = Color(0.72, 0.35, 0.51, 0.95)
+attack_dir = "res://assets/images/characters/chapter3/combat/assessor_altapresyo/strike"
+attack_count = 8

@@ -24,6 +24,8 @@ extends Resource
 ## One-time effects, resolved immediately when the move lands.
 @export var direct_damage: int = 0
 @export var self_heal: int = 0
+## Fraction absorbed from the next damaging player hit. Zero preserves older moves.
+@export_range(0.0, 0.8, 0.05) var guard_reduction: float = 0.0
 
 ## Ongoing effects that persist across turns. `statuses` land on the player;
 ## `self_statuses` land on the enemy that used the move.

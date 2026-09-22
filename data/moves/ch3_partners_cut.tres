@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="EnemyMove" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_move.gd" id="1"]
+
+[ext_resource type="Texture2D" path="res://assets/images/ui/skill_icons/chapter3/contractor_kutsaba/change_order_barrage.png" id="skill_icon"]
+
+[resource]
+script = ExtResource("1")
+icon = ExtResource("skill_icon")
+move_id = "c3combat_change_order_barrage"
+move_name = "Change Order Barrage"
+description = "Four spinning change orders."
+direct_damage = 27
+self_heal = 0
+guard_reduction = 0.0
+animation_style = "volley"
+effect_color = Color(0.78, 0.82, 0.32, 0.95)
+attack_dir = "res://assets/images/characters/chapter3/combat/contractor_kutsaba/release"
+attack_count = 8

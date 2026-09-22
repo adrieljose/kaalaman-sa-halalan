@@ -13,9 +13,18 @@ extends Node
 const OUT_DIR := "res://output/menu"
 const SETTLE := 45
 const CASES := [
-	{"name": "wide", "window": Vector2i(1280, 960)},
-	{"name": "portrait", "window": Vector2i(390, 844)},
-	{"name": "landscape", "window": Vector2i(844, 390)},
+	{"name": "wide", "design": Vector2i(853, 480),
+		"device": LayoutProfile.Device.DESKTOP,
+		"arrangement": LayoutProfile.Arrangement.WIDE,
+		"base": Vector2i(640, 480)},
+	{"name": "portrait", "design": Vector2i(320, 692),
+		"device": LayoutProfile.Device.PHONE_PORTRAIT,
+		"arrangement": LayoutProfile.Arrangement.PORTRAIT,
+		"base": Vector2i(320, 560)},
+	{"name": "landscape", "design": Vector2i(584, 270),
+		"device": LayoutProfile.Device.PHONE_LANDSCAPE,
+		"arrangement": LayoutProfile.Arrangement.LANDSCAPE_COMPACT,
+		"base": Vector2i(480, 270)},
 ]
 
 var _faults: Array[String] = []
@@ -26,10 +35,23 @@ func _ready() -> void:
 	DirAccess.make_dir_recursive_absolute(OUT_DIR)
 
 	for case in CASES:
-		DisplayServer.window_set_size(case["window"])
-		await get_tree().process_frame
+		# The dummy headless DisplayServer cannot change its CSS window size, which
+		# is the input LayoutDirector uses for device classification. Supply the
+		# same immutable profiles the real browser would produce so this exercises
+		# all three authored arrangements instead of the dummy window three times.
+		get_tree().root.size = case["design"]
+		for _f in 8:
+			await get_tree().process_frame
+		var profile := LayoutProfile.new()
+		profile.device = case["device"]
+		profile.arrangement = case["arrangement"]
+		profile.base_size = case["base"]
+		profile.design_size = Vector2(case["design"])
+		profile.is_touch = profile.device != LayoutProfile.Device.DESKTOP
+		Layout.profile = profile
 		var scene: Node = load("res://scenes/main_menu.tscn").instantiate()
 		get_tree().root.add_child(scene)
+		scene.call("_apply_layout", profile)
 		for _f in SETTLE:
 			await get_tree().process_frame
 
@@ -43,7 +65,12 @@ func _ready() -> void:
 
 		var d: Vector2 = Layout.profile.design_size
 		var rect := button.get_global_rect()
-		print("  %-10s button %s   screen %s" % [name, rect, d])
+		print("  %-10s button %s   menu %s   screen %s" % [
+			name, rect, (scene.get_node("Menu") as Control).get_global_rect(), d])
+		for menu_child in scene.get_node("Menu").get_children():
+			if menu_child is Control:
+				print("             %-18s %s" % [menu_child.name,
+					(menu_child as Control).get_global_rect()])
 
 		# On screen, whole.
 		if rect.position.x < 0.0 or rect.position.y < 0.0 \
@@ -73,8 +100,10 @@ func _ready() -> void:
 		elif caption.get_global_rect().end.y > rect.end.y + 0.5:
 			_faults.append("%s: the caption spills out of the button" % name)
 
-		get_viewport().get_texture().get_image().save_png(
-			"%s/patch_button_%s.png" % [OUT_DIR, name])
+		if DisplayServer.get_name() != "headless":
+			await RenderingServer.frame_post_draw
+			get_viewport().get_texture().get_image().save_png(
+				"%s/patch_button_%s.png" % [OUT_DIR, name])
 
 		# And the panel it opens.
 		scene.call("_on_patch_notes_pressed")
@@ -90,11 +119,13 @@ func _ready() -> void:
 					% [name, over])
 			var notes := panel.find_child("PatchNotesText", true, false) as RichTextLabel
 			var shown := notes.get_parsed_text()
-			for wanted in ["v1.3", "v1.2", "v1.1", "Chapter 2", "Tutorial"]:
+			for wanted in ["v1.3", "v1.2", "v1.1", "Chapter 2", "Tutorial", "Chapter 4", "Chapter 5", "Main website", "Testing website", "NOT available on either published website yet", "Senator Sabaw", "Save / Load"]:
 				if not shown.contains(wanted):
 					_faults.append("%s: the notes never mention %s" % [name, wanted])
-			get_viewport().get_texture().get_image().save_png(
-				"%s/patch_panel_%s.png" % [OUT_DIR, name])
+			if DisplayServer.get_name() != "headless":
+				await RenderingServer.frame_post_draw
+				get_viewport().get_texture().get_image().save_png(
+					"%s/patch_panel_%s.png" % [OUT_DIR, name])
 
 		# CLOSE has to actually close it.
 		scene.call("_on_close_panels")

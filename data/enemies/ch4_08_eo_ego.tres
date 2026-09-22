@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/images/portraits/enemy_eo_ego.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/images/backgrounds/chapter4/08_signing_hall.png" id="3"]
+[ext_resource type="Resource" path="res://data/moves/c4_executive_smash.tres" id="10"]
+[ext_resource type="Resource" path="res://data/moves/c4_eo_barrage.tres" id="11"]
+[ext_resource type="Resource" path="res://data/moves/c4_presidential_seal_guard.tres" id="12"]
+
+[resource]
+script = ExtResource("1")
+enemy_name = "EO Ego"
+title = "The Order Overlord"
+max_hp = 620
+portrait = ExtResource("2")
+hud_portrait = ExtResource("2")
+background = ExtResource("3")
+ground_fraction = 0.0
+player_battle_offset = Vector2(0, 0)
+enemy_battle_offset = Vector2(-28, 0)
+enemy_battle_scale = 1.18
+lore = "The Order Overlord. He speaks only in issuances, and he has never once been told that an order can be questioned."
+is_boss = false
+moves = [ExtResource("10"), ExtResource("11"), ExtResource("12")]
+idle_dir = "res://assets/images/characters/chapter4/eo_ego_idle"
+idle_count = 8
+attack_dir = "res://assets/images/characters/chapter4/eo_ego_attack"
+attack_count = 12
+hit_dir = "res://assets/images/characters/chapter4/eo_ego_hit"
+hit_count = 8
+walk_dir = "res://assets/images/characters/chapter4/eo_ego_walk"
+walk_count = 10
+flip_h = false

@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="ChapterData" load_steps=11 format=3]
+
+[ext_resource type="Script" path="res://scripts/chapter_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/enemies/ch4_01_secretary_sipsip.tres" id="2"]
+[ext_resource type="Resource" path="res://data/enemies/ch4_02_protocol_porma.tres" id="3"]
+[ext_resource type="Resource" path="res://data/enemies/ch4_03_spox_spin.tres" id="4"]
+[ext_resource type="Resource" path="res://data/enemies/ch4_04_chief_utos.tres" id="5"]
+[ext_resource type="Resource" path="res://data/enemies/ch4_05_cabinet_konek.tres" id="6"]
+[ext_resource type="Resource" path="res://data/enemies/ch4_06_director_dikta.tres" id="7"]
+[ext_resource type="Resource" path="res://data/enemies/ch4_07_adviser_areglo.tres" id="8"]
+[ext_resource type="Resource" path="res://data/enemies/ch4_08_eo_ego.tres" id="9"]
+[ext_resource type="Resource" path="res://data/enemies/ch4_09_lolo_enrilegend.tres" id="10"]
+
+[resource]
+script = ExtResource("1")
+chapter_number = 4
+chapter_name = "Malacanang"
+encounters = [ExtResource("2"), ExtResource("3"), ExtResource("4"), ExtResource("5"), ExtResource("6"), ExtResource("7"), ExtResource("8"), ExtResource("9"), ExtResource("10")]

@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="EnemyMove" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_move.gd" id="1"]
+
+[ext_resource type="Texture2D" path="res://assets/images/ui/skill_icons/chapter4/director_dikta/directive_volley.png" id="skill_icon"]
+
+[resource]
+script = ExtResource("1")
+icon = ExtResource("skill_icon")
+move_id = "c4combat_directive_volley"
+move_name = "Directive Volley"
+description = "Pinakakawalan ang mga direktiba nang sabay-sabay."
+direct_damage = 29
+self_heal = 0
+guard_reduction = 0.00
+animation_style = "volley"
+effect_color = Color(0.660, 0.260, 0.320, 0.95)
+attack_dir = "res://assets/images/characters/chapter4/director_dikta_attack2"
+attack_count = 12

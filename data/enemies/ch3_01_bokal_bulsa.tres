@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/images/portraits/enemy_bokal_bulsa.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/images/backgrounds/capitol_session_hall.png" id="3"]
+[ext_resource type="Resource" path="res://data/moves/ch3_kickback_flick.tres" id="10"]
+[ext_resource type="Resource" path="res://data/moves/ch3_pocket_payload.tres" id="11"]
+[ext_resource type="Resource" path="res://data/moves/ch3_deep_pockets.tres" id="12"]
+
+[resource]
+script = ExtResource("1")
+enemy_name = "Bokal Bulsa"
+title = "The Pocket Politico"
+max_hp = 300
+portrait = ExtResource("2")
+hud_portrait = ExtResource("2")
+background = ExtResource("3")
+ground_fraction = 0.965
+player_battle_offset = Vector2(0, 0)
+enemy_battle_offset = Vector2(-32, 0)
+enemy_battle_scale = 1.30
+lore = "The Pocket Politico. Provincial power turned into a personal advantage."
+is_boss = false
+moves = [ExtResource("10"), ExtResource("11"), ExtResource("12")]
+idle_dir = "res://assets/images/characters/chapter3/bokal_bulsa_idle"
+idle_count = 8
+attack_dir = "res://assets/images/characters/chapter3/bokal_bulsa_attack"
+attack_count = 12
+hit_dir = "res://assets/images/characters/chapter3/bokal_bulsa_hit"
+hit_count = 8
+walk_dir = "res://assets/images/characters/chapter3/bokal_bulsa_walk"
+walk_count = 10
+flip_h = false

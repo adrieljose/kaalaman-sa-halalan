@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="EnemyMove" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_move.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/images/ui/skill_icons/chapter5/quorum_kuno/empty_seat_shuffle.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+icon = ExtResource("2")
+move_id = "c5combat_empty_seat_shuffle"
+move_name = "Empty Seat Shuffle"
+description = "Naglalaho, lumilitaw sa ibang upuan, at humahagis."
+direct_damage = 30
+self_heal = 0
+guard_reduction = 0.00
+animation_style = "volley"
+effect_color = Color(0.620, 0.720, 0.800, 0.95)
+attack_dir = "res://assets/images/characters/chapter5/quorum_kuno_attack2"
+attack_count = 12

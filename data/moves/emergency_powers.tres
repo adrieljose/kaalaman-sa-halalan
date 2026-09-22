@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="EnemyMove" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_move.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+move_id = "emergency_powers"
+move_name = "Emergency Powers"
+description = "He declares the calamity. The calamity is him."
+direct_damage = 40
+animation_style = "slam"
+effect_color = Color(0.98, 0.86, 0.48, 0.95)
+min_phase = 2

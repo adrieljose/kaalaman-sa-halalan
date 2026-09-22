@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/images/portraits/enemy_quorum_kuno.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/images/backgrounds/chapter5/04_assembly_walkway.png" id="3"]
+[ext_resource type="Resource" path="res://data/moves/c5_attendance_swipe.tres" id="10"]
+[ext_resource type="Resource" path="res://data/moves/c5_empty_seat_shuffle.tres" id="11"]
+[ext_resource type="Resource" path="res://data/moves/c5_quorum_escape.tres" id="12"]
+
+[resource]
+script = ExtResource("1")
+enemy_name = "Quorum Kuno"
+title = "The Vanishing Vote"
+max_hp = 740
+portrait = ExtResource("2")
+hud_portrait = ExtResource("2")
+background = ExtResource("3")
+ground_fraction = 0.9125
+player_battle_offset = Vector2(0, 0)
+enemy_battle_offset = Vector2(-25, 0)
+enemy_battle_scale = 1.14
+lore = "The Vanishing Vote. Present at roll call, absent at the division, and back in his seat before anybody can ask where he went."
+is_boss = false
+moves = [ExtResource("10"), ExtResource("11"), ExtResource("12")]
+idle_dir = "res://assets/images/characters/chapter5/quorum_kuno_idle"
+idle_count = 8
+attack_dir = "res://assets/images/characters/chapter5/quorum_kuno_attack"
+attack_count = 12
+hit_dir = "res://assets/images/characters/chapter5/quorum_kuno_hit"
+hit_count = 8
+walk_dir = "res://assets/images/characters/chapter5/quorum_kuno_walk"
+walk_count = 10
+flip_h = false

@@ -24,3 +24,10 @@ NVIDIA Corporation/
 # them out of the history.
 output/
 tmp/
+__pycache__/
+
+# Browser automation logs and screenshots are local audit artifacts.
+.playwright-cli/
+
+# Rejected title-screen experiments are kept locally for reference only.
+archive/rejected_title_battleground/

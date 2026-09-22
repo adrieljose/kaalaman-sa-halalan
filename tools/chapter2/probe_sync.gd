@@ -8,15 +8,15 @@ extends Node
 
 func _ready() -> void:
 	await get_tree().process_frame
-	var chapter = load("res://data/chapters/chapter_02.tres")
+	var chapter: ChapterData = load("res://data/chapters/chapter_02.tres")
 	var probe := AnimatedCharacter.new()
 	add_child(probe)
 	print("clip playback, per rival:")
-	for enemy in chapter.encounters:
+	for enemy: EnemyData in chapter.encounters:
 		probe.configure_from(enemy)
-		var atk := enemy.attack_count / probe.attack_fps
-		var hit := enemy.hit_count / probe.hit_fps
-		var old := enemy.attack_count / probe.fps
+		var atk: float = enemy.attack_count / probe.attack_fps
+		var hit: float = enemy.hit_count / probe.hit_fps
+		var old: float = enemy.attack_count / probe.fps
 		print("  %-16s attack %d frames: %.2fs  (was %.2fs)   hit %d: %.2fs" % [
 			enemy.enemy_name, enemy.attack_count, atk, old, enemy.hit_count, hit])
 	get_tree().quit(0)

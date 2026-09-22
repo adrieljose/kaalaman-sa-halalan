@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/images/portraits/enemy_cong_meow.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/images/backgrounds/capitol_governor_office.png" id="3"]
+[ext_resource type="Resource" path="res://data/moves/cong_meow_capitol_claw.tres" id="4"]
+[ext_resource type="Resource" path="res://data/moves/cong_meow_viral_meowburst.tres" id="5"]
+[ext_resource type="Resource" path="res://data/moves/cong_meow_nine_lives.tres" id="6"]
+
+[resource]
+script = ExtResource("1")
+enemy_name = "CONG MEOW"
+title = "The Meowjority Leader"
+max_hp = 700
+portrait = ExtResource("2")
+hud_portrait = ExtResource("2")
+background = ExtResource("3")
+is_boss = true
+lore = "A fictional, theatrical Capitol boss who treats every debate like his own viral spotlight. Quick claws, faster notifications, and a suspicious supply of second chances."
+moves = [ExtResource("4"), ExtResource("5"), ExtResource("6")]
+enemy_battle_scale = 1.18
+enemy_battle_offset = Vector2(-25, 0)
+ground_fraction = 0.95
+idle_dir = "res://assets/images/characters/chapter3/cong_meow_idle"
+idle_count = 8
+attack_dir = "res://assets/images/characters/chapter3/cong_meow_slash1"
+attack_count = 6
+hit_dir = "res://assets/images/characters/chapter3/cong_meow_hit"
+hit_count = 8
+walk_dir = "res://assets/images/characters/chapter3/cong_meow_walk"
+walk_count = 10

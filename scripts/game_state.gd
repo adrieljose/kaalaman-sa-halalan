@@ -87,8 +87,7 @@ const STARTING_POTION_COUNT := 2
 var potions: Dictionary = {}
 
 ## Whether a chapter's certificate has been earned. Keyed chapter_no -> true.
-## This is the game's only persisted state — everything else in GameState is
-## scoped to the current run and starts fresh each launch. It has to survive
+## Separate from permanent chapter/difficulty progression below. It survives
 ## the app closing, because the certificate, once earned, should stay earned.
 ##
 ## What is deliberately NOT persisted is progress TOWARD earning it — see
@@ -105,6 +104,39 @@ var certificate_earned: Dictionary = {}
 ## a page reload on web) starts this at {} again regardless of what the player
 ## achieved in an earlier sitting.
 var _session_tier_progress: Dictionary = {}
+## Permanent chapter/difficulty progression, independent of certificate rules.
+var completed_tiers: Dictionary = {}
+var checkpoint: Dictionary = {}
+var pending_checkpoint: Dictionary = {}
+
+func capture_checkpoint(hp:int) -> void:
+	if tutorial_mode: return
+	checkpoint={"chapter":chapter_number(),"encounter":encounter_index,"difficulty":difficulty,
+		"character":character,"hp":hp,"potions":{"0":potion_count(0),"1":potion_count(1),"2":potion_count(2)}}
+	_save_progress()
+
+func prepare_checkpoint_resume() -> bool:
+	var checked:=SaveGameCodec.validate(SaveGameCodec.encode(completed_tiers,checkpoint))
+	if not checked.error.is_empty() or checkpoint.is_empty(): return false
+	if not load_chapter(int(checkpoint.chapter)): return false
+	encounter_index=int(checkpoint.encounter)
+	difficulty=checkpoint.difficulty
+	character=checkpoint.character
+	for type in [0,1,2]: potions[type]=int(checkpoint.potions[str(type)])
+	pending_checkpoint=checkpoint.duplicate(true)
+	tutorial_mode=false
+	return true
+
+func apply_imported_save(checked:Dictionary) -> void:
+	# Keep previously earned wins when importing an older backup.
+	for number in checked.progress:
+		var tiers:Dictionary=completed_tiers.get(number,{})
+		tiers.merge(checked.progress[number],true)
+		completed_tiers[number]=tiers
+	checkpoint=checked.checkpoint.duplicate(true)
+	pending_checkpoint.clear()
+	_session_tier_progress.clear()
+	_save_progress()
 ## Whatever name the player last typed onto a certificate, remembered so they
 ## are not retyping it every time they come back to claim one. Empty until
 ## they claim a certificate for the first time.
@@ -132,6 +164,7 @@ var tutorial_mode: bool = false
 ## screen that owns those choices.
 var pending_play_request: bool = false
 const PROGRESS_SAVE_PATH := "user://progress.save"
+var progress_save_path: String = "user://testing_progress.save" if OS.has_feature("testing_chapters") else PROGRESS_SAVE_PATH
 
 func _ready() -> void:
 	reset_potions()
@@ -151,18 +184,23 @@ func load_chapter(chapter_no: int) -> bool:
 	encounter_index = 0
 	return true
 
-## Records ONE difficulty tier as beaten for THIS SESSION, and — if that
-## completes the full Easy -> Medium -> Hard climb — marks the certificate
-## earned and saves that one fact permanently. Called once, right when the
-## last encounter of a run is won.
+## Saves each completed tier permanently. Separately tracks the same-session
+## climb for certificates. Called after winning the final encounter of a run.
 func mark_difficulty_completed(chapter_no: int, tier: String) -> void:
+	if tutorial_mode or chapter_no < 1 or chapter_no > 5 or tier not in QuestionBank.DIFFICULTY_ORDER:
+		return
+	var permanent: Dictionary = completed_tiers.get(chapter_no, {})
+	permanent[tier] = true
+	completed_tiers[chapter_no] = permanent
 	var tiers: Dictionary = _session_tier_progress.get(chapter_no, {})
 	tiers[tier] = true
 	_session_tier_progress[chapter_no] = tiers
 	for required in QuestionBank.DIFFICULTY_ORDER:
 		if not tiers.get(required, false):
+			_save_progress()
 			return
 	if certificate_earned.get(chapter_no, false):
+		_save_progress()
 		return
 	certificate_earned[chapter_no] = true
 	_save_progress()
@@ -174,17 +212,25 @@ func mark_difficulty_completed(chapter_no: int, tier: String) -> void:
 func is_chapter_completed(chapter_no: int) -> bool:
 	return certificate_earned.get(chapter_no, false)
 
-## Is `tier` reachable right now, given what has been beaten THIS SESSION?
-## Easy is always open; Medium needs Easy done this session; Hard needs Medium
-## done this session. Used both to grey out the difficulty buttons and to
-## defend _start_run() against launching a tier the player has not actually
-## earned access to.
+## Production uses permanent progression. Testing unlocks every valid tier.
+## Both the menu buttons and the run entry point use this check.
 func is_tier_unlocked(chapter_no: int, tier: String) -> bool:
+	return progression_tier_access(chapter_no, tier, OS.has_feature("testing_chapters"))
+
+func is_progression_completed(chapter_no: int) -> bool:
+	for tier in QuestionBank.DIFFICULTY_ORDER:
+		if not completed_tiers.get(chapter_no, {}).get(tier, false): return false
+	return true
+
+func progression_tier_access(chapter_no: int, tier: String, practice: bool) -> bool:
 	var idx := QuestionBank.DIFFICULTY_ORDER.find(tier)
-	if idx <= 0:
-		return true
-	var prev_tier: String = QuestionBank.DIFFICULTY_ORDER[idx - 1]
-	return _session_tier_progress.get(chapter_no, {}).get(prev_tier, false)
+	if idx < 0 or chapter_no < 1 or chapter_no > 5: return false
+	if practice: return true
+	for previous in range(1, chapter_no):
+		if not is_progression_completed(previous): return false
+	for previous in range(idx):
+		if not completed_tiers.get(chapter_no, {}).get(QuestionBank.DIFFICULTY_ORDER[previous], false): return false
+	return true
 
 ## Which tiers are done THIS SESSION, in fixed order — lets the certificate
 ## panel show real progress ("Easy, Medium done — this sitting") instead of a
@@ -210,36 +256,49 @@ func set_player_name(typed: String) -> void:
 	_save_progress()
 
 func _save_progress() -> void:
-	var file := FileAccess.open(PROGRESS_SAVE_PATH, FileAccess.WRITE)
+	var file := FileAccess.open(progress_save_path, FileAccess.WRITE)
 	if file == null:
 		push_warning("GameState: could not write %s (%s)" % [
-			PROGRESS_SAVE_PATH, error_string(FileAccess.get_open_error())])
+			progress_save_path, error_string(FileAccess.get_open_error())])
 		return
-	# Only the earned flag persists -- session climb progress is intentionally
-	# never written here. JSON object keys must be strings, so chapter numbers
-	# are stringified.
+	# Save permanent tiers and earned certificates, not the certificate session
+	# climb. JSON converts dictionary chapter keys to strings on disk.
 	var serializable: Dictionary = {}
 	for chapter_no in certificate_earned:
 		serializable[str(chapter_no)] = true
 	file.store_string(JSON.stringify({
+		"progress_version": 2,
+		"completed_tiers": completed_tiers,
+		"checkpoint": checkpoint,
 		"certificate_earned": serializable,
 		"player_name": player_name,
 		"tutorial_completed": tutorial_completed,
 	}))
+	file.close()
 
 func _load_progress() -> void:
-	if not FileAccess.file_exists(PROGRESS_SAVE_PATH):
+	if not FileAccess.file_exists(progress_save_path):
 		return
-	var file := FileAccess.open(PROGRESS_SAVE_PATH, FileAccess.READ)
+	var file := FileAccess.open(progress_save_path, FileAccess.READ)
 	if file == null:
 		push_warning("GameState: could not read %s (%s)" % [
-			PROGRESS_SAVE_PATH, error_string(FileAccess.get_open_error())])
+			progress_save_path, error_string(FileAccess.get_open_error())])
 		return
 	var parsed: Variant = JSON.parse_string(file.get_as_text())
 	if typeof(parsed) != TYPE_DICTIONARY:
-		push_warning("GameState: %s is not a JSON object, ignoring" % PROGRESS_SAVE_PATH)
+		push_warning("GameState: %s is not a JSON object, ignoring" % progress_save_path)
 		return
 	var data := parsed as Dictionary
+	completed_tiers.clear()
+	var saved_tiers: Variant = data.get("completed_tiers", {})
+	if saved_tiers is Dictionary:
+		for key in saved_tiers:
+			var number := str(key).to_int()
+			if number < 1 or number > 5 or not saved_tiers[key] is Dictionary: continue
+			var valid: Dictionary = {}
+			for tier in QuestionBank.DIFFICULTY_ORDER:
+				if saved_tiers[key].get(tier, false) == true: valid[tier] = true
+			completed_tiers[number] = valid
 	# Older saves ("completed_chapters", then briefly "completed_difficulties")
 	# recorded progress in ways that did not require one continuous sitting.
 	# Neither can honestly satisfy the current rule, so neither is migrated --
@@ -249,8 +308,16 @@ func _load_progress() -> void:
 	for chapter_key in data.get("certificate_earned", {}):
 		if bool(data["certificate_earned"][chapter_key]):
 			certificate_earned[int(chapter_key)] = true
+			# A previously earned certificate proves all three tiers were won.
+			if int(chapter_key) >= 1 and int(chapter_key) <= 5:
+				completed_tiers[int(chapter_key)] = {"easy":true,"medium":true,"hard":true}
 	player_name = String(data.get("player_name", ""))
 	tutorial_completed = bool(data.get("tutorial_completed", false))
+	checkpoint={}
+	var candidate:Variant=data.get("checkpoint",{})
+	if candidate is Dictionary:
+		var checked:=SaveGameCodec.validate(SaveGameCodec.encode(completed_tiers,candidate))
+		if checked.error.is_empty(): checkpoint=checked.checkpoint
 
 ## Remembers that the tutorial was seen through to its last card. Written
 ## immediately rather than at the end of the session, so closing the tab on the
@@ -298,6 +365,9 @@ func advance_encounter() -> bool:
 func reset_chapter() -> void:
 	encounter_index = 0
 	reset_potions()
+	checkpoint.clear()
+	pending_checkpoint.clear()
+	if not tutorial_mode: _save_progress()
 
 ## 1-based, for display ("Encounter 3 of 5").
 func encounter_number() -> int:

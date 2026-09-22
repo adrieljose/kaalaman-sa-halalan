@@ -5,6 +5,8 @@ extends Resource
 @export var title: String = ""
 @export var max_hp: int = 100
 @export var portrait: Texture2D
+## Optional authored face crop; old encounters keep their automatic idle crop.
+@export var hud_portrait: Texture2D
 ## Where this encounter is fought. Each encounter carries its own backdrop, so
 ## walking right through the chapter visibly travels somewhere rather than
 ## replaying the same room with a different opponent in it. Left null, the
@@ -17,6 +19,8 @@ extends Resource
 ## Offsets are in the 640x480 design coordinate system and are scaled down on
 ## compact layouts.
 @export_range(0.75, 1.5, 0.01) var battle_scale: float = 1.0
+## Sprite-specific sizing; does not enlarge the player or repaint the room.
+@export_range(0.75, 1.5, 0.01) var enemy_battle_scale: float = 1.0
 @export var player_battle_offset: Vector2 = Vector2.ZERO
 @export var enemy_battle_offset: Vector2 = Vector2.ZERO
 

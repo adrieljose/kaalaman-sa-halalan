@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/images/portraits/enemy_whip_walanghiya.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/images/backgrounds/chapter5/05_caucus_terrace.png" id="3"]
+[ext_resource type="Resource" path="res://data/moves/c5_bloc_breaker.tres" id="10"]
+[ext_resource type="Resource" path="res://data/moves/c5_vote_count_volley.tres" id="11"]
+[ext_resource type="Resource" path="res://data/moves/c5_majority_guard.tres" id="12"]
+
+[resource]
+script = ExtResource("1")
+enemy_name = "Whip Walanghiya"
+title = "The Vote Wrangler"
+max_hp = 780
+portrait = ExtResource("2")
+hud_portrait = ExtResource("2")
+background = ExtResource("3")
+ground_fraction = 0.9125
+player_battle_offset = Vector2(0, 0)
+enemy_battle_offset = Vector2(-29, 0)
+enemy_battle_scale = 1.14
+lore = "The Vote Wrangler. He does not argue and he does not persuade. He counts, and by the time the bell rings the count is already whatever he said it would be."
+is_boss = false
+moves = [ExtResource("10"), ExtResource("11"), ExtResource("12")]
+idle_dir = "res://assets/images/characters/chapter5/whip_walanghiya_idle"
+idle_count = 8
+attack_dir = "res://assets/images/characters/chapter5/whip_walanghiya_attack"
+attack_count = 12
+hit_dir = "res://assets/images/characters/chapter5/whip_walanghiya_hit"
+hit_count = 8
+walk_dir = "res://assets/images/characters/chapter5/whip_walanghiya_walk"
+walk_count = 10
+flip_h = false

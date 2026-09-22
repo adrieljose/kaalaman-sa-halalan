@@ -1,0 +1,4 @@
+[gd_scene load_steps=2 format=3]
+[ext_resource type="Script" path="res://tools/menu/verify_early_attack_sync.gd" id="1"]
+[node name="EarlyAttackSync" type="Node"]
+script = ExtResource("1")

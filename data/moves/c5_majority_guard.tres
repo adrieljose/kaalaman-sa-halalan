@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="EnemyMove" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_move.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/images/ui/skill_icons/chapter5/whip_walanghiya/majority_guard.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+icon = ExtResource("2")
+move_id = "c5combat_majority_guard"
+move_name = "Majority Guard"
+description = "Ang mayorya ang nakaharang sa iyo."
+direct_damage = 0
+self_heal = 0
+guard_reduction = 0.45
+animation_style = "curse"
+effect_color = Color(0.360, 0.780, 0.520, 0.95)
+attack_dir = "res://assets/images/characters/chapter5/whip_walanghiya_guard"
+attack_count = 10

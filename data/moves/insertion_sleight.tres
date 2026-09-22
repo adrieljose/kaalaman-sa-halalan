@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="EnemyMove" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_move.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+move_id = "insertion_sleight"
+move_name = "Insertion Sleight"
+description = "One clause, added between the reading and the vote."
+direct_damage = 25
+animation_style = "curse"
+effect_color = Color(0.78, 0.60, 0.86, 0.95)

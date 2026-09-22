@@ -1,0 +1,35 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/images/portraits/enemy_spiker_supremo.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/images/backgrounds/chapter5/09_grand_house_hall.png" id="3"]
+[ext_resource type="Resource" path="res://data/moves/c5_house_rules.tres" id="10"]
+[ext_resource type="Resource" path="res://data/moves/c5_majority_motion.tres" id="11"]
+[ext_resource type="Resource" path="res://data/moves/c5_speakers_shield.tres" id="12"]
+
+[resource]
+script = ExtResource("1")
+enemy_name = "MarTinde RomuRulez"
+title = "The House Supremo"
+max_hp = 1250
+portrait = ExtResource("2")
+hud_portrait = ExtResource("2")
+background = ExtResource("3")
+ground_fraction = 0.9125
+player_battle_offset = Vector2(0, 0)
+enemy_battle_offset = Vector2(-28, 0)
+enemy_battle_scale = 1.20
+lore = "The House Supremo. He does not raise his voice, because he has never needed to. He holds the gavel, the calendar and the majority, and the chamber moves when he says it moves."
+is_boss = true
+moves = [ExtResource("10"), ExtResource("11"), ExtResource("12")]
+phase_thresholds = [0.50]
+phase_banners = ["HOUSE IN SESSION!"]
+idle_dir = "res://assets/images/characters/chapter5/spiker_supremo_idle"
+idle_count = 8
+attack_dir = "res://assets/images/characters/chapter5/spiker_supremo_attack"
+attack_count = 12
+hit_dir = "res://assets/images/characters/chapter5/spiker_supremo_hit"
+hit_count = 8
+walk_dir = "res://assets/images/characters/chapter5/spiker_supremo_walk"
+walk_count = 10
+flip_h = false

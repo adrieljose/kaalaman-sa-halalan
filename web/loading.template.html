@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="fil">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kaalaman sa Halalan</title>
+$GODOT_HEAD_INCLUDE
+<style>
+@font-face { font-family:'Press Start 2P'; src:url('@@PIXEL_FONT@@') format('truetype'); font-weight:400; font-style:normal; font-display:swap; }
+:root { color-scheme: dark; --gold:#d5a64b; --cream:#ffe8b1; --ink:#1b100b; --legal-footer-height:calc(28px + env(safe-area-inset-bottom)); }
+* { box-sizing:border-box; }
+html,body { margin:0; width:100%; height:100%; background:var(--ink); overflow:hidden; }
+body { font-family:Georgia,'Times New Roman',serif; color:var(--cream); }
+#canvas { position:fixed !important; inset:0 0 auto !important; display:block; width:100% !important; height:calc(100% - var(--legal-footer-height)) !important; border:0; outline:none; }
+/* Legal links live outside the canvas. Floating them over the lower-left corner
+   covered battle controls on phones and intercepted part of their touch area. */
+#legal-links { position:fixed; z-index:30; inset:auto 0 0; height:var(--legal-footer-height); display:flex; align-items:flex-start; justify-content:center; gap:16px; padding:5px max(10px,env(safe-area-inset-right)) env(safe-area-inset-bottom) max(10px,env(safe-area-inset-left)); border-top:1px solid rgba(213,166,75,.72); background:#1b100b; font:11px/1.4 Arial,sans-serif; }
+#legal-links a { color:#ffe8b1; text-decoration:underline; text-underline-offset:2px; }
+#legal-links a:hover { color:#fff4d2; }
+#legal-links a:focus-visible { outline:3px solid white; outline-offset:3px; }
+#loading { position:fixed; inset:0; z-index:10; isolation:isolate; overflow:auto; display:grid; grid-template-rows:1fr auto; padding:clamp(20px,5vh,54px) max(20px,env(safe-area-inset-right)) max(22px,env(safe-area-inset-bottom)); background:#1b100b; }
+.backdrop { position:fixed; inset:0; z-index:-2; width:100%; height:100%; object-fit:cover; object-position:center 58%; image-rendering:pixelated; }
+#loading::before { content:''; position:fixed; inset:0; z-index:-1; background:linear-gradient(180deg,rgba(20,12,7,.35),rgba(20,12,7,.16) 32%,rgba(20,12,7,.8) 78%,#170e0a); }
+.composition { align-self:center; width:min(100%,1000px); margin:auto; display:flex; flex-direction:column; align-items:center; gap:clamp(36px,10vh,104px); }
+.logo { width:min(100%,880px); height:auto; object-fit:contain; image-rendering:pixelated; }
+.loading-panel { width:min(100%,540px); text-align:center; }
+.eyebrow { margin:0 0 14px; font-family:'Press Start 2P',monospace; font-size:16px; font-weight:400; line-height:1.8; letter-spacing:0; color:#efd192; text-shadow:2px 2px #24140f; }
+h1 { margin:0 0 27px; font-size:clamp(21px,3.2vw,30px); line-height:1.3; font-weight:normal; text-shadow:0 2px 2px #170d09; }
+.track { position:relative; height:24px; margin:0 9px; padding:4px; background:#24140f; border:2px solid var(--gold); box-shadow:0 0 0 2px #422614,0 0 0 3px #8c602e,0 5px 0 #100b08; }
+.track::before,.track::after { content:''; position:absolute; top:5px; width:10px; height:10px; border:2px solid #ffe1a0; background:#a76a30; transform:rotate(45deg); }
+.track::before { left:-9px; } .track::after { right:-9px; }
+.rail { width:100%; height:100%; overflow:hidden; background:#3b2220; }
+.fill { height:100%; width:0; background:repeating-linear-gradient(90deg,transparent 0 16px,#50201e 16px 18px),linear-gradient(#c66a56 0 2px,#9a3e37 2px 65%,#6f2827 65%); border-right:2px solid #ffe2a0; box-shadow:inset 0 1px #f2b36a; transition:width .2s linear; }
+.track.indeterminate .fill { width:28%; animation:travel 2.2s ease-in-out infinite alternate; }
+.progress-meta { display:flex; justify-content:space-between; gap:12px; align-items:start; margin:14px 7px 0; font-family:Arial,sans-serif; font-size:11px; letter-spacing:.06em; color:#e8cb97; }
+#percent { font-variant-numeric:tabular-nums; color:#ffe5a5; white-space:nowrap; }
+.hint { margin:28px 0 0; font-size:14px; line-height:1.6; color:#ddc6a0; }
+#failure { margin:20px 0 0; padding:18px; border:1px solid #bf8954; background:#2b1815; }
+#failure p { font:13px/1.6 Arial,sans-serif; overflow-wrap:anywhere; }
+button { background:#81342f; border:2px solid var(--gold); padding:11px 22px; color:#ffe8b1; font:bold 12px Arial,sans-serif; cursor:pointer; }
+button:hover { background:#a04a3f; } button:focus-visible { outline:3px solid white; outline-offset:4px; }
+[hidden] { display:none !important; }
+noscript { position:fixed; inset:auto 20px 20px; z-index:20; padding:18px; background:#2b1815; text-align:center; }
+@keyframes travel { from { transform:translateX(0); } to { transform:translateX(255%); } }
+@media(max-width:520px) { .composition { gap:70px; } .logo { width:100%; } .loading-panel { max-width:380px; } .eyebrow { font-size:8px; text-shadow:1px 1px #24140f; } h1 { margin-bottom:24px; } .hint { max-width:260px; margin:25px auto 0; } .backdrop { object-position:52% center; } }
+@media(max-height:500px) and (min-width:521px) { #loading { padding-top:16px; padding-bottom:14px; } .composition { gap:14px; } .logo { width:min(56vw,460px); } .eyebrow { margin-bottom:6px; font-size:8px; text-shadow:1px 1px #24140f; } h1 { margin-bottom:14px; font-size:20px; } .hint { margin-top:14px; font-size:12px; } }
+@media(prefers-reduced-motion:reduce) { .fill { transition:none; } .track.indeterminate .fill { animation:none; width:100%; opacity:.6; } }
+</style>
+</head>
+<body>
+<canvas id="canvas" tabindex="0" aria-label="Kaalaman sa Halalan game">Your browser does not support canvas.</canvas>
+<nav id="legal-links" aria-label="Legal information"><a href="privacy.html" target="_blank" rel="noopener">Privacy</a><a href="terms.html" target="_blank" rel="noopener">Terms &amp; Disclaimer</a></nav>
+<main id="loading" aria-busy="true">
+  <img class="backdrop" src="@@BACKGROUND@@" alt="" aria-hidden="true">
+  <div class="composition">
+    <img class="logo" src="@@LOGO@@" alt="Kaalaman sa Halalan — I Am Aware" fetchpriority="high">
+    <section class="loading-panel" aria-labelledby="loading-title">
+      <p class="eyebrow">ANG BAWAT BOTO, MAY HALAGA</p>
+      <h1 id="loading-title" role="status" aria-live="polite">Inihahanda ang inyong paglalakbay…</h1>
+      <div id="progress-track" class="track indeterminate" role="progressbar" aria-label="Pag-download ng laro" aria-valuemin="0" aria-valuemax="100">
+        <div class="rail"><div class="fill" id="progress-fill"></div></div>
+      </div>
+      <div class="progress-meta"><span id="progress-label">Kumokonekta sa laro…</span><span id="percent">Sandali lang</span></div>
+      <p class="hint">Kilalanin ang pamahalaan.<br>Gamitin ang kaalaman. Maging mapanuring botante.</p>
+      <div id="failure" role="alert" hidden><p id="failure-text"></p><button id="retry" type="button">SUBUKAN MULI</button></div>
+    </section>
+  </div>
+</main>
+<noscript>Kailangan ng JavaScript para maglaro. I-enable ito sa browser at i-refresh ang pahina.</noscript>
+<script>
+// Present errors even if the engine download fails, before Engine exists.
+window.gameLoader = (() => {
+  const overlay = document.getElementById('loading');
+  const track = document.getElementById('progress-track');
+  const fill = document.getElementById('progress-fill');
+  const label = document.getElementById('progress-label');
+  const percent = document.getElementById('percent');
+  const title = document.getElementById('loading-title');
+  let stopped = false;
+  document.getElementById('retry').addEventListener('click', () => location.reload());
+  return {
+    progress(current,total) {
+      if (stopped) return;
+      const known = Number.isFinite(total) && total > 0 && Number.isFinite(current) && current >= 0;
+      track.classList.toggle('indeterminate', !known);
+      if (known) {
+        const value = Math.min(100,Math.max(0,Math.floor(current / total * 100)));
+        track.setAttribute('aria-valuenow',String(value));
+        fill.style.width = value + '%'; percent.textContent = value + '%';
+        label.textContent = value === 100 ? 'Kumpleto na ang download' : 'Dina-download ang mga kagamitan…';
+        title.textContent = value === 100 ? 'Inihahanda ang laro…' : 'Inihahanda ang inyong paglalakbay…';
+      } else {
+        track.removeAttribute('aria-valuenow'); fill.style.width = '';
+        percent.textContent = 'Sandali lang'; label.textContent = 'Inihahanda ang mga kagamitan…';
+      }
+    },
+    fail(error) {
+      if (stopped) return;
+      stopped = true; overlay.setAttribute('aria-busy','false');
+      track.hidden = true; document.querySelector('.progress-meta').hidden = true;
+      title.textContent = 'Hindi ma-load ang laro';
+      document.getElementById('failure-text').textContent = error instanceof Error ? error.message : String(error);
+      document.getElementById('failure').hidden = false;
+    },
+    ready() {
+      if (stopped) return;
+      stopped = true; overlay.remove(); document.getElementById('canvas').focus();
+    }
+  };
+})();
+</script>
+<script src="$GODOT_URL" onerror="gameLoader.fail('Hindi na-download ang game engine. Suriin ang internet connection at subukang muli.')"></script>
+<script>
+const GODOT_CONFIG = $GODOT_CONFIG;
+const GODOT_THREADS_ENABLED = $GODOT_THREADS_ENABLED;
+(async () => {
+  if (typeof Engine === 'undefined') return;
+  try {
+    const engine = new Engine(GODOT_CONFIG);
+    const missing = Engine.getMissingFeatures({threads:GODOT_THREADS_ENABLED});
+    if (missing.length) {
+      if (GODOT_CONFIG.serviceWorker && GODOT_CONFIG.ensureCrossOriginIsolationHeaders && 'serviceWorker' in navigator) {
+        const registration = await navigator.serviceWorker.getRegistration();
+        if (!registration) {
+          await engine.installServiceWorker(); location.reload(); return;
+        }
+      }
+      throw new Error('May kulang na browser feature: ' + missing.join(', ') + '. Gumamit ng browser na may WebGL support.');
+    }
+    await engine.startGame({onProgress:(current,total) => gameLoader.progress(current,total)});
+    gameLoader.ready();
+  } catch (error) { console.error(error); gameLoader.fail(error); }
+})();
+</script>
+</body>
+</html>

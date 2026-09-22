@@ -1,0 +1,186 @@
+[
+  {
+    "slug": "bokal_bulsa",
+    "source": "exec-e05ac743-d5c5-4e49-bb5b-79b4c4c4a9e8.png",
+    "files": [
+      "ch3_kickback_flick",
+      "ch3_pocket_payload",
+      "ch3_deep_pockets"
+    ],
+    "names": [
+      "Pocket Punch",
+      "Resolution Ricochet",
+      "Pocket Privilege"
+    ],
+    "ids": [
+      "pocket_punch",
+      "resolution_ricochet",
+      "pocket_privilege"
+    ],
+    "prop": "coin",
+    "guard": "folder",
+    "label": "APPROVED",
+    "color": "e7ba56"
+  },
+  {
+    "slug": "assessor_altapresyo",
+    "source": "exec-dcbaa007-6fdc-42f1-9267-bbc5bd390c46.png",
+    "files": [
+      "ch3_markup_strike",
+      "ch3_appraisal_talons",
+      "ch3_overvalued_cover"
+    ],
+    "names": [
+      "Appraisal Hammer",
+      "Tax Tag Toss",
+      "Assessment Shield"
+    ],
+    "ids": [
+      "appraisal_hammer",
+      "tax_tag_toss",
+      "assessment_shield"
+    ],
+    "prop": "tag",
+    "guard": "grid",
+    "label": "P 999,999",
+    "color": "ed7475"
+  },
+  {
+    "slug": "treasurer_tago",
+    "source": "exec-5e301389-2ddd-4e8b-a16f-f59c8a15eaff.png",
+    "files": [
+      "ch3_treasury_slam",
+      "ch3_keychain_lash",
+      "ch3_vault_lockdown"
+    ],
+    "names": [
+      "Coffer Crush",
+      "Lockbox Launch",
+      "Vault Lockdown"
+    ],
+    "ids": [
+      "coffer_crush",
+      "lockbox_launch",
+      "vault_lockdown"
+    ],
+    "prop": "box",
+    "guard": "vault",
+    "label": "LOCKED",
+    "color": "90c1ce"
+  },
+  {
+    "slug": "auditor_alibi",
+    "source": "exec-e242480d-6f40-4e6a-978e-6081fa2e9b1f.png",
+    "files": [
+      "ch3_redaction_slash",
+      "ch3_paper_trail_torrent",
+      "ch3_whitewash"
+    ],
+    "names": [
+      "Red Pen Riposte",
+      "Paper Trail Storm",
+      "Audit Exception"
+    ],
+    "ids": [
+      "red_pen_riposte",
+      "paper_trail_storm",
+      "audit_exception"
+    ],
+    "prop": "paper",
+    "guard": "paperwall",
+    "label": "DISALLOWANCE",
+    "color": "f17382"
+  },
+  {
+    "slug": "planner_palusot",
+    "source": "exec-cd460291-2e00-4bcf-b6ba-8edcc1677214.png",
+    "files": [
+      "ch3_blueprint_crossfire",
+      "ch3_compass_sweep",
+      "ch3_strategic_reroute"
+    ],
+    "names": [
+      "Blueprint Bash",
+      "Zoning Grid",
+      "Revised Plan"
+    ],
+    "ids": [
+      "blueprint_bash",
+      "zoning_grid",
+      "revised_plan"
+    ],
+    "prop": "blueprint",
+    "guard": "route",
+    "label": "REVISED",
+    "color": "74dbea"
+  },
+  {
+    "slug": "engineer_eskandalo",
+    "source": "exec-3780daf5-a09c-4ca0-ab6e-1c87ec05e85c.png",
+    "files": [
+      "ch3_substandard_smash",
+      "ch3_rebar_rake",
+      "ch3_hardhat_hunker"
+    ],
+    "names": [
+      "Hard Hat Headbutt",
+      "Concrete Chuck",
+      "Safety Barricade"
+    ],
+    "ids": [
+      "hard_hat_headbutt",
+      "concrete_chuck",
+      "safety_barricade"
+    ],
+    "prop": "rubble",
+    "guard": "barricade",
+    "label": "UNDER CONSTRUCTION",
+    "color": "f1b444"
+  },
+  {
+    "slug": "contractor_kutsaba",
+    "source": "exec-caf04c79-04ac-402f-9544-68b335dc5f02.png",
+    "files": [
+      "ch3_rigged_deal",
+      "ch3_partners_cut",
+      "ch3_padded_contract"
+    ],
+    "names": [
+      "Contract Case Combo",
+      "Change Order Barrage",
+      "Partner Protection"
+    ],
+    "ids": [
+      "contract_case_combo",
+      "change_order_barrage",
+      "partner_protection"
+    ],
+    "prop": "paper",
+    "guard": "board",
+    "label": "CHANGE ORDER",
+    "color": "e3d173"
+  },
+  {
+    "slug": "project_padrino",
+    "source": "exec-dfb3f395-1421-4e6a-ab80-346beac90c28.png",
+    "files": [
+      "ch3_strings_attached",
+      "ch3_backroom_verdict",
+      "ch3_patrons_protection"
+    ],
+    "names": [
+      "Padrino Palm",
+      "Backroom Deal",
+      "Padrino's Favor"
+    ],
+    "ids": [
+      "padrino_palm",
+      "backroom_deal",
+      "padrinos_favor"
+    ],
+    "prop": "envelope",
+    "guard": "seal",
+    "label": "SEALED DEAL",
+    "color": "d6b66d"
+  }
+]

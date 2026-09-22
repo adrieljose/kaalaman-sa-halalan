@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/images/portraits/enemy_clerk_kurakot.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/images/backgrounds/capitol_assessor.png" id="3"]
+[ext_resource type="Resource" path="res://data/moves/zonal_value_slash.tres" id="10"]
+[ext_resource type="Resource" path="res://data/moves/tax_map_trap.tres" id="11"]
+[ext_resource type="Resource" path="res://data/moves/reassessment_rain.tres" id="12"]
+
+[resource]
+script = ExtResource("1")
+enemy_name = "Assessor Anino"
+title = "The Shadow Valuer"
+max_hp = 320
+portrait = ExtResource("2")
+background = ExtResource("3")
+lore = "Her friend's hectare is worth almost nothing on paper. Yours went up again. Both figures came from the same desk."
+is_boss = false
+moves = [ExtResource("10"), ExtResource("11"), ExtResource("12")]
+idle_dir = "res://assets/images/characters/clerk_kurakot_battle_idle_34"
+idle_count = 8
+attack_dir = "res://assets/images/characters/clerk_kurakot_battle_attack_34"
+attack_count = 6
+hit_dir = "res://assets/images/characters/clerk_kurakot_battle_hit_34"
+hit_count = 6

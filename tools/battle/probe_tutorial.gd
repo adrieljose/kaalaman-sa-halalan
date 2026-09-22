@@ -110,8 +110,10 @@ func _ready() -> void:
 			_faults.append("step %d has no title or no body" % (i + 1))
 
 		if i in SHOT_STEPS:
-			var path := "%s/step_%02d.png" % [OUT_DIR, i + 1]
-			get_viewport().get_texture().get_image().save_png(path)
+			if DisplayServer.get_name() != "headless":
+				await RenderingServer.frame_post_draw
+				var path := "%s/step_%02d.png" % [OUT_DIR, i + 1]
+				get_viewport().get_texture().get_image().save_png(path)
 
 	# The two demonstrations have to have actually happened.
 	var enemy_hp: int = scene.get("_enemy_hp")

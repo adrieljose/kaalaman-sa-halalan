@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="ChapterData" load_steps=11 format=3]
+
+[ext_resource type="Script" path="res://scripts/chapter_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/enemies/ch3_01_bokal_bulsa.tres" id="2"]
+[ext_resource type="Resource" path="res://data/enemies/ch3_02_assessor_altapresyo.tres" id="3"]
+[ext_resource type="Resource" path="res://data/enemies/ch3_03_treasurer_tago.tres" id="4"]
+[ext_resource type="Resource" path="res://data/enemies/ch3_04_auditor_alibi.tres" id="5"]
+[ext_resource type="Resource" path="res://data/enemies/ch3_05_planner_palusot.tres" id="6"]
+[ext_resource type="Resource" path="res://data/enemies/ch3_06_engineer_eskandalo.tres" id="7"]
+[ext_resource type="Resource" path="res://data/enemies/ch3_07_contractor_kutsaba.tres" id="8"]
+[ext_resource type="Resource" path="res://data/enemies/ch3_08_project_padrino.tres" id="9"]
+[ext_resource type="Resource" path="res://data/enemies/ch3_09_cong_meow.tres" id="10"]
+
+[resource]
+script = ExtResource("1")
+chapter_number = 3
+chapter_name = "Provincial Circuit"
+encounters = [ExtResource("2"), ExtResource("3"), ExtResource("4"), ExtResource("5"), ExtResource("6"), ExtResource("7"), ExtResource("8"), ExtResource("9"), ExtResource("10")]

@@ -15,28 +15,73 @@ const BATTLE_SCENE := "res://scenes/word_battle.tscn"
 ## disk rather than typed in, so shipping chapter 3 means adding its data and
 ## nothing else -- this constant stops being a thing anyone has to remember.
 ## Caps what the WEB BUILD shows as unlocked, independent of which
-## chapter_XX.tres files exist on disk. Chapter 2 is finished enough to test
-## locally but not to release, and this is the one knob that keeps it out of
-## the public build without deleting or renaming anything: chapter_02.tres
-## stays in place, every local run still sees it, and un-capping later is a
-## one-line change back to TOTAL_CHAPTERS.
+## chapter_XX.tres files exist on disk. This is the one knob that keeps an
+## unfinished chapter out of the public build without deleting or renaming
+## anything: its chapter_XX.tres stays in place and every local run still sees
+## it.
+##
+## 2 as of 2026-09-06: Chapter 2 is released. Chapter 3 has its rooms, its data
+## and its choreography but its rivals still wear borrowed Chapter 2 sprites and
+## none of its 28 skill icons exist, so it stays local until that is finished.
+## Raising this to 3 is the whole of what releasing it takes.
 ##
 ## OS.has_feature("editor") is true whenever the project runs through the
 ## editor executable — pressing Play, or any `godot --path .` invocation used
 ## by this project's own tooling — and false in an exported template, which is
 ## the only thing Vercel is ever serving. That is what makes "local" and
 ## "deployed" the same thing as "editor" and "not editor" here.
-const RELEASE_CAP := 1
+## All five chapters are included; production access is earned sequentially.
+const RELEASE_CAP := 5
 
-static func unlocked_chapters() -> int:
+## Chapters that EXIST and have shipped — the old meaning of
+## unlocked_chapters(), before progression was added. Kept separate because the
+## two locks are different facts and the player is owed different words for
+## them: a chapter past this line has not been written yet, and no amount of
+## playing will open it.
+static func released_chapters() -> int:
 	var n := 0
 	for i in range(1, TOTAL_CHAPTERS + 1):
 		if not GameState.chapter_exists(i):
 			break
 		n = i
-	if not OS.has_feature("editor"):
+	if not OS.has_feature("editor") and not OS.has_feature("testing_chapters"):
 		n = mini(n, RELEASE_CAP)
 	return n
+
+## Chapters opened by PROGRESS. Chapter 1 is always open; every chapter after
+## it needs the one before it finished on Easy, Medium AND Hard (saved).
+##
+## Uses permanent tier wins, not the separate same-session certificate rule.
+static func earned_chapters() -> int:
+	var n := 1
+	while n < TOTAL_CHAPTERS and GameState.is_progression_completed(n):
+		n += 1
+	return n
+
+## What the player can actually enter: the stricter of the two locks.
+##
+## The progression lock, like RELEASE_CAP, is lifted in the editor. Both are
+## the same bargain -- the shipped build is the thing being gated, and this
+## project's own tooling drives chapters 2 and 3 directly dozens of times a
+## session. Gating those behind a full three-tier run of chapter 1 would make
+## every probe in tools/ unrunnable.
+static func unlocked_chapters() -> int:
+	var n := released_chapters()
+	if not OS.has_feature("editor") and not OS.has_feature("testing_chapters") and not PROGRESSION_GATE_OFF:
+		n = mini(n, earned_chapters())
+	return n
+
+## TEST BUILD SWITCH -- set true on 2026-09-08 so Chapter 3 can be played on
+## the live site without first clearing Chapters 1 and 2 on all three
+## difficulties. It makes every RELEASED chapter clickable on the map.
+##
+## This does NOT delete the progression rule, it only stops it applying: the
+## rule still lives in earned_chapters(), the notice that explains it is still
+## written, and the probe in tools/progression still tests it. Flipping this
+## back to false is the whole of what re-arming it takes.
+##
+## Disabled for production. The testing_chapters feature is the testing bypass.
+const PROGRESSION_GATE_OFF := false
 const TOTAL_CHAPTERS := 5
 ## How long the "AVAILABLE SOON!" notice stays up before fading itself out.
 const TOAST_HOLD := 1.3
@@ -99,8 +144,8 @@ const CREDITS_COPY := """[center][color=#6f211b][font_size=12][b]KAALAMAN SA HAL
 
 [color=#234c63][font_size=15][b]PROJECT / ELECTION INFORMATION[/b][/font_size][/color]
 [color=#8b6b2d]━━━━━━━━━━━━━━━━━━━━━━━━━━━━[/color]
-[b]Kaalaman sa Halalan[/b] — a word game about Philippine elections.
-All enemies are fictional archetypes, not real people or parties.
+[b]Kaalaman sa Halalan[/b] — a COMELEC-affiliated educational word game about Philippine elections.
+This is a fictional satirical work. Characters are exaggerated composites or parodies; no endorsement by any candidate, party, or public official is implied. Gameplay is not a statement of fact about any real person.
 
 [color=#234c63][font_size=15][b]MUSIC & SOUND[/b][/font_size][/color]
 [color=#8b6b2d]━━━━━━━━━━━━━━━━━━━━━━━━━━━━[/color]
@@ -111,7 +156,8 @@ All enemies are fictional archetypes, not real people or parties.
 [color=#234c63][font_size=15][b]ASSETS / ATTRIBUTION[/b][/font_size][/color]
 [color=#8b6b2d]━━━━━━━━━━━━━━━━━━━━━━━━━━━━[/color]
 [b]Art[/b]
-Pixel art by Adriel Jose C. Villas
+Art direction, editing, and integration by Adriel Jose C. Villas.
+Generated with PixelLab and OpenAI tools where applicable.
 
 [b]Engine[/b]
 Godot Engine 4.7 (MIT)
@@ -125,10 +171,63 @@ Godot Engine 4.7 (MIT)
 ## appeared to do nothing. This panel is built entirely in code and its text
 ## lives here alone, so editing this constant is the whole job.
 ##
-## Dates are the dates each change actually shipped, taken from the repository
-## history rather than from memory. Newest first.
+## Older version dates come from repository history. The Chapter 3 entry is a
+## retrospective of the September 8 live build, dated when its notes were updated.
 const PATCH_NOTES_COPY := """[center][color=#6f211b][font_size=12][b]WHAT'S NEW[/b][/font_size][/color]
 [color=#59442d]Everything added since Chapter 1[/color][/center]
+
+[color=#234c63][font_size=15][b]Chapters 4–5 & Progression Update[/b][/font_size][/color]
+[color=#59442d]Patch notes updated 16 September 2026[/color]
+[color=#8b6b2d]━━━━━━━━━━━━━━━━━━━━━━━━━━━━[/color]
+[b]Chapter 4 — Malacañang Palace[/b]
+Continue through the Palace complex with eight regular rivals and final boss Lolo Enrilegend — The Eternal Statesman. Battle across indoor, outdoor, and semi-outdoor locations with animated environmental details and dedicated enemy skill icons.
+
+[b]Chapter 5 — Congress of the Philippines[/b]
+Take the fight to Congress, from legislative grounds and committee spaces to the final House chamber. Face eight regular rivals and MarTinde RomuRulez — The House Supremo, with Congress-themed environments and boss encounters.
+
+[b]More natural Chapter 1–2 attacks[/b]
+Early-chapter enemies now use improved arm, leg, and body movement. Wind-ups, strikes, projectile releases, and recovery are better synchronized with skill effects. Movement timing and rendering have also been optimized.
+
+[b]Facing and floor-placement fixes[/b]
+Senator Sabaw and Kapitan Komisyon now face the player correctly. Bidding Bandit and Ordinance Ogre have revised backgrounds and fighter placement to provide a clearer standing surface.
+
+[b]Main website: earn your way through all five chapters[/b]
+New players begin at Chapter 1 Easy. Complete Easy to unlock Medium, then Medium to unlock Hard. Completing all three difficulties unlocks the next chapter's Easy mode. Complete Chapter 3 to open Chapter 4, then complete Chapter 4 to open Chapter 5. Completed difficulty progress is saved automatically between sessions.
+
+[b]Testing website: everything unlocked[/b]
+All five chapters and all three difficulties remain available for testing. Testing progress is stored separately from main-site progress.
+
+[b]Coming next: downloadable Save / Load checkpoints[/b]
+Built and tested locally; NOT available on either published website yet. The upcoming feature lets you download a save file and later restore your chapter, difficulty, encounter, character, HP, and potions at the start of a battle. It does not resume a partially played turn. Main and testing save files will remain separate.
+
+[color=#234c63][font_size=15][b]Chapter 3 — Provincial Capitol[/b][/font_size][/color]
+[color=#59442d]Patch notes updated 11 September 2026[/color]
+[color=#8b6b2d]━━━━━━━━━━━━━━━━━━━━━━━━━━━━[/color]
+[b]Nine Capitol encounters[/b]
+Take Juan or Maria through the Provincial Circuit: eight regular rivals and a new final boss. Face Bokal Bulsa, Assessor Altapresyo, Treasurer Tago, Auditor Alibi, Planner Palusot, Engineer Eskandalo, Contractor Kutsaba, and Project Padrino.
+
+[b]New boss: CONG MEOW[/b]
+The Meowjority Leader closes the chapter with Capitol Claw, Viral Meowburst, and Nine Lives. His dedicated attack effects and defensive shield give the final encounter its own identity.
+
+[b]Original pixel-art rivals with movement[/b]
+Chapter 3 now has its own character artwork and portraits, with idle, walking, attack, defense, and hurt animations. Body movement, wind-ups, follow-through, and recovery make each encounter more expressive.
+
+[b]27 skills, 27 unique icons[/b]
+Each of the nine rivals has three skills with an individual transparent pixel-art icon in the enemy moves panel. Sharper scaling and clearer inactive icons make the moves easier to read.
+
+[b]Attacks that match their names[/b]
+The regular rivals' 24 skills now have individual choreography, including moving props, projectiles, and defensive effects. Hits are timed to impact, and fighters return to their battle stance afterward.
+
+[b]Fight across the Capitol[/b]
+Chapter 3 battles use Capitol locations including the session hall, assessor's office, treasury, arcade, committee room, project yard, relief yard, and final executive office. Backdrops and fighter placement give these encounters their provincial setting.
+
+[b]Distinct damage-reaction voices[/b]
+All nine rivals now have their own voice profiles: 36 hurt reactions and nine defeat lines in total. Reactions avoid immediate repeats and overlapping playback, respect SFX volume, and give defeat lines priority.
+
+[b]Juan and Maria combat improvements[/b]
+Both heroes can use five attack variations: three close-range and two ranged attacks. Ranged attacks keep the hero in place while projectiles travel toward the enemy, with damage synchronized to the impact.
+
+[color=#59442d]This entry documents the Chapter 3 features already included in the live game. This patch-notes update does not change combat balance, questions, or chapter access.[/color]
 
 [color=#234c63][font_size=15][b]v1.3 — 2 September 2026[/b][/font_size][/color]
 [color=#8b6b2d]━━━━━━━━━━━━━━━━━━━━━━━━━━━━[/color]
@@ -317,6 +416,10 @@ var _maria_shadow: Panel
 @onready var map_panel: Control = $MapPanel
 @onready var map_back_button: Button = $MapPanel/MapBackButton
 @onready var soon_toast: PanelContainer = $MapPanel/SoonToast
+## The notice now answers two different locks, so its wording is set per click
+## rather than left as the one line authored in the scene.
+@onready var toast_title: Label = $MapPanel/SoonToast/VBox/ToastTitle
+@onready var toast_body: Label = $MapPanel/SoonToast/VBox/ToastBody
 
 ## Tracked so a second click restarts the notice cleanly instead of two fades
 ## fighting over the same node.
@@ -363,6 +466,10 @@ func _ready() -> void:
 	options_button.pressed.connect(_on_options_pressed)
 	credits_button.pressed.connect(_on_credits_pressed)
 	quit_button.pressed.connect(_on_quit_pressed)
+	# A web game cannot reliably close its own browser tab. Do not show a
+	# control that only leaves the canvas stopped or frozen.
+	if OS.has_feature("web"):
+		quit_button.hide()
 	credits_close_button.pressed.connect(_on_close_panels)
 	easy_button.pressed.connect(_start_run.bind("easy"))
 	medium_button.pressed.connect(_start_run.bind("medium"))
@@ -403,6 +510,8 @@ func _ready() -> void:
 	# played.
 	_build_tutorial()
 	_build_patch_notes()
+	var save_button:=_insert_menu_button("SaveLoadButton","SAVE / LOAD",Color(0.9,1,0.9),options_button)
+	save_button.pressed.connect(func(): SaveFilePanel.open(self))
 	_style_main_menu()
 	_style_credits_panel()
 	_build_static_title_characters()
@@ -1125,7 +1234,7 @@ func _layout_map(profile: LayoutProfile) -> void:
 
 	var back_size := Vector2(108.0, 28.0) if profile.is_wide() else Vector2(120.0, 44.0)
 	_place(map_back_button, Rect2(margin, d.y - margin - back_size.y, back_size.x, back_size.y))
-	# Width and stacking only — the height is settled in _show_soon_toast(),
+	# Width and stacking only — the height is settled in _show_toast(),
 	# once the body label has a width to wrap at. Raised to the top of the map
 	# because, as a child added before the chapter list, it was being painted
 	# over by the very buttons it is answering.
@@ -1259,14 +1368,14 @@ func _open_chapter_map() -> void:
 func _on_chapter_pressed(chapter: int) -> void:
 	if chapter > unlocked_chapters():
 		Audio.play_sfx("word_rejected")
-		_show_soon_toast()
+		_show_locked_toast(chapter)
 		return
 	# Load it here rather than at _start_run, so everything downstream — the
 	# difficulty hints, the certificate panel, the question pool — is already
 	# talking about the chapter the player just picked.
 	if not GameState.load_chapter(chapter):
 		Audio.play_sfx("word_rejected")
-		_show_soon_toast()
+		_show_locked_toast(chapter)
 		return
 	Audio.play_sfx("button_click")
 	_apply_difficulty_hints()
@@ -1281,9 +1390,28 @@ func _on_chapter_pressed(chapter: int) -> void:
 	await get_tree().process_frame
 	_centre_panel(character_panel, CHARACTER_PANEL_SIZE)
 
+## Words the notice for the reason THIS chapter is shut, then shows it.
+##
+## The two locks are not the same news. "Still being written" is an apology for
+## something the player cannot affect; "finish chapter 1 on all three
+## difficulties" is an instruction they can act on this minute. Showing the
+## first message for the second case would tell a player to wait for content
+## that is already sitting there, so the wording is chosen per click.
+func _show_locked_toast(chapter: int) -> void:
+	if chapter <= released_chapters():
+		var previous := chapter - 1
+		var name_of_previous := String(CHAPTER_TITLES.get(previous, "Chapter %d" % previous))
+		toast_title.text = "LOCKED"
+		toast_body.text = ("Finish %s on Easy, Medium and Hard to open %s. Your progress is saved."
+			% [name_of_previous, CHAPTER_TITLES.get(chapter, "Chapter %d" % chapter)])
+	else:
+		toast_title.text = "AVAILABLE SOON!"
+		toast_body.text = "This chapter is still being written. Chapter 1 is ready to play."
+	_show_toast()
+
 ## A self-dismissing notice, so a locked chapter never traps the player behind
 ## a dialog they have to close.
-func _show_soon_toast() -> void:
+func _show_toast() -> void:
 	if _toast_tween != null and _toast_tween.is_valid():
 		_toast_tween.kill()
 	soon_toast.modulate.a = 1.0
@@ -1518,11 +1646,11 @@ func _on_quit_pressed() -> void:
 ## promise cannot drift from the timer. And the example words are read out of
 ## the question bank, so rewriting the bank can never again leave the menu
 ## advertising words the game no longer asks about.
-## Also GATES the buttons: Medium needs Easy beaten this sitting, Hard needs
-## Medium. Called at boot (nothing unlocked yet) and again every time the
+## Also GATES the buttons using saved wins: Medium needs Easy, Hard needs
+## Medium. Testing bypasses both gates. Called at boot and again every time the
 ## difficulty panel is about to be shown, since the picture can change between
 ## those two moments — the player may have beaten Easy since the panel was
-## last open, in the same continuous session.
+## last open, or progress may have been loaded from an earlier session.
 func _apply_difficulty_hints() -> void:
 	var chapter_no := GameState.chapter_number()
 	var buttons := {"easy": easy_button, "medium": medium_button, "hard": hard_button}
@@ -1541,7 +1669,7 @@ func _apply_difficulty_hints() -> void:
 		if not unlocked:
 			var idx := QuestionBank.DIFFICULTY_ORDER.find(tier)
 			var prev: String = QuestionBank.DIFFICULTY_ORDER[idx - 1]
-			label.text = "Beat %s first, this sitting, to unlock %s." % [
+			label.text = "Beat %s first to unlock %s. Progress is saved." % [
 				prev.capitalize(), tier.capitalize()]
 			continue
 		var seconds := int(round(GameState.question_seconds(tier)))
@@ -1683,14 +1811,19 @@ func _build_reviewer() -> void:
 	subtitle.add_theme_color_override("font_color", Color(0.78, 0.72, 0.58))
 	column.add_child(subtitle)
 
-	# Only chapters the player can actually reach get a tab. QuestionBank holds
-	# data for all five (chapters 2-5 were written ahead of the content that
-	# unlocks them), but a reviewer entry for a chapter nobody can play would
-	# just be confusing. Reusing unlocked_chapters() means this needs no changes
-	# when chapter 2 ships — it gains a tab the same moment its map pin opens.
+	# Every chapter that has SHIPPED gets a tab, whether or not this player has
+	# earned their way to it. The reviewer is study material, not a reward: a
+	# player working toward chapter 2 is exactly the person who should be able
+	# to read chapter 2's questions first. So this asks released_chapters(),
+	# deliberately NOT unlocked_chapters() — the progression gate belongs on the
+	# map, where it decides what can be played, and nowhere else.
+	#
+	# Chapters past the release line still get nothing: QuestionBank holds
+	# questions for all five, but a tab for a chapter with no rivals or rooms
+	# behind it would promise content that does not exist yet.
 	var chapter_row := _add_tab_row(column, "CHAPTER")
 	for chapter_no in QuestionBank.chapters_available():
-		if int(chapter_no) > unlocked_chapters():
+		if int(chapter_no) > released_chapters():
 			continue
 		var tab := _make_tab(String(CHAPTER_TABS.get(chapter_no, "CH %d" % chapter_no)))
 		tab.pressed.connect(_on_reviewer_chapter_selected.bind(int(chapter_no)))
@@ -2417,7 +2550,14 @@ func _build_certificate() -> void:
 	column.add_child(_certificate_status_label)
 
 	_certificate_name_input = LineEdit.new()
-	_certificate_name_input.placeholder_text = "Enter your name"
+	var name_label := Label.new()
+	name_label.text = "Name to print on certificate"
+	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	name_label.add_theme_font_size_override("font_size", 11)
+	name_label.add_theme_color_override("font_color", Color(0.92, 0.86, 0.72))
+	column.add_child(name_label)
+
+	_certificate_name_input.placeholder_text = "Your name"
 	_certificate_name_input.max_length = CERTIFICATE_NAME_MAX_LENGTH
 	_certificate_name_input.custom_minimum_size = Vector2(0, 30)
 	_certificate_name_input.alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -2426,6 +2566,15 @@ func _build_certificate() -> void:
 	# having to reach for the mouse would be an odd extra step.
 	_certificate_name_input.text_submitted.connect(func(_text: String) -> void: _on_certificate_claim_pressed())
 	column.add_child(_certificate_name_input)
+
+	var privacy_note := Label.new()
+	privacy_note.text = "Stored only in this browser and used for your in-game certificate."
+	privacy_note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	privacy_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	privacy_note.custom_minimum_size = Vector2(300, 0)
+	privacy_note.add_theme_font_size_override("font_size", 9)
+	privacy_note.add_theme_color_override("font_color", Color(0.86, 0.81, 0.72))
+	column.add_child(privacy_note)
 
 	_certificate_claim_button = Button.new()
 	_certificate_claim_button.custom_minimum_size = Vector2(0, 36)

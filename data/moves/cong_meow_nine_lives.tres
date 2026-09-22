@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EnemyMove" load_steps=3 format=3]
+[ext_resource type="Script" path="res://scripts/enemy_move.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/images/ui/skill_icons/chapter3/cong_meow/nine_lives.png" id="2"]
+[resource]
+script = ExtResource("1")
+move_id = "cong_meow_nine_lives"
+move_name = "Nine Lives"
+icon = ExtResource("2")
+description = "Halves the next hit. Max 3 shields; 2 offensive turns between uses."
+direct_damage = 0
+guard_reduction = 0.5
+animation_style = "curse"
+effect_color = Color(1, 0.84, 0.42, 1)
+attack_dir = "res://assets/images/characters/chapter3/cong_meow_guard"
+attack_count = 12

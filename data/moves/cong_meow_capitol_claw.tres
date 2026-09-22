@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="EnemyMove" load_steps=3 format=3]
+[ext_resource type="Script" path="res://scripts/enemy_move.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/images/ui/skill_icons/chapter3/cong_meow/capitol_claw.png" id="2"]
+[resource]
+script = ExtResource("1")
+move_id = "cong_meow_capitol_claw"
+move_name = "Capitol Claw"
+icon = ExtResource("2")
+description = "Three close-range claw strikes: 8 + 8 + 14 damage."
+direct_damage = 30
+animation_style = "slam"
+effect_color = Color(1, 0.8, 0.4, 1)
+attack_dir = "res://assets/images/characters/chapter3/cong_meow_slash1"
+attack_count = 6

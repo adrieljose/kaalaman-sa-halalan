@@ -73,8 +73,9 @@ travels with it (kept alongside the font as `OFL.txt`).
 
 ## Art
 
-Pixel art (characters, tiles, backgrounds, potion and move icons, UI banners)
-generated with [PixelLab](https://pixellab.ai) for this project.
+Art direction, editing, and integration by Adriel Jose C. Villas. Pixel art
+(characters, tiles, backgrounds, potion and move icons, and UI banners) was
+generated with [PixelLab](https://pixellab.ai) and OpenAI tools where applicable.
 
 ## Word Lists
 

@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/images/portraits/enemy_permit_peke.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/images/backgrounds/capitol_project_yard.png" id="3"]
+[ext_resource type="Resource" path="res://data/moves/tarpaulin_unfurl.tres" id="10"]
+[ext_resource type="Resource" path="res://data/moves/ribbon_cut.tres" id="11"]
+[ext_resource type="Resource" path="res://data/moves/groundbreaking_pose.tres" id="12"]
+
+[resource]
+script = ExtResource("1")
+enemy_name = "Engineer Epal"
+title = "The Tarpaulin King"
+max_hp = 340
+portrait = ExtResource("2")
+background = ExtResource("3")
+lore = "His face is on the waiting shed, the water tank and the road. None of the three were paid for with his money."
+is_boss = false
+moves = [ExtResource("10"), ExtResource("11"), ExtResource("12")]
+idle_dir = "res://assets/images/characters/permit_peke_battle_idle_34"
+idle_count = 8
+attack_dir = "res://assets/images/characters/permit_peke_battle_attack_34"
+attack_count = 6
+hit_dir = "res://assets/images/characters/permit_peke_battle_hit_34"
+hit_count = 6

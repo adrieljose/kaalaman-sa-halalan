@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/images/portraits/enemy_notaryo_naku.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/images/backgrounds/capitol_arcade.png" id="3"]
+[ext_resource type="Resource" path="res://data/moves/notice_of_disallowance.tres" id="10"]
+[ext_resource type="Resource" path="res://data/moves/findings_flurry.tres" id="11"]
+[ext_resource type="Resource" path="res://data/moves/compliance_crush.tres" id="12"]
+
+[resource]
+script = ExtResource("1")
+enemy_name = "Auditor Alibi"
+title = "The Finding Dodger"
+max_hp = 380
+portrait = ExtResource("2")
+background = ExtResource("3")
+lore = "Four years of findings, every one of them answered, not one of them settled."
+is_boss = false
+moves = [ExtResource("10"), ExtResource("11"), ExtResource("12")]
+idle_dir = "res://assets/images/characters/notaryo_naku_battle_idle_34"
+idle_count = 8
+attack_dir = "res://assets/images/characters/notaryo_naku_battle_attack_34"
+attack_count = 7
+hit_dir = "res://assets/images/characters/notaryo_naku_battle_hit_34"
+hit_count = 6

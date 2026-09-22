@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="EnemyMove" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_move.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/images/ui/skill_icons/chapter5/spiker_supremo/house_rules.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+icon = ExtResource("2")
+move_id = "c5combat_house_rules"
+move_name = "House Rules"
+description = "Ang tuntunin ng Kapulungan -- at ang martilyo na nagpapatupad nito."
+direct_damage = 48
+self_heal = 0
+guard_reduction = 0.00
+animation_style = "slam"
+effect_color = Color(0.980, 0.820, 0.420, 0.95)
+attack_dir = "res://assets/images/characters/chapter5/spiker_supremo_attack"
+attack_count = 12

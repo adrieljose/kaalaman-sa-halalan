@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://scripts/enemy_data.gd" id="1"]
 [ext_resource type="Texture2D" path="res://assets/images/portraits/enemy_bidding_bandit.png" id="2"]
-[ext_resource type="Texture2D" path="res://assets/images/backgrounds/cityhall_bidding.png" id="3"]
+[ext_resource type="Texture2D" path="res://assets/images/backgrounds/cityhall_bidding_floor_v2.png" id="3"]
 [ext_resource type="Resource" path="res://data/moves/briefcase_beatdown.tres" id="10"]
 [ext_resource type="Resource" path="res://data/moves/bid_folder_fan.tres" id="11"]
 [ext_resource type="Resource" path="res://data/moves/contract_snare.tres" id="12"]
@@ -17,7 +17,7 @@ background = ExtResource("3")
 battle_scale = 1.15
 ground_fraction = 0.965
 player_battle_offset = Vector2(22, 6)
-enemy_battle_offset = Vector2(-22, 4)
+enemy_battle_offset = Vector2(-22, 0)
 hurt_voice = "bidding_bandit"
 lore = "Three companies bid. All three envelopes are in his handwriting."
 is_boss = false

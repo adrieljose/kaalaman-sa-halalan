@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="EnemyMove" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_move.gd" id="1"]
+
+[ext_resource type="Texture2D" path="res://assets/images/ui/skill_icons/chapter3/treasurer_tago/vault_lockdown.png" id="skill_icon"]
+
+[resource]
+script = ExtResource("1")
+icon = ExtResource("skill_icon")
+move_id = "c3combat_vault_lockdown"
+move_name = "Vault Lockdown"
+description = "Vault-door guard: next hit -35%."
+direct_damage = 0
+self_heal = 0
+guard_reduction = 0.35
+animation_style = "curse"
+effect_color = Color(0.24, 0.65, 0.67, 0.95)
+attack_dir = "res://assets/images/characters/chapter3/combat/treasurer_tago/brace"
+attack_count = 8

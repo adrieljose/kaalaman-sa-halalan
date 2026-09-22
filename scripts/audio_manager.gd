@@ -79,7 +79,7 @@ func _ready() -> void:
 	_voice_player.bus = SFX_BUS
 	# A voice should sit slightly above the impact noise it arrives with,
 	# otherwise the grunt is buried under its own hit.
-	_voice_player.volume_db = 2.0
+	_voice_player.volume_db = VOICE_GAIN
 	add_child(_voice_player)
 
 ## Music and SFX live on their own buses so the balance between them is a
@@ -183,11 +183,107 @@ const VOICE_COOLDOWN := 0.55
 ## a rival must never be heard grunting in two voices at once, which pooling
 ## allows; and a fresh grunt should cut the previous one rather than layer over
 ## it, which a dedicated player gives for free.
+## The gain the voice player is built with; a reduced reaction dips below it.
+const VOICE_GAIN := 2.0
+
 var _voice_player: AudioStreamPlayer
 var _voice_until: float = 0.0
 ## Which take played last, so the same one is never heard twice running -- with
 ## only three takes, plain random repeats often enough to notice.
 var _voice_last: int = -1
+
+# --- spoken enemy reactions ------------------------------------------------
+#
+# RECONSTRUCTED 2026-09-07. The original of this section was lost when a
+# `git checkout` intended to undo a test edit reverted this file to HEAD while
+# the work was still uncommitted. Everything from CH3_VOICES down to the take
+# draw is the original, recovered verbatim from a `git diff` captured earlier
+# in that session; the tail (path, playback, bookkeeping, signal) is rebuilt to
+# the contract that tools/audio/probe_chapter3_voices.gd asserts, and verified
+# against it.
+#
+# Chapters 1-3 spoken reactions share the existing single voice player/SFX bus.
+# Fixed identities are independent of encounter ordering and gameplay RNG.
+const CH3_VOICES := {
+	"Bokal Bulsa":"bokal_bulsa", "Assessor Altapresyo":"assessor_altapresyo",
+	"Treasurer Tago":"treasurer_tago", "Auditor Alibi":"auditor_alibi",
+	"Planner Palusot":"planner_palusot", "Engineer Eskandalo":"engineer_eskandalo",
+	"Contractor Kutsaba":"contractor_kutsaba", "Project Padrino":"project_padrino",
+	"CONG MEOW":"cong_meow",
+}
+const CH3_VOICE_COOLDOWN := 0.7
+const CH1_VOICES := {
+	"Lord Trapo":"lord_trapo", "Vote Vandal":"vote_vandal",
+	"Senator Sabaw":"senator_sabaw", "Kapitan Komisyon":"kapitan_komisyon",
+	"Ate Ayuda":"ate_ayuda",
+}
+const CH2_VOICES := {
+	"Fixer Fredo":"fixer_fredo", "Clerk Kurakot":"clerk_kurakot",
+	"Permit Peke":"permit_peke", "Notaryo Naku":"notaryo_naku",
+	"Cashier Kaltas":"cashier_kaltas", "Budget Bandido":"budget_bandido",
+	"Bidding Bandit":"bidding_bandit", "Ordinance Ogre":"ordinance_ogre",
+	"Don Eraptado":"don_eraptado",
+}
+signal enemy_reaction_started(identity: String, kind: String, take: int)
+## Chapter 5 hooks use the same four hurt takes and one defeat clip contract.
+## Missing recordings fall back safely; never imitate a real person's voice.
+const CH5_VOICES := {
+	"Cong Kodigo":"cong_kodigo", "Senador Sawsaw":"senador_sawsaw",
+	"Chairman Chika":"chairman_chika", "Quorum Kuno":"quorum_kuno",
+	"Whip Walanghiya":"whip_walanghiya", "Amendment Atras":"amendment_atras",
+	"Bicam Berto":"bicam_berto", "Budget Bomba":"budget_bomba",
+	"MarTinde RomuRulez":"martinde_romurulez",
+}
+var _reaction_rng := RandomNumberGenerator.new()
+var _reaction_last: Dictionary = {}
+var _reaction_defeated := false
+
+func has_chapter3_voice(enemy_name: String) -> bool:
+	return CH3_VOICES.has(enemy_name)
+
+func has_enemy_reaction_voice(enemy_name: String) -> bool:
+	return CH1_VOICES.has(enemy_name) or CH2_VOICES.has(enemy_name) or CH3_VOICES.has(enemy_name) or CH5_VOICES.has(enemy_name)
+
+func play_enemy_reaction(enemy_name: String, defeated: bool = false, reduced: bool = false, heavy: bool = false) -> bool:
+	if not has_enemy_reaction_voice(enemy_name): return false
+	# Paused is deliberate suppression, not a missing clip: never fall back.
+	if get_tree().paused: return true
+	var now := float(Time.get_ticks_msec()) / 1000.0
+	# Defeat interrupts hurt exactly once; hurt never interrupts defeat.
+	if _reaction_defeated: return true
+	if not defeated and (now < _voice_until or _voice_player.playing): return true
+	var chapter := 1 if CH1_VOICES.has(enemy_name) else 2 if CH2_VOICES.has(enemy_name) else 5 if CH5_VOICES.has(enemy_name) else 3
+	var registry: Dictionary = CH1_VOICES if chapter==1 else CH2_VOICES if chapter==2 else CH5_VOICES if chapter==5 else CH3_VOICES
+	var identity: String = registry[enemy_name]
+	var bank := "heavy" if heavy and identity=="don_eraptado" else "hurt"
+	var history_key := identity+"/"+bank
+	var take := 0
+	if not defeated:
+		var candidates: Array[int] = []
+		for candidate in range(1,5):
+			if candidate != int(_reaction_last.get(history_key,-1)): candidates.append(candidate)
+		take = candidates[_reaction_rng.randi_range(0,candidates.size()-1)]
+		_reaction_last[history_key] = take
+	# --- reconstructed from here ---
+	var kind := "defeat" if defeated else bank
+	var clip := "defeat" if defeated else "%s_%02d" % [bank, take]
+	var path := "res://assets/audio/sfx/voices/chapter%d/%s/%s.ogg" % [chapter, identity, clip]
+	if not ResourceLoader.exists(path):
+		# Let the caller fall back to the shared set rather than going silent.
+		return false
+	var stream: AudioStream = load(path)
+	if stream == null:
+		return false
+	_voice_player.stop()
+	_voice_player.stream = stream
+	# A mitigated hit is a quieter reaction, not a different one.
+	_voice_player.volume_db = -3.0 if reduced else VOICE_GAIN
+	_voice_player.play()
+	_voice_until = now + CH3_VOICE_COOLDOWN
+	if defeated:
+		_reaction_defeated = true
+	enemy_reaction_started.emit(identity, kind, take)
+	return true
 
 
 ## Plays one of a character's takes. Returns false if nothing played, so a
@@ -219,6 +315,7 @@ func play_voice(voice: String, kind: String = "hurt") -> bool:
 func reset_voice() -> void:
 	_voice_until = 0.0
 	_voice_last = -1
+	_reaction_defeated = false
 	if _voice_player != null:
 		_voice_player.stop()
 

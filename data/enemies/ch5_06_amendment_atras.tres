@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/images/portraits/enemy_amendment_atras.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/images/backgrounds/chapter5/06_revision_office.png" id="3"]
+[ext_resource type="Resource" path="res://data/moves/c5_red_pen_slash.tres" id="10"]
+[ext_resource type="Resource" path="res://data/moves/c5_revision_rain.tres" id="11"]
+[ext_resource type="Resource" path="res://data/moves/c5_motion_to_amend.tres" id="12"]
+
+[resource]
+script = ExtResource("1")
+enemy_name = "Amendment Atras"
+title = "The Bill Rewriter"
+max_hp = 810
+portrait = ExtResource("2")
+hud_portrait = ExtResource("2")
+background = ExtResource("3")
+ground_fraction = 0.9125
+player_battle_offset = Vector2(0, 0)
+enemy_battle_offset = Vector2(-25, 0)
+enemy_battle_scale = 1.15
+lore = "The Bill Rewriter. Whatever you agreed to this morning is not what is on the page this afternoon, and he has the revision history to prove it always said this."
+is_boss = false
+moves = [ExtResource("10"), ExtResource("11"), ExtResource("12")]
+idle_dir = "res://assets/images/characters/chapter5/amendment_atras_idle"
+idle_count = 8
+attack_dir = "res://assets/images/characters/chapter5/amendment_atras_attack"
+attack_count = 12
+hit_dir = "res://assets/images/characters/chapter5/amendment_atras_hit"
+hit_count = 8
+walk_dir = "res://assets/images/characters/chapter5/amendment_atras_walk"
+walk_count = 10
+flip_h = false
