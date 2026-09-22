@@ -34,6 +34,12 @@ func _ready()->void:
 	var snapshot:Dictionary=GameState.completed_tiers
 	GameState.completed_tiers=state.completed_tiers.duplicate(true)
 	check(MainMenu.earned_chapters()==5,"menu sees full progression")
+	var menu:=MainMenu.new()
+	check(menu._certificate_unlocked(),"certificate accepts all five completed chapters")
+	GameState.completed_tiers[5]["hard"]=false
+	check(not menu._certificate_unlocked(),"certificate stays locked with one tier missing")
+	check("Progress: 14/15" in menu._certificate_progress_message(),"certificate reports full-game progress")
+	menu.free()
 	GameState.completed_tiers={}
 	check(MainMenu.earned_chapters()==1,"menu fresh player")
 	GameState.completed_tiers=snapshot
